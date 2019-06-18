@@ -334,5 +334,6 @@
 -   https://daringfireball.net/projects/markdown/ By JOHN GRUBER
 -   https://en.wikipedia.org/wiki/Markdown  
 -   http://jekyllrb.com/docs/frontmatter/  Front-matter 是文件最上方以 \--- 分隔的区域，用于指定个别文件的变量.
+-   https://guides.github.com/features/mastering-markdown/ Markdown on the GitHub platform
 
 
