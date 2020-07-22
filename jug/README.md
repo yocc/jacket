@@ -1,5 +1,7 @@
 # 目录
 
+##### [system_information.md]
+
 ##### [CentOS.md]
 
 ##### [Exif.md]
