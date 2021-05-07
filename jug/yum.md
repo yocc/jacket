@@ -195,7 +195,8 @@ protect: 更新相关
 # yum -y install ffmpeg ffmpeg-devel --enablerepo=nux-dextop		// 通过制定仓库来安装 FFmpeg 和 FFmpeg-devel 包
 [root@Linux modules]# yum install subversion --enablerepo=WandiscoSVN			// 安装 SVN
 # yum install vim-enhanced.x86_64
-# yum install xmms-mp3			// 安装rpm包,如xmms-mp3
+# yum install xmms-mp3																					// 安装rpm包,如xmms-mp3
+[chenchen@localhost ~]$ sudo yum update bind-utils.x86_64				// 安装 dig
 ```
 
 
