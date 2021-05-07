@@ -41,7 +41,9 @@ $ sudo yum -y install libffi libffi-devel
 ```
 ./configure # 不默认安装 ./configure --prefix=/home/chenchen/program/python3 --exec-prefix=/home/chenchen/bin --enable-shared --enable-optimizations --enable-big-digits        # prefix 程序本身的位置; exec-prefix 执行文件的位置
 
-./configure --prefix=$HOME/program/python3 --enable-shared --enable-optimizations --enable-big-digits  --with-system-ffi  (使用)
+./configure --prefix=$HOME/program/python3 --enable-shared --enable-optimizations --enable-big-digits  --with-system-ffi  (使用1)
+
+./configure --prefix=$HOME/program/python3 --enable-shared --enable-big-digits  --with-system-ffi  (使用2, 参考 FAQ)
 
 ./configure --prefix=$HOME/program/python3 --exec-prefix=$HOME/bin --enable-shared --enable-optimizations --enable-big-digits  --with-system-ffi
 ```
@@ -89,10 +91,36 @@ https://packaging.python.org/guides/installing-stand-alone-command-line-tools/
 Unix/macOS:
 $ python3 -m venv <DIR>
 $ source <DIR>/bin/activate				// 在虚拟环境目录DIR中/bin/activate
+$ deactivate											// 退出虚拟环境
+
+例如: 
+[chenchen@localhost bin]$ . ./activate
+(xxx.01.py3.9.5) [chenchen@localhost bin]$ python3
+Python 3.9.5 (default, May  7 2021, 10:23:11) 
+[GCC 4.8.5 20150623 (Red Hat 4.8.5-39)] on linux
+Type "help", "copyright", "credits" or "license" for more information.
+>>> import sys
+>>> sys.path
+['', '/home/chenchen/program/python3.9.5/lib/python39.zip', '/home/chenchen/program/python3.9.5/lib/python3.9', '/home/chenchen/program/python3.9.5/lib/python3.9/lib-dynload', '/home/chenchen/program/venv/xxx.01.py3.9.5/lib/python3.9/site-packages']
+>>> 
+(xxx.01.py3.9.5) [chenchen@localhost bin]$ deactivate
+[chenchen@localhost bin]$ 
+[chenchen@localhost bin]$ python3
+Python 3.9.5 (default, May  7 2021, 10:23:11) 
+[GCC 4.8.5 20150623 (Red Hat 4.8.5-39)] on linux
+Type "help", "copyright", "credits" or "license" for more information.
+>>> import sys
+>>> sys.path
+['', '/home/chenchen/program/python3.9.5/lib/python39.zip', '/home/chenchen/program/python3.9.5/lib/python3.9', '/home/chenchen/program/python3.9.5/lib/python3.9/lib-dynload', '/home/chenchen/program/python3.9.5/lib/python3.9/site-packages']
+>>> 
+[chenchen@localhost bin]$ 
+其实 venv 虚拟环境的激活是修改了系统环境变量的优先级, 通过 env shell指令是可以观察到的.
+
 2. virtualenv 需要单独安装, 但是支持 Python 2.7+ 和 Python 3.3+, 并且 pip, setuptools 和 wheel 默认情况下始终安装到创建的虚拟环境中(无论 Python 版本如何)
 Unix/macOS:
 $ python3 -m venv <DIR>
 $ source <DIR>/bin/activate				// 同上
+$ deactivate											// 退出虚拟环境
 在 Unix shell 下使用 source 可以确保将虚拟环境的变量设置在当前shell中, 而不是在子进程中(子进程随后会消失, 没有任何作用)
 
 直接管理多个虚拟环境可能变得很乏味, 因此依赖性管理指南引入了更高级别的工具 Pipenv, 该工具自动为您处理的每个项目和应用程序管理一个单独的虚拟环境. 
@@ -320,6 +348,7 @@ make: *** [profile-opt] Error 2
 1. 升级 gcc 至 8.1.0 【不推荐】
 2. ./configure 参数中去掉 --enable-optimizations
 ```
+
 
 
 ### See Also
