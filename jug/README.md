@@ -1,5 +1,13 @@
 # 目录
 
+
+
+##### [yum.md]
+
+##### [rpm.md]
+
+##### [Hardware_information.md]
+
 ##### [Python3.md]
 
 ##### [VirtualBox.md]
@@ -13,6 +21,12 @@
 ##### [antd_npm_node_nvm.md]
 
 ##### [Markdown_for_Typora.md]
+
+[yum.md]: https://github.com/yocc/jacket/blob/master/jug/yum.md "yum.md"
+
+[rpm.md]: https://github.com/yocc/jacket/blob/master/jug/rpm.md "rpm.md"
+
+[Hardware_information.md]: https://github.com/yocc/jacket/blob/master/jug/Hardware_information.md "Hardware_information.md"
 
 [python3.md]: https://github.com/yocc/jacket/blob/master/jug/Python3.md "Python3.md"
 [virtualbox.md]: https://github.com/yocc/jacket/blob/master/jug/VirtualBox.md "VirtualBox.md"
