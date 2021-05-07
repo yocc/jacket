@@ -2,6 +2,8 @@
 
 ---
 
+
+
 ### LSB (Linux Standard Base) and Distribution information 基于 Linux 标准和发行信息
 
 - \$ cat /etc/redhat-release
