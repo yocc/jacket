@@ -1,5 +1,15 @@
 # VirtualBox
 
+---
+
+
+
+## 目录
+
+[TOC]
+
+
+
 ## 新建虚拟电脑
 
 ##### 虚拟电脑名称和系统类型
@@ -59,7 +69,7 @@
         混杂模式: 拒绝
         MAC 地址: 0800275FEF58                          # 不能重复
         勾选 ‘接入网线’
-
+    
     网卡2
         勾选 ‘启用网络连接’
         连接方式: 桥接网卡
@@ -69,6 +79,8 @@
         混杂模式: 拒绝
         MAC 地址: 0800274B8849                          # 不能重复
         勾选 ‘接入网线’
+
+
 
 ## 启动和安装 OS
 
@@ -102,7 +114,7 @@
 ##### 添加新用户
 
     # useradd jeffchen
-    # passwd 67#*#23NMT32
+    # passwd jeffchen
 
 ##### 修改 /etc/suduers
 
@@ -161,19 +173,19 @@ ISTFILESIZE=4500
 ###### 相关指令
 
     $ ip a                                  # 查看网络配置
-
+    
     $ nmcli d s                             # 查看所有设备
     $ nmcli c s                             # 查看所有连接
     $ nmcli c d 链接名字                     # down 指定链接
     $ nmcli c u 链接名字                     # up 指定链接
     $ nmcli d c 设备名字                     # 同 up(c u), 重启设备, nmcli device connect --help
-
+    
     $ sudo nmcli c c 链接名字 新链接名字       # 克隆一个链接, 产生新文件, sudo (network-scripts)
     $ sudo nmcli c delete 链接名字           # 删除一个链接, 删除链接文件, sudo
-
+    
     $ route -nee                            # 查看路由表
     $ traceroute -n baidu.com               # 跟踪路由
-
+    
     $ sudo yum -y install net-tools
     $ sudo yum -y install traceroute
 
@@ -188,6 +200,8 @@ ISTFILESIZE=4500
 - 虚拟机 -> 有线办公网络, (通)桥接, (不通)NAT 网络
 - 虚拟机 -> 无线办公网络, (不通)桥接, (不通)NAT 网络
 - 虚拟机 -> 公网, (不通)桥接, (通)NAT 网络
+
+
 
 ## FAQ
 
@@ -226,6 +240,8 @@ UUID="d5f73c61-be9d-4f32-a035-f2219d8f1896"
 DEVICE="enp0s3"
 ONBOOT="yes"                                        // yes 开启
 ```
+
+
 
 ## See Also
 
