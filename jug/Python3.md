@@ -10,6 +10,23 @@
 
 
 
+### 写在前面
+
+```
+写在前面: 为了减少源码安装的异常情况, 必要采取两步, 1. 检验源码签名, SIG或者MD5; 2. 编译前先清理一下, make distclean;
+1. 获取源码, tar zxvf 源码.tgz -C ./
+验证下载文件完整性
+$ gpg --verify Python-3.8.5.tgz.asc
+$ gpg --search-keys E3FF2839C048B25C084DEBE9B26995E310250568
+$ gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys E3FF2839C048B25C084DEBE9B26995E310250568
+$ gpg --verify Python-3.8.5.tgz.asc
+或者
+[chenchen@localhost tmp]$ md5sum Python-3.8.5.tgz
+e2f52bcf531c8cc94732c0b6ff933ff0  Python-3.8.5.tgz
+```
+
+
+
 ### 下载 Python3 源码
 
 ```
@@ -212,6 +229,16 @@ $ python3 -m pip search 包名                 # 从远程PyPI里找包
 ```
 $ python -m pip install grpcio                  # 安装 gRPC
 $ python -m pip install grpcio-tools            # 安装 gRPC 工具, 工具包括 protoc(protocol buffer 编译器) 和 插件(从 .proto 服务定义文件 生成 server 和 client 代码)
+```
+
+
+
+### 目录说明
+
+```
+/home/chenchen/program/python3.9.5/																			  # python 本体安装目录
+/home/chenchen/program/python3.9.5/lib/python3.9(版本号)										# 标准库目录, 其中含有 “site-packages” 目录(第三方软件包安装目录); 如果是 venv 虚拟环境下, 标准库目录下只有 “site-packages” 目录, 无标准库内容(显然共用虚拟环境的“父”环境标准库)
+/home/chenchen/program/venv/xxx.01.py3.9.5/lib/python3.9/site-packages		# 第3方软件包安装目录(此例为虚拟环境下的情况)
 ```
 
 

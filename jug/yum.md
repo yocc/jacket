@@ -140,6 +140,22 @@ protect: 更新相关
 ```
 
 ```
+直接找一个 repo 文件
+cd /etc/yum.repos.d/
+wget http://mirrors.163.com/.help/CentOS-Base-163.repo
+yum makecache  //生成缓存
+yum update
+```
+
+```
+通过安装特定插件来自动找最快的镜像
+安装好yum-fastestmirror后,每次用yum安装就会自动检查速度最快的镜像了
+yum install yum-fastestmirror
+yum clean all
+安装好yum-fastestmirror后,每次用yum安装就会自动检查速度最快的镜像了
+```
+
+```
 刷新仓库
 # yum clean								// 
 # yum clean all           // 刷新仓库配置
@@ -230,5 +246,14 @@ protect: 更新相关
 // 每天定期执行系统更新
 # chkconfig yum on
 # service yum start
+```
+
+
+
+### 杂项
+
+```
+安装 rz sz
+yum -y install lrzsz
 ```
 

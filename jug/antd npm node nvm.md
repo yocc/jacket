@@ -30,7 +30,7 @@ nvm -> Node.js -> npm -> antd
 ### 步骤总览
 1. 我们最终需要的是 antd, <https://ant.design/docs/react/introduce-cn>
 2. 而 antd 官网建议需要通过 npm 来安装
-3. 而 npm 是随 Node.js 安装而同时被安装的,  <https://docs.npmjs.com/downloading-and-installing-node-js-and-npm>
+3. 而 npm 是 Node.js 写的, 所以随 Node.js 安装而同时被安装的,  <https://docs.npmjs.com/downloading-and-installing-node-js-and-npm>. (其实 npm 有两种安装方式, 1, 最快, 通过安装 Node.js 时同时自动完成 npm 安装; 2, 最高级专业可持续, 通过 nvm 安装.)
 4. 而 安装 Node.js 官方强烈推荐通过 nvm 来完成安装 (Node version manager)
 5. 而 nvm 的安装需要先了解当前操作系统的环境, 版本, 系统位数, 安装位置, 是否可用等等
 
@@ -113,6 +113,36 @@ x86_64
 
 3. 安装: 根据 nvm git 中的文档来安装, `curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.34.0/install.sh | bash`
 
+    ```shell
+    # ~/.bashrc, 由于需要翻墙, 需要给 Linux OS 配置代理, 在 ~/.bashrc 文件中配置, 以便后面通过 curl 可以访问资源
+    # http://10.210.97.118/proxy.pac
+    # 10.255.0.186:3128
+    # 10.81.254.21:3128
+    #export http_proxy="http://10.81.254.21:3128"
+    #export https_proxy="http://10.81.254.21:3128"
+    export http_proxy="http://10.255.0.186:3128"
+    export https_proxy="http://10.255.0.186:3128"
+    # unset http_proxy, 删除环境变量
+    # unset https_proxy, 删除环境变量
+    
+    
+    # 继续 git 文档
+    [chenchen@localhost ~]$ curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash
+      % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                     Dload  Upload   Total   Spent    Left  Speed
+    100 14926  100 14926    0     0   2810      0  0:00:05  0:00:05 --:--:--  4024
+    => Downloading nvm as script to '/home/chenchen/.nvm'
+    
+    => nvm source string already in /home/chenchen/.bashrc
+    => bash_completion source string already in /home/chenchen/.bashrc
+    => Close and reopen your terminal to start using nvm or run the following to use it now:
+    
+    export NVM_DIR="$HOME/.nvm"
+    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+    [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+    [chenchen@localhost ~]$ 
+    ```
+
 4. 检查: 安装后通过 `command -v nvm` 来检查是否安装 nvm 成功, 成功返回 nvm 这几个字, 否则都是错误
 
     ```shell
@@ -163,7 +193,20 @@ x86_64
 
     永久切换 `nvm alias default <版本号>` 、 `nvm alias default node`
 
+7. 加快 nvm install 的速度
 
+    ```shell
+    方案一：临时解决方案（每次安装替换成淘宝镜像源）
+    NVM_NODEJS_ORG_MIRROR=https://npm.taobao.org/mirrors/node nvm install stable
+    
+    方案二：linux环境下设置默认镜像源
+    nvm的默认配置文件安装在~/.nvm目录下，找到 nvm.sh 修改 NVM_NODEJS_ORG_MIRROR 的默认参数即可。
+    
+    方案三：linux下设置永久环境变量
+    在 ~/.bashrc 文件中添加 export NVM_NODEJS_ORG_MIRROR=https://npm.taobao.org/mirrors/node
+    ```
+
+    
 
 ### Node 和 npm 安装配置
 
@@ -247,7 +290,17 @@ x86_64
 3. 修改 npm 下载源, 改为国内
 
     ```shell
+    # 通过命令行修改配置
     [chenchen@dev3_10.211.21.18 ppp]$ npm config set registry https://registry.npm.taobao.org
+    ```
+
+    ```shell
+    # 命令行对要安装的模块临时指定配置
+    npm --registry=https://registry.npm.taobao.org install module
+    
+    # 可以把这个设置写到 ~/.npmrc 文件中
+    registry=https://registry.npm.taobao.org/
+    disturl=https://npm.taobao.org/dist
     ```
 
 4. 清除缓存
