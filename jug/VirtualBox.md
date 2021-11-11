@@ -116,7 +116,7 @@
     # useradd jeffchen
     # passwd jeffchen
 
-##### 修改 /etc/suduers
+##### 修改 /etc/sudoers
 
 ```
 chenchen    ALL=(ALL)       NOPASSWD: ALL    # 增加sudo权限，免密码
@@ -172,22 +172,36 @@ ISTFILESIZE=4500
 
 ###### 相关指令
 
-    $ ip a                                  # 查看网络配置
-    
-    $ nmcli d s                             # 查看所有设备
-    $ nmcli c s                             # 查看所有连接
-    $ nmcli c d 链接名字                     # down 指定链接
-    $ nmcli c u 链接名字                     # up 指定链接
-    $ nmcli d c 设备名字                     # 同 up(c u), 重启设备, nmcli device connect --help
-    
-    $ sudo nmcli c c 链接名字 新链接名字       # 克隆一个链接, 产生新文件, sudo (network-scripts)
-    $ sudo nmcli c delete 链接名字           # 删除一个链接, 删除链接文件, sudo
-    
-    $ route -nee                            # 查看路由表
-    $ traceroute -n baidu.com               # 跟踪路由
-    
-    $ sudo yum -y install net-tools
-    $ sudo yum -y install traceroute
+```shell
+$ ip a                                  # 查看网络配置
+
+$ nmcli d s                             # 查看所有设备
+$ nmcli c s                             # 查看所有连接
+$ nmcli c d 链接名字                     # down 指定链接
+$ nmcli c u 链接名字                     # up 指定链接
+$ nmcli d c 设备名字                     # 同 up(c u), 重启设备, nmcli device connect --help
+
+$ sudo nmcli c c 链接名字 新链接名字       # 克隆一个链接, 产生新文件, sudo (network-scripts)
+$ sudo nmcli c delete 链接名字           # 删除一个链接, 删除链接文件, sudo
+
+$ route -nee                            # 查看路由表
+$ traceroute -n baidu.com               # 跟踪路由
+
+$ sudo yum -y install net-tools
+$ sudo yum -y install traceroute
+```
+
+```shell
+$ ifconfig enp0s3 down
+$ ifconfig enp0s3 up
+
+$ ifdown eth0
+$ ifup eth0
+
+$ service network restart
+```
+
+
 
 ###### 连通性
 

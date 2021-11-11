@@ -10,15 +10,16 @@
 
 ```shell
 找了一个中国, go本身下载速度很快,  https://golang.google.cn/
-[chenchen@localhost tmp]$ wget https://golang.google.cn/dl/go1.14.6.linux-amd64.tar.gz         # 下载二进制, 而不是源码
-[chenchen@localhost tmp]$ sha256sum go1.14.6.linux-amd64.tar.gz                                             # 与官网下载校验
+[chenchen@localhost tmp]$ sudo yum -y install wget
+[chenchen@localhost tmp]$ wget https://golang.google.cn/dl/go1.14.6.linux-amd64.tar.gz  # 下载二进制, 而不是源码
+[chenchen@localhost tmp]$ sha256sum go1.14.6.linux-amd64.tar.gz              # 与官网下载校验
 5c566ddc2e0bcfc25c26a5dc44a440fcc0177f7350c1f01952b34d5989a0d287  go1.14.6.linux-amd64.tar.gz
 
 
 Go 1.13 及以上（推荐）, 其实 go env 是修改了 $HOME/.config/go/env 物理文件, 增加了2条, 这两条优先级高, 覆盖默认配置.
 打开你的终端并执行:
-$ go env -w GO111MODULE=on
-$ go env -w GOPROXY=https://goproxy.cn,direct                # GOPROXY="https://proxy.golang.org,direct"
+$ go env -w GO111MODULE=on  # 1.13 (含)版本之后不需要了
+$ go env -w GOPROXY=https://goproxy.cn,direct           # GOPROXY="https://proxy.golang.org,direct"
 完成.
 $ go env GOPATH            # 查看当前的 GOPATH
 # 重要说明
@@ -27,9 +28,7 @@ $ go env GOPATH            # 查看当前的 GOPATH
 # GOPATH 可以设置多个, 其中, 第一个将会是默认的包目录, 使用 go get 下载的包都会在第一个 path 中的 src 目录下, 使用 go install 时, 在哪个 GOPATH 中找到了这个包, 就会在哪个 GOPATH 下的 bin 目录生成可执行文件.
 # go env, 返回的各项环境变量设置才是运行时的效果, 以此为准
 
-
-
-下面是另一种修改配置的办法, 没有上面好, 上面是官方推荐
+🌟 下面是另一种修改配置的办法, 没有上面好, 上面是官方推荐
 macOS 或 Linux
 打开你的终端并执行:
 $ export GO111MODULE=on
@@ -39,6 +38,28 @@ $ echo "export GO111MODULE=on" >> ~/.profile
 $ echo "export GOPROXY=https://goproxy.cn" >> ~/.profile
 $ source ~/.profile
 完成.
+```
+
+```shell
+文件: $HOME/.config/go/env
+#GO111MODULE=on														  # 1.13 (含)版本之后不需要了
+GOPROXY=https://goproxy.cn,direct						# qiniu 代理
+#GOROOT=/home/chenchen/tmp/go1172/go				# 不能在 go 运行时配置了, 由于 vim-go 插件的需要, 移到 ~/.bashrc 中配置
+#GOBIN=/home/chenchen/tmp/go1172/gobin			# 不能在 go 运行时配置了, 由于 vim-go 插件的需要, 移到 ~/.bashrc 中配置
+```
+
+```shell
+文件: ~/.bashrc
+# vim8
+export PATH=/usr/local/vim8/bin:$PATH
+
+# go 
+export PATH=$PATH:/home/chenchen/tmp/go1172/go/bin
+
+# Golang, GOPATH, GOROOT, GOBIN
+export GOPATH=/home/chenchen/tmp/go1172/gopath
+export GOROOT=/home/chenchen/tmp/go1172/go
+export GOBIN=/home/chenchen/tmp/go1172/gobin
 ```
 
 ##### GO111MODULE
@@ -58,7 +79,8 @@ Modules模块 可以直接从版本控制仓库下载或者来自模块代理服
 go 命令的 下载行为 可以使用 GOPROXY、GOSUMDB、GOPRIVATE 和其他环境变量. 参见“go help environment” 和 https://golang.org/ref/mod#private-module-privacy 了解更多信息
 [chenchen@localhost hello]$ 
 
-
+[chenchen@localhost hello]$ go install 
+go: go.mod file not found in current directory or any parent directory; see 'go help modules'
 ```
 
 ##### 下载
@@ -72,6 +94,8 @@ wget.x86_64                                 1.14-18.el7_6.1            base
 7154e88f5a8047aad4b80ebace58a059e36e7e2e4eb3b383127a28c711b4ff59  go1.16.4.linux-amd64.tar.gz
 [chenchen@localhost tmp]$ tar -zxvf go1.16.4.linux-amd64.tar.gz -C ./
 [chenchen@localhost tmp]$ mv ./go/ ~/program/go1.16.4
+
+# 配置方法1: 
 [chenchen@localhost ~]$ vim .bashrc
 
 PATH="$HOME/.local/bin:$HOME/bin:$HOME/program/python3.9.5/bin:$HOME/program/go1.16.4/bin:$PATH"
@@ -85,6 +109,17 @@ export GOBIN="$HOME/gopath1.16.4/bin"			# go install 的目录, 可选系统环�
 [chenchen@localhost ~]$ go version
 go version go1.16.4 linux/amd64
 [chenchen@localhost ~]$ mkdir gopath1.16.4
+
+# 配置方法2: (采用)
+# .bashrc 文件控制 Linux OS 环境变量, 极简化至少需要 GOPATH, go 本体命令的位置, 即 GOROOT/bin, 但 GOROOT 在 ~/.config/go/env 中定义(遵循最小化(范围)原则)
+[chenchen@localhost ~]$ vim .bashrc
+export PATH=$PATH:/home/chenchen/tmp/go1172/go/bin		# go 本体 GOROOT/bin/go 的执行位置
+export GOPATH=/home/chenchen/tmp/go1172/gopath				# GOPATH {workspace}/src|pkg|bin/{base path}
+[chenchen@localhost ~]$ vim .config/go/env
+#GO111MODULE=on														# 可选. #和// 均可起到注释效果. 13 (含)版本之后不再需要.
+GOPROXY=https://goproxy.cn,direct					# 可选. 代理配置
+GOROOT=/home/chenchen/tmp/go1172/go			  # 可选. go本体位置. 由于在 .bashrc 中指定 PATH go命令位置后自动推算, 也可以另外重新指定位置或者显式指定, 当指定时优先级大于 PATH 推算.
+GOBIN=/home/chenchen/tmp/go1172/gobin		  # 可选. 特指开发者编译后的二进制文件位置
 ```
 
 ##### 常量
@@ -239,3 +274,98 @@ Use "go help <topic>" for more information about that topic.
 
 [chenchen@localhost hello]$
 ```
+
+
+
+### GO111MODULE
+
+
+GO111MODULE=on|off|auto				# 环境变量
+
+. 原因和背景: Go 早期 `go get` 会将软件包的所有源码都下载到 $GOPATH/src 目录下. 并且不能指定每个软件包他自己的版本. 这显然不够智慧和精细. 于是从 Go 1.11 版本开始引入了 Go 模块 (Go Modules), 使用 go.mod 文件保存标记版本和每个软件包的版本.
+
+. 为了过度 Go 1.11 和 1.12 这两个特殊版本下, 有特别的含义:
+
+- 设置 =on, 表示强制使用 Go 模块  (Go Modules), 即必须以 go.mod 方式工作. 
+- 设置 =off, 表示强制不使用 go.mod 方式工作, 即全部下载软件包源码到项目中.
+- 设置 =auto(默认), 同时还按照项目代码路径在 GOPATH 目录之外和之内又分两种不同情况:
+  - 项目代码路径在 GOPATH 目录之外, 按 =on 表现;
+  - 项目代码路径在 GOPATH 目录之内, 按 =off 表现;
+
+. 在 Go 1.13 之后 GO111MODULE=auto(默认), 含义变化了:
+
+- 存在 go.mod **或者** 项目代码路径在 GOPATH 目录之外, 按 =on 表现;
+- 项目代码路径在 GOPATH 目录之内 **并且** 没有 go.mod, 按 =off 表现;
+
+. go get 通常用于安装和下载软件包. 如果开启了 =on, 那么也会自动记录在 go.mod 中.
+
+~~. =on时, go build 期间使用的包存储在 $GOPATH/pkg/mod 中.~~
+
+
+
+大小问题
+
+```shell
+[chenchen@localhost tmp]$ l
+total 605M
+6147741 -rw-rw-r--. 1 chenchen chenchen 452K Jan 23 2020 upx-3.96-amd64_linux.tar.xz
+[chenchen@localhost tmp]$ xz -d upx-3.96-amd64_linux.tar.xz
+[chenchen@localhost tmp]$ l
+total 605M
+2614447 -rw-rw-r--. 1 chenchen chenchen 600K Jan 23 2020 upx-3.96-amd64_linux.tar
+[chenchen@localhost tmp]$ tar xvf upx-3.96-amd64_linux.tar
+upx-3.96-amd64_linux/
+upx-3.96-amd64_linux/BUGS
+upx-3.96-amd64_linux/COPYING
+upx-3.96-amd64_linux/LICENSE
+upx-3.96-amd64_linux/NEWS
+upx-3.96-amd64_linux/README
+upx-3.96-amd64_linux/README.1ST
+upx-3.96-amd64_linux/THANKS
+upx-3.96-amd64_linux/upx
+upx-3.96-amd64_linux/upx.1
+upx-3.96-amd64_linux/upx.doc
+upx-3.96-amd64_linux/upx.html
+[chenchen@localhost tmp]$ l
+total 605M
+2614447 -rw-rw-r--. 1 chenchen chenchen 600K Jan 23 2020 upx-3.96-amd64_linux.tar
+6147741 drwxr-xr-x. 2 chenchen chenchen 161 Jan 24 2020 upx-3.96-amd64_linux
+
+# build|install -ldflags="-w, 去掉DWARF调试信息, 不能gdb调试", "-s, 去掉符号信息"
+[chenchen@localhost hello]$ go install -ldflags='-w'
+[chenchen@localhost hello]$ l ../../../gobin
+total 3.0M
+ 2614449 -rwxrwxr-x. 1 chenchen chenchen 1.3M Oct 12 04:22 hello
+ # upx
+ [chenchen@localhost hello]$ upx -9 hello		// 是否存在 -s 参数
+                       Ultimate Packer for eXecutables
+                          Copyright (C) 1996 - 2020
+UPX 3.96        Markus Oberhumer, Laszlo Molnar & John Reiser   Jan 23rd 2020
+
+        File size         Ratio      Format      Name
+   --------------------   ------   -----------   -----------
+   1307619 ->    509756   38.98%   linux/amd64   hello                         
+
+Packed 1 file.
+```
+
+## 杂项
+
+```shell
+标准库位置:
+go本体\pkg\linux_amd64
+$GOROOT/pkg/$GOOS_$GOARCH/
+
+build:
+[chenchen@localhost e04_2]$ go build -o hh7 -ldflags="-s -w" hello_world.go 
+[chenchen@localhost e04_2]$ go build -o count_characters -ldflags "-s -w" count_characters.go
+```
+
+
+
+
+
+
+
+
+

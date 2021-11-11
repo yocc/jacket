@@ -7,7 +7,7 @@
 ### LSB (Linux Standard Base) and Distribution information 基于 Linux 标准和发行信息
 
 - \$ cat /etc/redhat-release
-- \$ uname -a
+- \$ uname -a, $uname -r
 - \$ lsb_release -a
 - \$ cat /etc/issue
 
@@ -16,9 +16,13 @@
 CentOS Linux release 7.3.1611 (Core)
 ```
 
-```
+```shell
 [chenchen@dev3_10.211.21.18 ~]$ uname -a
 Linux dev5 3.10.0-514.el7.x86_64 #1 SMP Tue Nov 22 16:42:41 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+[chenchen@localhost ~]$ uname -r		// 查看内核版本
+3.10.0-1062.el7.x86_64
+[chenchen@localhost ~]$ uname -a
+Linux localhost.localdomain 3.10.0-1062.el7.x86_64 #1 SMP Wed Aug 7 18:08:02 UTC 2019 x86_64 x86_64 x86_64 GNU/Linux
 
 Linux         内核名称
 hathor69      网络中主机名称
@@ -31,7 +35,7 @@ GNU/Linux     操作系统
 参考: man uname
 ```
 
-```
+```shell
 [chenchen@localhost ~]$ lsb_release -a
 sudo: lsb_release: command not found
 [chenchen@localhost ~]$ sudo yum install -y redhat-lsb
@@ -44,7 +48,7 @@ Release:        8.1.1911
 Codename:       Core
 ```
 
-```
+```shell
 [chenchen@dev3_10.211.21.18 ~]$ cat /etc/issue
 \S
 Kernel \r on an \m

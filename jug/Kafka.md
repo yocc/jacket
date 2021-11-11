@@ -9,7 +9,7 @@ Apache Kafka 是一个开放源代码的分布式事件流平台，成千上万�
 使用延迟低至 2ms 的计算机集群以网络受限的吞吐量传递消息。
 
 可扩展
-可以将生产集群规模扩展到多达一千个经纪人，每天数万亿条消息，数 PB 的数据以及数十万个分区。弹性扩展和收缩存储和处理。
+可以将生产集群规模扩展到多达一千个 broker 经纪人，每天数万亿条消息，数 PB 的数据以及数十万个 partitions 分区。弹性扩展和收缩存储和处理。
 production 生产
 broker 经纪人
 message 消息
@@ -174,7 +174,71 @@ yozr57
 
 
 
+Kafka: 高吞吐量分布式消息系统.
+Apache Kafka: 是一个开放源代码的分布式事件流平台，成千上万的公司使用它来实现高性能数据管道，流分析，数据集成和关键任务应用程序。
 
+关键词和术语:
+高吞吐量, 分布式, 消息, 开源, 事件, 流, 平台, 高性能, 管道, 分析, 集成, 多副本备份、横向扩展, 持久化, 解耦, 缓冲, 异步, 分布是事物控制, 幂等性
+
+jms: java message service
+broker: n. 代理, 中间人, 主题topic所在的地方
+topic: n. 话题
+partition: n. 分区
+leader: 
+follower:
+controller:
+queue: n. 队列
+pub/sub
+ipc: Internet Process Connection, 过程间通信
+rpc: Remote Procedure Call, 远程过程调用
+Kafka Data Flow
+
+production: n. 生产
+product: n. 产物, 产品
+producer: n. 生产者
+consume: vt. 消费
+consumer: n. 消费者
+consumer group: 消费者组
+Replica: n. 复制品
+replicate: vt. 复制, 重复
+
+
+message 消息
+partitions 分区
+Elastically expand 弹性扩展
+contract storage 收缩存储
+durable: adj. 持久
+persistence: n. 持久化
+streams of data: 数据流
+fault-tolerant: 容错
+
+
+
+jms 分两种模型:
+. queue: 队列模式, p2p, 点对点, 队列;
+. topic: 主题模式, 也称为 发布/订阅模式
+注: 
+. p2p, 一个生产者生产的消息只能有一个消费者消费.
+. msg 发布到主题, 从主题订阅.
+以上是传统 jms 的模型, Kafka 就是传统 jms 的变形.
+但 Kafka 没有队列的概念, 但引用了 group 消费者组. 用消费者组中只能有一个消费者来消费这个主题.
+如果实现队列模式, 只能有一个消费者来消费.
+所以把所有消费者都放进一个组, 那么就只能有一个消费着在消费了.
+消费者组中只能有一个消费者消费消息.
+发布/订阅模式, 用个消息都有一个专门消费者组, 每组中只有一个消费者, 那么, 所有消费者就都能同时消费消息了.
+Kafka 通过消息者组和规定消费者组中只能有一个消费者消费的规定.
+来实现了, 两种模式, 即, p2p模式和发布/订阅模式.
+
+
+
+jms 与通常程序的区别:
+消息的传递分为两种: 
+. 进程内部: 面向对象传参, 传对象的引用.
+. 进程之间: 序列化, rpc/ipc
+注: 
+. ipc/rpc 都是进程间通信. 
+. 通常场景, a, b两个进程, 若要之间通信, 需要建立 socket 连接, 然后发消息, 以上场景的作法耦合度特别高, 而且要求消息模型, a, b之间传递消息或者调用时必须保持在线. 如果 b 不在线, 套接字就连不上. 所以 a 与 b 互通前提是 a, b, 同时保证在线, 提高了必要条件.
+. 生产者 -》 中间件 -》 消费者, 解耦
 
 
 

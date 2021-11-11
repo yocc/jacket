@@ -30,6 +30,7 @@ e2f52bcf531c8cc94732c0b6ff933ff0  Python-3.8.5.tgz
 ### 下载 Python3 源码
 
 ```
+$ sudo yum -y install wget
 $ wget https://www.python.org/ftp/python/3.8.5/Python-3.8.5.tgz
 ```
 

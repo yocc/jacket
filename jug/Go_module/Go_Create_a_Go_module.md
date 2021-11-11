@@ -54,7 +54,7 @@ cd
 cd %HOMEPATH%
 
 2. 为您的 Go 模块源代码创建一个 greetings 目录.
-例如, 从您的主目录使用以下命令:
+例如, 从您的 home 目录使用以下命令:
 mkdir greetings
 cd greetings
 
@@ -97,6 +97,20 @@ message = fmt.Sprintf("Hi, %v. Welcome!", name)
 . 使用 fmt package 的 Sprintf 函数创建问候消息. 第一个参数是格式字符串, Sprintf 用 name 参数的值替换 %v 格式动词. 插入 name 参数的值完成问候文本.
 . 将格式化的问候文本返回给调用者.
 在下一步中, 您将从另一个模块调用此函数.
+```
+
+```shell
+. 什么是包, 模块?
+	.. 一个模块(module)就是一个目录, 模块下可以含有多个包(package); 
+	.. 一个包(package)就是一个文件, 包是功能(func)的集合, 一个包含有多个功能(func);
+	.. 一个功能(func)就是一个函数, 函数(func)含有多个代码片段;
+	.. 一个代码片段就是一段逻辑;
+. 包, 包的声明
+	.. 
+. 函数, 函数的声明
+	.. 大写 == public
+. 变量, 变量的声明和初始化
+	.. := 简写 == var mesg string
 ```
 
 
