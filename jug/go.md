@@ -49,7 +49,7 @@ GOPROXY=https://goproxy.cn,direct						# qiniu 代理
 ```
 
 ```shell
-文件: ~/.bashrc
+文件: ~/.bashrc or ~/.bash_profile
 # vim8
 export PATH=/usr/local/vim8/bin:$PATH
 
@@ -60,6 +60,9 @@ export PATH=$PATH:/home/chenchen/tmp/go1172/go/bin
 export GOPATH=/home/chenchen/tmp/go1172/gopath
 export GOROOT=/home/chenchen/tmp/go1172/go
 export GOBIN=/home/chenchen/tmp/go1172/gobin
+
+# upx
+export PATH=$PATH:/home/chenchen/tmp/upx-3.96-amd64_linux
 ```
 
 ##### GO111MODULE
@@ -128,7 +131,7 @@ GOBIN=/home/chenchen/tmp/go1172/gobin		  # 可选. 特指开发者编译后的�
 GOROOT: Go本地安装的目录(解压后拷贝的目录)
 GOPATH: 工作空间
 GOPATH: {workspace}/src|pkg|bin/{base path}
-GOBIN: 特指开发者编译后的二进制文件位置, 和 GOPATH/bin 是一个位置
+GOBIN: 特指开发者编译后的二进制文件位置, 可以和 GOPATH/bin 是一个位置
 import path 对应本地 {workspace} 里的位置或者 {远程仓库} 的位置
 
 Go 代码组织结构:

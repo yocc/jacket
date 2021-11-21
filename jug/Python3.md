@@ -12,7 +12,7 @@
 
 ### 写在前面
 
-```
+```shell
 写在前面: 为了减少源码安装的异常情况, 必要采取两步, 1. 检验源码签名, SIG或者MD5; 2. 编译前先清理一下, make distclean;
 1. 获取源码, tar zxvf 源码.tgz -C ./
 验证下载文件完整性
@@ -29,7 +29,7 @@ e2f52bcf531c8cc94732c0b6ff933ff0  Python-3.8.5.tgz
 
 ### 下载 Python3 源码
 
-```
+```shell
 $ sudo yum -y install wget
 $ wget https://www.python.org/ftp/python/3.8.5/Python-3.8.5.tgz
 ```
@@ -38,7 +38,7 @@ $ wget https://www.python.org/ftp/python/3.8.5/Python-3.8.5.tgz
 
 ### 解压缩
 
-```
+```shell
 $ tar zxvf 源码.tgz -C ./
 ```
 
@@ -46,7 +46,7 @@ $ tar zxvf 源码.tgz -C ./
 
 ### 基本工具, ssl 模块, ctypes 模块
 
-```
+```shell
 $ sudo yum -y install gcc make automake autoconf libtool
 $ sudo yum -y install openssl openssl-devel
 $ sudo yum -y install libffi libffi-devel
@@ -56,7 +56,7 @@ $ sudo yum -y install libffi libffi-devel
 
 ### ./configure
 
-```
+```shell
 ./configure # 不默认安装 ./configure --prefix=/home/chenchen/program/python3 --exec-prefix=/home/chenchen/bin --enable-shared --enable-optimizations --enable-big-digits        # prefix 程序本身的位置; exec-prefix 执行文件的位置
 
 ./configure --prefix=$HOME/program/python3 --enable-shared --enable-optimizations --enable-big-digits  --with-system-ffi  (使用1)
@@ -70,8 +70,11 @@ $ sudo yum -y install libffi libffi-devel
 
 ### make, make install
 
-```
-make                    # make distclean 清除 configure
+```shell
+make distclean 	# 清除 configure
+./configure ...
+make clean
+make                    
 make install
 (VirtualBox 上需要30分钟左右)
 ```
@@ -80,20 +83,21 @@ make install
 
 ### 检查
 
-```
+```shell
 $ python --version
 $ python2 --version
 $ python2.7 --version
 Python 2.7.5
 
 $ whereis python						# 查看当前系统 python 可执行文件的位置
+$ which python
 ```
 
 
 
 ### Creating Virtual Environments
 
-```
+```shell
 Python “虚拟环境” 允许将 Python 软件包安装在特定应用程序的隔离位置, 而不是全局安装.
 如果要安全安装全局命令行工具, 请参阅安装独立命令行工具. 
 https://packaging.python.org/guides/installing-stand-alone-command-line-tools/
@@ -148,7 +152,7 @@ $ deactivate											// 退出虚拟环境
 
 ### pip
 
-```
+```shell
 pip (package installer for Python) 是推荐的安装程序, 现代版本的Python附带的安装软件包最流行工具. 
 它提供了从 PyPI (Python Package Index) 和其他 Python 软件包索引中查找, 下载 和 安装软件包的基本核心功能, 并且可以通过其命令行界面(CLI)集成到各种开发工作流程中.
 pip 文档: https://pip.pypa.io/en/stable/
@@ -168,7 +172,7 @@ $ python3 -m pip install "SomeProject~=1.4.2"		// 安装“兼容”版本, 意�
 
 
 
-```
+```shell
 ### 首先安装 pip
 # 下列情况表示已经自带了 pip:
 # 从 python.org 下载的 Python2 >= 2.7.9 或者 Python3 >= 3.4, 或者 已经在 virtualenv 或者 venv 创建的虚拟环境下工作时, 表示已经在安装了 pip. 此时仅需要确认升级 pip 即可.
@@ -208,7 +212,7 @@ python -m pip install -U pip						# 更新
 
 ### pip, 安装包
 
-```
+```shell
 /home/chenchen/program/python3/lib/python3.8/site-packages/包名
 python3本体安装目录: $HOME/program/python3
 python3本体安装目录/lib/python版本/site-packages/包名
@@ -227,7 +231,7 @@ $ python3 -m pip search 包名                 # 从远程PyPI里找包
 
 ### 安装 gRPC
 
-```
+```shell
 $ python -m pip install grpcio                  # 安装 gRPC
 $ python -m pip install grpcio-tools            # 安装 gRPC 工具, 工具包括 protoc(protocol buffer 编译器) 和 插件(从 .proto 服务定义文件 生成 server 和 client 代码)
 ```
@@ -236,7 +240,7 @@ $ python -m pip install grpcio-tools            # 安装 gRPC 工具, 工具包�
 
 ### 目录说明
 
-```
+```shell
 /home/chenchen/program/python3.9.5/																			  # python 本体安装目录
 /home/chenchen/program/python3.9.5/lib/python3.9(版本号)										# 标准库目录, 其中含有 “site-packages” 目录(第三方软件包安装目录); 如果是 venv 虚拟环境下, 标准库目录下只有 “site-packages” 目录, 无标准库内容(显然共用虚拟环境的“父”环境标准库)
 /home/chenchen/program/venv/xxx.01.py3.9.5/lib/python3.9/site-packages		# 第3方软件包安装目录(此例为虚拟环境下的情况)
@@ -246,7 +250,7 @@ $ python -m pip install grpcio-tools            # 安装 gRPC 工具, 工具包�
 
 ### 关键术语
 
-```
+```shell
 . 从 Python3.4 开始, pip 是首选项的安装程序, 默认包含在 Python 二进制安装器中.
 . virtual environment 是个半隔离的 Python 环境, 在这个环境下允许安装软件包以供特定应用程序使用, 而不是在系统范围内安装软件包.
 . venv 是用于创建虚拟环境的标准工具, 从 Python3.3 起成为 Python 的一部分. 从 Python3.4 开始, 默认情况下是将 pip 安装到所有被创建的虚拟环境中.
@@ -278,7 +282,7 @@ https://packaging.python.org/tutorials/installing-packages/#creating-virtual-env
 
 ### FAQ
 
-```
+```shell
 问题:
 ./python3: error while loading shared libraries: libpython3.8.so.1.0: cannot open shared object file: No such file or directory
 原因:
@@ -299,7 +303,7 @@ root@localhost lib]# cd /usr/local/bin/python3/lib
 [root@localhost lib]# cp libpython3.7m.so.1.0 /usr/lib64
 ```
 
-```
+```shell
 问题:
 $ python3 -m pip install grpcio 时,
 ERROR: Could not install packages due to an EnvironmentError: HTTPSConnectionPool(host='files.pythonhosted.org', port=443): Max retries exceeded with url: /packages/2a/7a/a544b27a47d9b28601c3053dba0955c94d50bc1e3d3359a86c38a3dd9094/grpcio-1.30.0-cp38-cp38-manylinux2010_x86_64.whl (Caused by NewConnectionError('<pip._vendor.urllib3.connection.VerifiedHTTPSConnection object at 0x7f1da68dcac0>: Failed to establish a new connection: [Errno 101] Network is unreachable'))
@@ -323,7 +327,7 @@ index-url=http://pypi.douban.com/simple
 * http://mirrors.aliyun.com/pypi/simple
 ```
 
-```
+```shell
 一些问题和解决办法:
 问题:
 u'[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed (_ssl.c:765)'),))
@@ -343,7 +347,7 @@ python3 要往常规的 '本体目录/lib/python版本/site-packages/' 安装包
 $ python3 -m pip install --user grpcio            # 使用 --user 参数
 ```
 
-```
+```shell
 问题:
 gcc -pthread -shared     -Wl,--no-as-needed -o libpython3.so -Wl,-hlibpython3.so libpython3.9.so
 gcc -pthread     -Xlinker -export-dynamic -o python Programs/python.o -L. -lpython3.9 -lcrypt -lpthread -ldl  -lutil -lm   -lm 
