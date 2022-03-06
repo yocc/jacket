@@ -242,5 +242,116 @@ jms 与通常程序的区别:
 
 
 
+二分查找一个具有n个元素的有序表，其时间复杂度为______。
+
+A．O(n)
+
+B．O(n2)
+
+C．O(log2n)
+
+D．(nlog2n)
+
+
+
+
+
+
+
+kafka 系统结构和工作流程的认识理解?
+
+其中涉及到的实现上的技巧? 比如, 0拷贝
+
+其中涉及到的数学原理? 二分查找n个元素的有序表
+
+Kafka的分区数是不是越多越好？
+
+Consumer个数与分区数有什么关系？
+
+如何选择Kafka的分区数和消费者个数?
+
+kafka 系统结构和工作流程的认识理解?
+
+
+
+
+
+sarama
+
+- API文档和例子在 [pkg.go.dev](https://pkg.go.dev/github.com/Shopify/sarama) 获取
+- Mocks 表示测试, 通过 [mocks](https://github.com/Shopify/sarama/blob/main/mocks) 子包
+- [examples](https://github.com/Shopify/sarama/blob/main/examples) 目录包括一些精心准备的例子
+- [tools](https://github.com/Shopify/sarama/blob/main/tools) 目录包括命令行工具, 这些工具对于测试, 检测诊断 和 测量 是有用的.
+- [FAQ](https://github.com/Shopify/sarama/wiki/Frequently-Asked-Questions)
+- 兼容性方面, "2 releases + 2 months", kafka, Golang 各两个版本, 并且各延迟2个月.
+
+概述 Overview
+
+* 纯 Go. 当高级 API 不够用时, 还有一套低级 API, 可以控制到字节. 高级 API 的使用示例与其完整文档内联提供.
+* produce messages, 使用 同步或者异步生产者. 
+* 异步处理器(AsyncProducer) 接受 channel 上的消息，并在后台尽可能高效地异步生成它们; 在大多数情况下, 它是首选. 
+* 同步处理器(SyncProducer) 提供了一种方法, 该方法将阻止, 直到Kafka确认消息已生成. 这可能很有用, 但有两个警告: 它通常效率较低, 并且实际的持久性保证取决于 "Producer.RequiredAcks" 的配置值. 在某些配置中, 同步处理器(SyncProducer)确认的消息有时仍会丢失. 
+* consume messages, 使用 消费者(Consumer)或者消费者组(Consumer-Group) API
+* 对于较低级别的需求, 代理(Broker)和请求/响应(Request/Response)对象允许精确控制网络上发送的每个连接(connection)和消息(message); 
+* 客户端提供在生产者和消费者之间共享的更高级别的元数据管理. 
+* 请求/响应(Request/Response)对象和属性大多未记录, 因为它们与 Kafka 记录的协议字段完全一致, https://cwiki.apache.org/confluence/display/KAFKA/A+Guide+To+The+Kafka+Protocol
+* 指标通过本地注册表中的 https://github.com/rcrowley/go-metrics 库公开. 
+  * Broker 相关指标
+  * Producer 相关指标
+  * Consumer 相关指标
+* 使用者组负责将主题和分区的处理划分到进程集合（使用者组的成员）上
+
+
+
+type Consumer
+
+```go
+type Consumer interface {
+  // topics() 返回从群集cluster元数meta据中检索retrieved到的可用主题集set of topics. 此方法与 Client.Topics() 相同, 仅为方便起见而提供
+	Topics() ([]string, error)
+
+  // Partitions() 返回给定主题(topic)的所有分区 ID 的排序列表.
+  // 此方法与 Client.Partitions() 相同, 并且为方便起见而提供.
+	Partitions(topic string) ([]int32, error)
+
+  // ConsumePartition() 在具有给定偏移量offset的给定主题/分区上创建分区使用者. 
+  // 如果此使用者已在给定主题/分区上正在使用, 它将返回错误. 偏移量offset可以是文字偏移量, 也可以是"偏移最新"或"偏移最旧"
+	ConsumePartition(topic string, partition int32, offset int64) (PartitionConsumer, error)
+
+  // HighWaterMarks() 返回每个主题和分区的当前高水位线.
+	// 不能保证分区之间的一致性, 因为高水位线是单独更新的.
+	HighWaterMarks() map[string]map[int32]int64
+
+  // Close() 关闭使用者. 必须在所有子分区组件已关闭后调用它.
+	Close() error
+}
+```
+
+Consumer 管理分区消费者, 这些分区消费者处理来自 brokers 的 Kafka 消息. 您必须在消费者上调用 Close() 以避免泄漏, 当它超出范围时, 它不会自动进行垃圾回收.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 

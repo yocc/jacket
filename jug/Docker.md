@@ -1,5 +1,9 @@
 # Docker
 
+---
+
+
+
 ### 先决条件
 
 #### OS 必须条件
@@ -9,6 +13,8 @@
 . CentOS 的 centos-extras 仓库必须开启. https://wiki.centos.org/AdditionalResources/Repositories
 
 . `overlay2` 存储驱动
+
+#### https://docs.docker.com/engine/install/centos/
 
 #### 卸载老版本
 
@@ -143,6 +149,67 @@ Linux 的安装后步骤
 
 
 
+
+```shell
+sudo yum install -y yum-utils
+sudo yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+
+cd /etc/yum.repos.d/docker-ce.repo
+
+sudo yum install docker-ce docker-ce-cli containerd.io
+sudo systemctl start docker
+systemctl status docker
+chkconfig --list
+systemctl status docker
+systemctl enable docker
+sudo systemctl enable docker
+systemctl status docker
+
+mkdir docker
+touch app.py
+touch Dockerfile
+
+sudo docker build --tag py .
+
+sudo docker image ls
+sudo docker images
+
+sudo docker run py
+sudo docker images
+sudo docker run c5e9de8c315c
+sudo docker run -d c5e9de8c315c
+
+sudo docker ps
+sudo docker ps -a
+
+sudo docker stop b249de0d65e6
+sudo docker rm edea8185e3c3
+
+sudo docker run -d -p 8889:8888 -p 1111:333 c5e9de8c315c
+netstat -ntlp
+
+sudo docker volume ls
+
+sudo docker run -d -p 8889:8888 -p 1111:333 -v v1:/app c5e9de8c315c
+
+sudo docker ps
+sudo docker volume ls
+sudo docker volume inspect
+sudo docker volume inspect V1
+sudo ls /var/lib/docker/volumes/V1/_data
+
+sudo docker volume rm v1
+sudo docker rm a2ef0a86e4e4 98f1d29930af 475176db48bb 0e4d2706eece b249de0d65e6 ba24fe5c542a 06a455c6179f
+
+sudo docker image prune
+
+sudo docker run -d -p 8889:8888 -v `pwd`:/app py
+
+sudo docker exec -it 800705c96724 bash
+
+
+
+```
 
 
 

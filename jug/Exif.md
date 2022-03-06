@@ -2,6 +2,10 @@
 
 # Exif
 
+---
+
+
+
 
 ### Abstract
 Exif (Exchangeable Image File)是可交换图像文件的缩写，是使用JPEG压缩将交换信息存储在数字摄影图像文件中的标准格式。

@@ -4,14 +4,27 @@
 
 
 
+### 目录
+
+[TOC]
+
+
+
 ### LSB (Linux Standard Base) and Distribution information 基于 Linux 标准和发行信息
 
-- \$ cat /etc/redhat-release
-- \$ uname -a, $uname -r
-- \$ lsb_release -a
-- \$ cat /etc/issue
+- $ cat /proc/version, 查看内核版本
+- $ cat /etc/redhat-release, 查看 CentOS 版本
+- \$ uname -a, $uname -r, 显示系统名, 节点名称, 操作系统的发行版号, 操作系统版本, 运行系统的机器 ID 号, 显示操作系统的发行版号
+- \$ lsb_release -a, LSB是Linux Standard Base的缩写, *lsb_release* 命令用来显示LSB和特定版本的相关信息
+- \$ cat /etc/issue, /etc/issue文件是Linux系统开机启动时在命令行界面弹出的欢迎语句文件.
 
+```shell
+[chenchen@grpc01 ~]$ cat /proc/version
+Linux version 3.10.0-1062.el7.x86_64 (mockbuild@kbuilder.bsys.centos.org) (gcc version 4.8.5 20150623 (Red Hat 4.8.5-36) (GCC) ) #1 SMP Wed Aug 7 18:08:02 UTC 2019
+[chenchen@grpc01 ~]$ 
 ```
+
+```shell
 [chenchen@dev3_10.211.21.18 ~]$ cat /etc/redhat-release
 CentOS Linux release 7.3.1611 (Core)
 ```
@@ -53,3 +66,13 @@ Codename:       Core
 \S
 Kernel \r on an \m
 ```
+
+
+
+### See Also
+
+/etc/issue: https://www.jianshu.com/p/0260ef80d779
+
+/etc/motd: https://www.cnblogs.com/pzk7788/p/10544340.html
+
+/etc/issue.net: https://www.cnblogs.com/pluse/p/5531523.html

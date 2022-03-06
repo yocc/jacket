@@ -1,5 +1,9 @@
 # vim
 
+---
+
+
+
 ### 目录
 
 
@@ -282,18 +286,55 @@ $ vim -u NONE -c "helptags ~/.vim/pack/vendor/start/nerdtree/doc" -c q			# 设�
 3. 常用命令
 
 - 目录前面有"+"号, 按 `Enter` 会展开目录，文件前面是"-"号, 按 `Enter` 会在右侧窗口展现该文件的内容, 并光标的焦点focus右侧
+
 - ctr+w
+
 - 和编辑文件一样, 通过 `h j k l` 移动光标定位
+
 - i 和 s 可以水平分割或纵向分割窗口打开文件
--  t 在标签页中打开
+
+- t 在标签页中打开
+
 - T 在后台标签页中打开
+
 - p 到上层目录
+
 - P 到根目录
+
 - K 到同目录第一个节点
+
 - J 到同目录最后一个节点
+
 - m 显示文件系统菜单 (添加, 删除, 移动操作)
+
 - ? 帮助
+
 - q 关闭
+
+  ```
+  和编辑文件一样，通过h j k l移动光标定位
+  打开关闭文件或者目录，如果是文件的话，光标出现在打开的文件中
+  go 效果同上，不过光标保持在文件目录里，类似预览文件内容的功能
+  i和s可以水平分割或纵向分割窗口打开文件，前面加g类似go的功能
+  t 在标签页中打开
+  T 在后台标签页中打开
+  ctrl+w+w 光标在左右窗口切换
+  ctrl+w+r 切换当前窗口左右布局
+  ctrl+p 模糊搜索文件
+  gT 切换到前一个tab
+  g t 切换到后一个tab
+  p 到上层目录
+  P 到根目录
+  K 到同目录第一个节点
+  J 到同目录最后一个节点
+  m 显示文件系统菜单（添加、删除、移动操作）
+  r: 刷新光标所在的目录
+  R: 刷新当前根路径
+  ? 帮助
+  q 关闭
+  ```
+
+  
 
 ### vim-airline plugin
 
@@ -390,7 +431,7 @@ $ vim -u NONE -c "helptags ~/.vim/pack/vendor/start/nerdtree/doc" -c q			# 设�
 [powerline fonts-installation]: https://powerline.readthedocs.io/en/master/installation/osx.html#fonts-installation
 
 [tabby]: https://tabby.sh/
-[vim8原生内置(naive)插件安装]: https://blog.csdn.net/qq_27825451/article/details/100557133
+[vim8原生内置(naive)插件管理器安装]: https://blog.csdn.net/qq_27825451/article/details/100557133
 
 
 
