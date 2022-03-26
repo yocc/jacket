@@ -694,6 +694,49 @@ int &b = a;			// 给变量 a 起一个别名, 叫做 b. & 在等号左侧. b 是
 
 
 
+## string
+
+```go
+func stri() {
+    ss := "阿迪哈佛安定嘎的高发大舅上看风景啊是"
+    s2 := &ss
+    s1 := ss[3:16]
+    fmt.Printf("%T\n%+v\n%p\n", ss, ss, &ss)
+    fmt.Printf("%T\n%+v\n%p\n", s2, s2, s2)
+    fmt.Printf("%T\n%+v\n%p\n", s1, s1, &s1)
+    fmt.Printf("%T\n%+v\n%p\n", len([]rune(ss)), len([]rune(ss)), &ss)
+    fmt.Printf("%T\n%+v\n%p\n", utf8.RuneCountInString(ss), utf8.RuneCountInString(ss), &ss)
+    fmt.Printf("%T\n%+v\n%p\n", bytes.Count([]byte(ss), nil)-1, bytes.Count([]byte(ss), nil)-1, &ss)
+    fmt.Printf("%T\n%+v\n%p\n", strings.Count(ss, "")-1, strings.Count(ss, "")-1, &ss)
+}
+
+[chenchen@grpc01 rou]$ go run sa.go                                                                                                                                                                                                                          
+string                                                                                                                                                                                                                                                       
+阿迪哈佛安定嘎的高发大舅上看风景啊是                                                                                                                                                                                                                         
+0xc000010260                                                                                                                                                                                                                                                 
+*string                                                                                                                                                                                                                                                      
+0xc000010260                                                                                                                                                                                                                                                 
+0xc000010260                                                                                                                                                                                                                                                 
+string                                                                                                                                                                                                                                                       
+迪哈佛安                                                                                                                                                                                                                                                     
+0xc000010270                                                                                                                                                                                                                                                 
+int                                                                                                                                                                                                                                                          
+18                                                                                                                                                                                                                                                           
+0xc000010260                                                                                                                                                                                                                                                 
+int                                                                                                                                                                                                                                                          
+18                                                                                                                                                                                                                                                           
+0xc000010260                                                                                                                                                                                                                                                 
+int                                                                                                                                                                                                                                                          
+18                                                                                                                                                                                                                                                           
+0xc000010260                                                                                                                                                                                                                                                 
+int                                                                                                                                                                                                                                                          
+18                                                                                                                                                                                                                                                           
+0xc000010260                                                                                                                                                                                                                                                 
+[chenchen@grpc01 rou]$
+```
+
+
+
 ## goroutine
 
 ```go

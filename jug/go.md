@@ -111,7 +111,7 @@ export PATH
 export GOROOT="$HOME/program/go1.16.4"		# Go本体(解压后拷贝的目录), 可选系统环境变量
 export GOPATH="$HOME/gopath1.16.4"				# 工作空间, 必须系统环境变量
 export GOPROXY="https://goproxy.cn"				# 包代理, 可选系统环境变量
-export GOBIN="$HOME/gopath1.16.4/bin"			# go install 的目录, 可选系统环境变量
+export GOBIN="$HOME/gopath1.16.4/bin"			# go install 的目录, 开发出的二进制文件生成位置, 可选系统环境变量
 [chenchen@localhost ~]$ . .bashrc
 [chenchen@localhost ~]$ go version
 go version go1.16.4 linux/amd64
@@ -307,6 +307,23 @@ GO111MODULE=on|off|auto				# 环境变量
 . go get 通常用于安装和下载软件包. 如果开启了 =on, 那么也会自动记录在 go.mod 中.
 
 ~~. =on时, go build 期间使用的包存储在 $GOPATH/pkg/mod 中.~~
+
+
+
+### 依赖, 扩展包的安装
+
+```shell
+# 有两种方式:
+1. 直接在代码中 import 包, 条件是 go本体版本要大于 Go 1.11+
+import "google.golang.org/grpc"
+这样在代码被执行时(go build, run, test)再自动下载获取必要的依赖包文件.
+
+2. 通过 got get 事先下载到本体指定目录下保存, 待到编译时直接参与使用.
+$ go get -u google.golang.org/grpc
+
+参考: https://github.com/grpc/grpc-go#installation
+     https://github.com/golang/go/wiki/Modules  中国翻墙说明
+```
 
 
 

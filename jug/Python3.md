@@ -40,16 +40,46 @@ $ wget https://www.python.org/ftp/python/3.8.5/Python-3.8.5.tgz
 
 ```shell
 $ tar zxvf 源码.tgz -C ./
+
+[chenchen@grpc01 tmp]$ tar zxvf Python-3.10.2.tgz -C ./
+Python-3.10.2/
+Python-3.10.2/Mac/
+Python-3.10.2/Mac/README.rst
+...
 ```
 
 
 
-### 基本工具, ssl 模块, ctypes 模块
+### 基本工具, ssl 模块, ctypes 模块, 其他各种模块
 
-```shell
+``` shell
 $ sudo yum -y install gcc make automake autoconf libtool
 $ sudo yum -y install openssl openssl-devel
 $ sudo yum -y install libffi libffi-devel
+
+$ sudo yum -y install bzip2 bzip2-devel
+$ sudo yum -y install readline readline-devel
+$ sudo yum -y install tk tk-devel
+$ sudo yum -y install sqlite sqlite-devel
+$ sudo yum -y install xz lzma xz-devel
+$ sudo yum -y install uuid uuid-devel
+#$ sudo yum -y install libuuid libuuid-devel  (libxxx 命名的一般是 Ubantu系统)
+$ sudo yum -y install zlib zlib-devel
+$ sudo yum -y install ncurses ncurses-devel
+$ sudo yum -y install gdbm gdbm-devel
+
+# 别用, 安装了好几十个
+# $ sudo yum -y install yum-utils
+# $ sudo yum -y groupinstall development
+# db4-devel libpcap-devel expat-devel
+
+# 官网建议安装前戏, 参考: https://devguide.python.org/setup/#linux
+$ sudo yum install yum-utils			# 工具
+$ sudo yum-builddep python3				# 为python3配置一个必须的构建环境和安装所需的依赖
+
+# ln -s
+$ ln -s 原文件 软连接名
+
 ```
 
 
@@ -62,6 +92,8 @@ $ sudo yum -y install libffi libffi-devel
 ./configure --prefix=$HOME/program/python3 --enable-shared --enable-optimizations --enable-big-digits  --with-system-ffi  (使用1)
 
 ./configure --prefix=$HOME/program/python3 --enable-shared --enable-big-digits  --with-system-ffi  (使用2, 参考 FAQ)
+./configure --prefix=$HOME/tmp/python37 --enable-shared --enable-big-digits  --with-system-ffi --with-openssl=/usr/local/openssl111m (成功, --with-openssl=OpenSSL本体根目录)
+./configure --prefix=$HOME/tmp/python39 --enable-shared --enable-big-digits  --with-system-ffi --with-openssl=/usr/local/openssl111m (成功, --with-openssl=OpenSSL本体根目录)
 
 ./configure --prefix=$HOME/program/python3 --exec-prefix=$HOME/bin --enable-shared --enable-optimizations --enable-big-digits  --with-system-ffi
 ```
@@ -77,6 +109,33 @@ make clean
 make                    
 make install
 (VirtualBox 上需要30分钟左右)
+```
+
+
+
+### 配置环境变量
+
+```shell
+[chenchen@grpc01 lib]$ pwd
+/home/chenchen/tmp/python37/lib
+[chenchen@grpc01 lib]$ l
+total 14M
+377487472 -r-xr-xr-x.  1 chenchen chenchen  14M Mar 12 16:55 libpython3.7m.so.1.0
+377487474 -r-xr-xr-x.  1 chenchen chenchen 7.5K Mar 12 16:55 libpython3.so
+377487473 lrwxrwxrwx.  1 chenchen chenchen   20 Mar 12 16:55 libpython3.7m.so -> libpython3.7m.so.1.0
+377487471 drwxr-xr-x.  4 chenchen chenchen  113 Mar 12 16:56 .
+381681757 drwxr-xr-x. 35 chenchen chenchen 8.0K Mar 12 16:56 python3.7
+369127301 drwxr-xr-x.  6 chenchen chenchen   56 Mar 12 16:56 ..
+ 96471001 drwxr-xr-x.  2 chenchen chenchen   67 Mar 12 16:56 pkgconfig
+直接在 安装的本体根目录/bin下执行 ./python3 --version, 会提示共享库没有的错误, 需要将本体lib加入共享库搜索目录.
+$ ~/tmp/python37/bin/python3 --version
+.......
+$ sudo vim /etc/ld.so.conf.d/python37.conf
+vim 编辑添加一行 /home/chenchen/tmp/python37/lib
+$ sudo ldconfig -vvv
+ 
+
+
 ```
 
 
@@ -146,6 +205,67 @@ $ deactivate											// 退出虚拟环境
 在 Unix shell 下使用 source 可以确保将虚拟环境的变量设置在当前shell中, 而不是在子进程中(子进程随后会消失, 没有任何作用)
 
 直接管理多个虚拟环境可能变得很乏味, 因此依赖性管理指南引入了更高级别的工具 Pipenv, 该工具自动为您处理的每个项目和应用程序管理一个单独的虚拟环境. 
+```
+
+```shell
+[chenchen@localhost venv]$ ~/tmp/python3/bin/python3 -m venv ./grpc01
+[chenchen@localhost venv]$ l
+total 0
+16777807 drwxrwxr-x. 7 chenchen chenchen 183 Mar 11 01:07 ..
+ 1642888 drwxrwxr-x. 3 chenchen chenchen  20 Mar 11 01:08 .
+19577901 drwxrwxr-x. 5 chenchen chenchen  74 Mar 11 01:08 grpc01
+[chenchen@localhost venv]$ cd grpc01/
+[chenchen@localhost grpc01]$ l
+total 4.0K
+35025244 drwxrwxr-x. 2 chenchen chenchen   6 Mar 11 01:08 include
+ 1642888 drwxrwxr-x. 3 chenchen chenchen  20 Mar 11 01:08 ..
+19577904 -rw-rw-r--. 1 chenchen chenchen  92 Mar 11 01:08 pyvenv.cfg
+19577903 lrwxrwxrwx. 1 chenchen chenchen   3 Mar 11 01:08 lib64 -> lib
+52437434 drwxrwxr-x. 3 chenchen chenchen  23 Mar 11 01:08 lib
+19577901 drwxrwxr-x. 5 chenchen chenchen  74 Mar 11 01:08 .
+35025245 drwxrwxr-x. 2 chenchen chenchen 173 Mar 11 01:08 bin
+[chenchen@localhost grpc01]$ cd bin/
+[chenchen@localhost bin]$ l
+total 32K
+35025246 lrwxrwxrwx. 1 chenchen chenchen   38 Mar 11 01:08 python3 -> /home/chenchen/tmp/python3/bin/python3
+35025247 lrwxrwxrwx. 1 chenchen chenchen    7 Mar 11 01:08 python -> python3
+19577901 drwxrwxr-x. 5 chenchen chenchen   74 Mar 11 01:08 ..
+34954311 -rwxrwxr-x. 1 chenchen chenchen  256 Mar 11 01:08 easy_install-3.7
+34954310 -rwxrwxr-x. 1 chenchen chenchen  256 Mar 11 01:08 easy_install
+35021277 -rwxrwxr-x. 1 chenchen chenchen  247 Mar 11 01:08 pip3.7
+35021276 -rwxrwxr-x. 1 chenchen chenchen  247 Mar 11 01:08 pip3
+35021275 -rwxrwxr-x. 1 chenchen chenchen  247 Mar 11 01:08 pip
+35021280 -rw-r--r--. 1 chenchen chenchen 2.4K Mar 11 01:08 activate.fish
+35021279 -rw-r--r--. 1 chenchen chenchen 1.3K Mar 11 01:08 activate.csh
+35021278 -rw-r--r--. 1 chenchen chenchen 2.2K Mar 11 01:08 activate
+35025245 drwxrwxr-x. 2 chenchen chenchen  173 Mar 11 01:08 .
+[chenchen@localhost bin]$ ./activate
+-bash: ./activate: Permission denied
+[chenchen@localhost bin]$ . ./activate
+(grpc01) [chenchen@localhost bin]$ pwd
+/home/chenchen/tmp/venv/grpc01/bin
+(grpc01) [chenchen@localhost bin]$ ./python3 -m pip list
+Package    Version
+---------- -------
+pip        20.1.1
+setuptools 47.1.0
+WARNING: You are using pip version 20.1.1; however, version 22.0.4 is available.
+You should consider upgrading via the '/home/chenchen/tmp/venv/grpc01/bin/python3 -m pip install --upgrade pip' command.
+(grpc01) [chenchen@localhost bin]$ ./python3 -m pip install --upgrade pip
+Collecting pip
+  Using cached pip-22.0.4-py3-none-any.whl (2.1 MB)
+Installing collected packages: pip
+  Attempting uninstall: pip
+    Found existing installation: pip 20.1.1
+    Uninstalling pip-20.1.1:
+      Successfully uninstalled pip-20.1.1
+Successfully installed pip-22.0.4
+(grpc01) [chenchen@localhost bin]$ /home/chenchen/tmp/venv/grpc01/bin/python3 -m pip list
+Package    Version
+---------- -------
+pip        22.0.4
+setuptools 47.1.0
+(grpc01) [chenchen@localhost bin]$ 
 ```
 
 
@@ -227,6 +347,70 @@ $ python3 -m pip show 包名                   # 列出安装过的包名的详�
 $ python3 -m pip search 包名                 # 从远程PyPI里找包
 ```
 
+```shell
+[chenchen@localhost python3]$ ./bin/python3 -m pip list
+Package    Version
+---------- -------
+pip        20.1.1
+setuptools 47.1.0
+WARNING: You are using pip version 20.1.1; however, version 22.0.4 is available.
+You should consider upgrading via the '/home/chenchen/tmp/python3/bin/python3 -m pip install --upgrade pip' command.
+[chenchen@localhost python3]$ /home/chenchen/tmp/python3/bin/python3 -m pip install --upgrade pip
+Collecting pip
+  Downloading pip-22.0.4-py3-none-any.whl (2.1 MB)
+     |████████████████████████████████| 2.1 MB 84 kB/s 
+Installing collected packages: pip
+  Attempting uninstall: pip
+    Found existing installation: pip 20.1.1
+    Uninstalling pip-20.1.1:
+      Successfully uninstalled pip-20.1.1
+Successfully installed pip-22.0.4
+[chenchen@localhost python3]$ 
+
+# pip 已经是最新版本了, 但 setuptools 并不是, 通过 -U 升级
+[chenchen@grpc01 python39]$ ./bin/python3 -m pip install --upgrade pip
+Requirement already satisfied: pip in ./lib/python3.9/site-packages (22.0.4)
+[chenchen@grpc01 python39]$ ./bin/python3 -m pip install -U setuptools
+Requirement already satisfied: setuptools in ./lib/python3.9/site-packages (58.1.0)
+Collecting setuptools
+  Downloading setuptools-60.9.3-py3-none-any.whl (1.1 MB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.1/1.1 MB 1.5 MB/s eta 0:00:00
+Installing collected packages: setuptools
+  Attempting uninstall: setuptools
+    Found existing installation: setuptools 58.1.0
+    Uninstalling setuptools-58.1.0:
+      Successfully uninstalled setuptools-58.1.0
+Successfully installed setuptools-60.9.3
+[chenchen@grpc01 python39]$ ./bin/python3 -m pip list
+Package    Version
+---------- -------
+pip        22.0.4
+setuptools 60.9.3
+
+# 同上
+[chenchen@grpc01 python37]$ ./bin/python3 -m pip list
+Package    Version
+---------- -------
+pip        22.0.4
+setuptools 47.1.0
+[chenchen@grpc01 python37]$ ./bin/python3 -m pip install -U setuptools
+Requirement already satisfied: setuptools in ./lib/python3.7/site-packages (47.1.0)
+Collecting setuptools
+  Using cached setuptools-60.9.3-py3-none-any.whl (1.1 MB)
+Installing collected packages: setuptools
+  Attempting uninstall: setuptools
+    Found existing installation: setuptools 47.1.0
+    Uninstalling setuptools-47.1.0:
+      Successfully uninstalled setuptools-47.1.0
+Successfully installed setuptools-60.9.3
+[chenchen@grpc01 python37]$ ./bin/python3 -m pip list
+Package    Version
+---------- -------
+pip        22.0.4
+setuptools 60.9.3
+[chenchen@grpc01 python37]$ 
+```
+
 
 
 ### 安装 gRPC
@@ -234,6 +418,37 @@ $ python3 -m pip search 包名                 # 从远程PyPI里找包
 ```shell
 $ python -m pip install grpcio                  # 安装 gRPC
 $ python -m pip install grpcio-tools            # 安装 gRPC 工具, 工具包括 protoc(protocol buffer 编译器) 和 插件(从 .proto 服务定义文件 生成 server 和 client 代码)
+```
+
+```shell
+(grpc01) [chenchen@localhost bin]$ ./python3 -m pip install grpcio
+Collecting grpcio
+  Downloading grpcio-1.44.0-cp37-cp37m-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (4.3 MB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 4.3/4.3 MB 156.5 kB/s eta 0:00:00
+Collecting six>=1.5.2
+  Downloading six-1.16.0-py2.py3-none-any.whl (11 kB)
+Installing collected packages: six, grpcio
+Successfully installed grpcio-1.44.0 six-1.16.0
+(grpc01) [chenchen@localhost bin]$ 
+(grpc01) [chenchen@localhost bin]$ ./python3 -m pip install grpcio-tools
+Collecting grpcio-tools
+  Downloading grpcio_tools-1.44.0-cp37-cp37m-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (2.4 MB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 2.4/2.4 MB 216.9 kB/s eta 0:00:00
+Requirement already satisfied: grpcio>=1.44.0 in /home/chenchen/tmp/venv/grpc01/lib/python3.7/site-packages (from grpcio-tools) (1.44.0)
+Collecting protobuf<4.0dev,>=3.5.0.post1
+  Downloading protobuf-3.19.4-cp37-cp37m-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (1.1 MB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.1/1.1 MB 9.9 MB/s eta 0:00:00
+Requirement already satisfied: setuptools in /home/chenchen/tmp/venv/grpc01/lib/python3.7/site-packages (from grpcio-tools) (47.1.0)
+Requirement already satisfied: six>=1.5.2 in /home/chenchen/tmp/venv/grpc01/lib/python3.7/site-packages (from grpcio>=1.44.0->grpcio-tools) (1.16.0)
+Installing collected packages: protobuf, grpcio-tools
+Successfully installed grpcio-tools-1.44.0 protobuf-3.19.4
+(grpc01) [chenchen@localhost bin]$ 
+```
+
+### 安装 TensorFlow
+
+```shell
+$ python -m pip install tensorflow                  # 安装 tensorflow
 ```
 
 
@@ -266,7 +481,6 @@ $ python -m pip install grpcio-tools            # 安装 gRPC 工具, 工具包�
 . IronPython, IronPython 和 Jython 类似, 只不过 IronPython 是运行在微软 .Net 平台上的 Python 解释器, 可以直接把 Python 代码编译成 .Net 的字节码.
 
 
-
 在版本 3.5 中进行了更改: 现在建议使用 venv 创建虚拟环境.
 参考: Python Packaging User Guide: Creating and using virtual environments.
 https://packaging.python.org/tutorials/installing-packages/#creating-virtual-environments
@@ -293,7 +507,7 @@ cd  /etc/ld.so.conf.d
 ->sudo vim python3.8.conf
 ->编辑 添加库文件路径 /home/chenchen/program/ptyon3/lib
 ->退出保存
-->运行 sudo ldconfig
+->运行 sudo ldconfig -vvv
 方法2:
 设置环境变量：(试验了, 不起作用)
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/python3/bin
@@ -381,8 +595,155 @@ make: *** [profile-opt] Error 2
 2. ./configure 参数中去掉 --enable-optimizations
 ```
 
+```shell
+问题1:
+Failed to build these modules:
+_hashlib              _ssl 
+
+问题2:
+Following modules built successfully but were removed because they could not be imported:
+_hashlib              _ssl                                     
+
+问题3:
+Could not build the ssl module!
+Python requires a OpenSSL 1.1.1 or newer
+
+问题4:
+Following modules built successfully but were removed because they could not be imported:
+_hashlib              _ssl                                     
+
+
+Could not build the ssl module!
+Python requires an OpenSSL 1.0.2 or 1.1 compatible libssl with X509_VERIFY_PARAM_set1_host().
+LibreSSL 2.6.4 and earlier do not provide the necessary APIs, https://github.com/libressl-portable/portable/issues/381
+
+问题5:
+*** WARNING: renaming "_ssl" since importing it failed: build/lib.linux-x86_64-3.8/_ssl.cpython-38-x86_64-linux-gnu.so: undefined symbol: OPENSSL_sk_num
+*** WARNING: renaming "_hashlib" since importing it failed: build/lib.linux-x86_64-3.8/_hashlib.cpython-38-x86_64-linux-gnu.so: undefined symbol: EVP_blake2b512
+
+原因:
+再次印证, 是 openssl 没有安装对, 或者文件有损坏. 细节文件不清, 但为了保险, 需要重新安装 openssl.
+openssl 是系统自带, 应该叫做 openssl-libs, 和 openssl, openssl-devel 还不是一回事儿
+
+# openssl-devel-1.0.2k-24.el7_9.x86_64
+# openssl-1.0.2k-24.el7_9.x86_64
+# openssl-libs-1.0.2k-24.el7_9.x86_64
+
+# rpm -e openssl-devel-1.0.2k-24.el7_9.x86_64
+# rpm -e openssl-1.0.2k-24.el7_9.x86_64
+# rpm -e openssl-libs-1.0.2k-24.el7_9.x86_64 --nodeps --force
+
+# sudo yum -y install openssl-libs
+# sudo yum -y reinstall openssl-libs
+# sudo yum -y install openssl openssl-devel
+# sudo yum -y reinstall openssl openssl-devel
+
+解决:
+openssl 一共三个: openssl-devel, openssl, openssl-libs
+其中 openssl-libs 是系统自带的, 无法 rpm -e xxx 卸载, 只能通过 sudo yum -y reinstall openssl-libs 来重装, 重装时一定看着 /usr/lib64 里面的文件是不是更新了, 一遍不行就两遍, 或者先卸载了 openssl 和 openssl-devel 再重装, 然后再安装 openssl 和 openssl-devel
+
+sudo yum -y reinstall openssl-libs
+sudo yum -y reinstall openssl openssl-devel
+
+接下来就是正常安装了:
+make distclean
+./configure --prefix=$HOME/tmp/python3 --enable-shared --enable-big-digits  --with-system-ffi
+make -j16
+make install
+
+相关:
+. 动态库查看, /etc/ld.so.conf.d/ 这下面是手动添加动态库的配置, 系统默认 openssl 是不需要这个配置. 但手动安装 openssl其他版本, 或者同系统多版本共存是需要手动配置. 在配置之后还需要刷新缓存, sudo ldconfig -vvv
+. 查看 openssl 命令所在的位置, $ whereis openssl
+. 查看系统环境默认使用的 openssl 是那个版本, $ openssl version
+. 查看 openssl 使用的对应动态库, $ ldd openssl, 必须到 openssl 二进制命令下的目录里执行
+. 查看系统都安装了那些 openssl 软件包, $ rpm -qa | grep ssl
+. 卸载指定全称的软件包, rpm -e openssl-devel-1.0.2k-24.el7_9.x86_64
+. 如果卸载时出现依赖而禁止卸载时, 可以‘强制’或者‘禁止依赖性’, rpm -e openssl-libs-1.0.2k-24.el7_9.x86_64 --nodeps --force
+. openssl-libs 包不能直接卸载, 卸载不掉, 只能 yum 重装, $ sudo yum -y reinstall openssl-libs, 重装时要观察动态库文件是否更新, 如果一遍不行就重装两遍.
+. 为了保险起见, 注意重装包的顺序, 先是 openssl-libs, 然后才是 openssl 和 openssl-devel, $ sudo yum -y reinstall openssl openssl-devel
+```
+
+```shell
+问题:
+The following modules found by detect_modules() in setup.py, have been
+built by the Makefile instead, as configured by the Setup files:
+_abc                  pwd                   time 
+
+原因:
+
+解决:
+
+```
+
+```shell
+问题:
+ldconfig: Can't create temporary cache file /etc/ld.so.cache~: Permission denied
+[chenchen@grpc01 ld.so.conf.d]$ openssl
+openssl: error while loading shared libraries: libssl.so.1.1: cannot open shared object file: No such file or directory
+```
+
+```shell
+
+```
+
+```shell
+问题:
+Installing collected packages: setuptools, pip
+  WARNING: The script easy_install-3.7 is installed in '/home/chenchen/tmp/python3/bin' which is not on PATH.
+  Consider adding this directory to PATH or, if you prefer to suppress this warning, use --no-warn-script-location.
+  WARNING: The scripts pip3 and pip3.7 are installed in '/home/chenchen/tmp/python3/bin' which is not on PATH.
+  Consider adding this directory to PATH or, if you prefer to suppress this warning, use --no-warn-script-location.
+Successfully installed pip-20.1.1 setuptools-47.1.0
+
+还没写:
+原因:
+
+解决:
+
+
+```
+
+```shell
+问题:
+WARNING: Value for scheme.headers does not match. Please report this to <https://github.com/pypa/pip/issues/10151>
+distutils: /home/chenchen/tmp/python39/include/python3.9/UNKNOWN
+sysconfig: /home/chenchen/tmp/Python-3.9.10/Include/UNKNOWN
+WARNING: Additional context:
+user = False
+home = None
+root = '/'
+prefix = None
+Looking in links: /tmp/tmp9c1aoon0
+Processing /tmp/tmp9c1aoon0/setuptools-58.1.0-py3-none-any.whl
+Processing /tmp/tmp9c1aoon0/pip-21.2.4-py3-none-any.whl
+Installing collected packages: setuptools, pip
+  WARNING: Value for scheme.headers does not match. Please report this to <https://github.com/pypa/pip/issues/10151>
+  distutils: /home/chenchen/tmp/python39/include/python3.9/setuptools
+  sysconfig: /home/chenchen/tmp/Python-3.9.10/Include/setuptools
+  WARNING: Value for scheme.headers does not match. Please report this to <https://github.com/pypa/pip/issues/10151>
+  distutils: /home/chenchen/tmp/python39/include/python3.9/pip
+  sysconfig: /home/chenchen/tmp/Python-3.9.10/Include/pip
+  WARNING: The scripts pip3 and pip3.9 are installed in '/home/chenchen/tmp/python39/bin' which is not on PATH.
+  Consider adding this directory to PATH or, if you prefer to suppress this warning, use --no-warn-script-location.
+Successfully installed pip-21.2.4 setuptools-58.1.0
+
+还没写:
+原因:
+
+解决:
+
+```
+
+
+
 
 
 ### See Also
 
 https://www.python.org/downloads/source/
+
+https://devguide.python.org/setup/#linux
+
+https://vault.centos.org/7.7.1908/os/x86_64/Packages/
+
+https://www.tensorflow.org/install

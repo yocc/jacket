@@ -46,6 +46,13 @@ nvm -> Node.js -> npm -> antd
 [root@dev3_10.211.21.18 ~]# lsb_release -a           
 bash: lsb_release: command not found		// 表示没有安装 lsb_release
 [root@dev3_10.211.21.18 ~]# yum -y install redhat-lsb
+[chenchen@grpc01 ~]$ lsb_release -a
+LSB Version:    :core-4.1-amd64:core-4.1-noarch:cxx-4.1-amd64:cxx-4.1-noarch:desktop-4.1-amd64:desktop-4.1-noarch:printing-4.1-amd64:printing-4.1-noarch
+Distributor ID: CentOS
+Description:    CentOS Linux release 7.7.1908 (Core)
+Release:        7.7.1908
+Codename:       Core
+[chenchen@grpc01 ~]$ 
 ```
 
 - cat /etc/os-release
@@ -145,6 +152,45 @@ x86_64
     [chenchen@localhost ~]$ 
     ```
 
+    ```shell
+    # https://github.com/nvm-sh/nvm#installing-and-updating
+    [chenchen@grpc01 ~]$ curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
+      % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                     Dload  Upload   Total   Spent    Left  Speed
+      0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
+    curl: (60) Peer's Certificate has expired.
+    More details here: http://curl.haxx.se/docs/sslcerts.html
+    
+    curl performs SSL certificate verification by default, using a "bundle"
+     of Certificate Authority (CA) public keys (CA certs). If the default
+     bundle file isn't adequate, you can specify an alternate file
+     using the --cacert option.
+    If this HTTPS server uses a certificate signed by a CA represented in
+     the bundle, the certificate verification probably failed due to a
+     problem with the certificate (it might be expired, or the name might
+     not match the domain name in the URL).
+    If you'd like to turn off curl's verification of the certificate, use
+     the -k (or --insecure) option.
+    [chenchen@grpc01 ~]$ curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh -k | bash
+      % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                     Dload  Upload   Total   Spent    Left  Speed
+    100 15037  100 15037    0     0  20666      0 --:--:-- --:--:-- --:--:-- 20655
+    => Downloading nvm from git to '/home/chenchen/.nvm'
+    => Initialized empty Git repository in /home/chenchen/.nvm/.git/
+    => Compressing and cleaning up git repository
+    
+    => nvm source string already in /home/chenchen/.bashrc
+    => bash_completion source string already in /home/chenchen/.bashrc
+    => Close and reopen your terminal to start using nvm or run the following to use it now:
+    
+    export NVM_DIR="$HOME/.nvm"
+    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+    [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+    [chenchen@grpc01 ~]$ 
+    ```
+
+    
+
 4. 检查: 安装后通过 `command -v nvm` 来检查是否安装 nvm 成功, 成功返回 nvm 这几个字, 否则都是错误
 
     ```shell
@@ -225,6 +271,45 @@ x86_64
     Creating default alias: default -> node (-> v12.0.0)
     ```
 
+    ```shell
+    # install, update
+    [chenchen@grpc01 ~]$ node -v
+    v16.6.1
+    [chenchen@grpc01 ~]$ nvm install node
+    Downloading and installing node v17.7.2...
+    Downloading http://npm.taobao.org/mirrors/node/v17.7.2/node-v17.7.2-linux-x64.tar.xz...
+    ######################################################################## 100.0%
+    Computing checksum with sha256sum
+    Checksums matched!
+    tar: bin/node: time stamp 2022-03-18 03:26:44 is 71024.677882196 s in the future
+    tar: share/systemtap/tapset: time stamp 2022-03-18 03:26:44 is 71024.676103298 s in the future
+    tar: share/systemtap: time stamp 2022-03-18 03:26:44 is 71024.676072077 s in the future
+    tar: share/doc/node/gdbinit: time stamp 2022-03-18 03:21:13 is 70693.675916341 s in the future
+    ......
+    ......
+    ......
+    tar: include: time stamp 2022-03-18 03:26:44 is 71023.965668564 s in the future
+    tar: README.md: time stamp 2022-03-18 03:26:46 is 71025.965614825 s in the future
+    tar: LICENSE: time stamp 2022-03-18 03:26:46 is 71025.963899613 s in the future
+    tar: CHANGELOG.md: time stamp 2022-03-18 03:26:46 is 71025.95854791 s in the future
+    tar: bin/corepack: time stamp 2022-03-18 03:26:44 is 71023.958449795 s in the future
+    tar: bin/npx: time stamp 2022-03-18 03:26:44 is 71023.958362106 s in the future
+    tar: bin/npm: time stamp 2022-03-18 03:26:44 is 71023.958326239 s in the future
+    tar: bin: time stamp 2022-03-18 03:26:44 is 71023.95831456 s in the future
+    Now using node v17.7.2 (npm v8.5.2)
+    [chenchen@grpc01 ~]$ node -v
+    v17.7.2
+    [chenchen@grpc01 ~]$ npm -v
+    8.5.2
+    [chenchen@grpc01 ~]$ whereis node
+    node: /home/chenchen/.nvm/versions/node/v17.7.2/bin/node
+    [chenchen@grpc01 ~]$ whereis npm
+    npm: /home/chenchen/.nvm/versions/node/v17.7.2/bin/npm
+    [chenchen@grpc01 ~]$ 
+    ```
+
+    
+
 2. 验证 node 和 npm 是否安装成功: `$ node -v` 和 `$ npm -v`
 
     ```shell
@@ -288,6 +373,30 @@ x86_64
     ; HOME = /usr/home/chenchen
     ; "npm config ls -l" to show all defaults.
     ```
+
+    ```shell
+    [chenchen@grpc01 bin]$ npm ls moment
+    nvm@0.39.1 /home/chenchen/.nvm
+    └── (empty)
+    
+    [chenchen@grpc01 bin]$ npm config list
+    ; "user" config from /home/chenchen/.npmrc
+    
+    disturl = "https://npm.taobao.org/dist" 
+    registry = "https://registry.npm.taobao.org/" 
+    
+    ; "project" config from /home/chenchen/.nvm/.npmrc
+    
+    package-lock = false 
+    
+    ; node bin location = /home/chenchen/.nvm/versions/node/v17.7.2/bin/node
+    ; cwd = /home/chenchen/.nvm/versions/node/v17.7.2/bin
+    ; HOME = /home/chenchen
+    ; Run `npm config ls -l` to show all defaults.
+    [chenchen@grpc01 bin]$ 
+    ```
+
+    
 
 3. 修改 npm 下载源, 改为国内
 
@@ -622,6 +731,8 @@ total 300K
 
 
 ## 参见
+
+nvm: https://github.com/nvm-sh/nvm#installing-and-updating
 
 npm 官网: <https://www.npmjs.com>
 

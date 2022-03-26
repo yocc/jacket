@@ -2,7 +2,7 @@
 
 ---
 
-
+[toc]
 
 ### 介绍
 
@@ -110,6 +110,8 @@ rpm -e --allmatchs e2fsprogs			// 卸载匹配
 rpm -e goaccess-0.6-1.el6.x86_64        // 卸载指定准确包名的软件
 rpm -e 包名 
 rpm --erase 包名
+
+
 ```
 
 
@@ -129,5 +131,78 @@ rpm --erase 包名
 #rpm -qpc rpm包
 5. 查看软件包的依赖关系
 #rpm -qpR rpm包
+```
+
+
+
+### FAQ
+
+```shell
+问题:
+[chenchen@grpc01 bin]$ sudo rpm -e python-2.7.5-86.el7.x86_64
+error: Failed dependencies:
+......
+
+解决:
+# --force (强制) 和 --nodeps (不查找依赖关系)
+sudo rpm -e python-2.7.5-86.el7.x86_64 --nodeps
+```
+
+```shell
+问题:
+删除了 python2.7 导致 yum不可用
+
+原因:
+删除了系统中不该删出的软件, 比如删除了 python2.7, 而 python2.7 是 yum 脚本使用的.
+即, vim /usr/bin/yum 第一行是 #!/usr/bin/python, 也就是 yum 是 python 脚本
+
+解决:
+思路是需要重新装回 python2.7
+1. 需要先找到之前通过 sudo rpm -e python-2.7.5-86.el7.x86_64 --nodeps 卸载掉的软件包
+通过官网 https://vault.centos.org/7.7.1908/os/x86_64/Packages/ 来搜索严格对应的软件包
+其中的 CentOS 系统版本号, 由一下方法拿到.
+[chenchen@grpc01 ~]$ cat /etc/redhat-release
+CentOS Linux release 7.7.1908 (Core)
+2. 下载找到的软件包
+wget https://vault.centos.org/7.7.1908/os/x86_64/Packages/python-2.7.5-86.el7.x86_64.rpm
+3. 通过 rpm 安装本地 rpm包
+sudo rpm -ivh python-2.7.5-86.el7.x86_64.rpm
+4. 检验 python 是否正常
+[chenchen@grpc01 ~]$ python --version
+Python 2.7.5
+[chenchen@grpc01 ~]$ yum list installed | grep  python
+audit-libs-python.x86_64               2.8.5-4.el7                     @base    
+dbus-python.x86_64                     1.1.1-9.el7                     @anaconda
+libselinux-python.x86_64               2.5-15.el7                      @base    
+libsemanage-python.x86_64              2.5-14.el7                      @base    
+libxml2-python.x86_64                  2.9.1-6.el7_9.6                 @updates 
+newt-python.x86_64                     0.52.15-4.el7                   @anaconda
+policycoreutils-python.x86_64          2.5-34.el7                      @base    
+python.x86_64                          2.7.5-86.el7                    @anaconda
+python-IPy.noarch                      0.75-6.el7                      @base    
+python-chardet.noarch                  2.2.1-3.el7                     @base    
+python-configobj.noarch                4.7.2-7.el7                     @anaconda
+python-decorator.noarch                3.4.0-3.el7                     @anaconda
+python-firewall.noarch                 0.6.3-2.el7                     @anaconda
+python-gobject-base.x86_64             3.22.0-1.el7_4.1                @anaconda
+python-iniparse.noarch                 0.4-9.el7                       @anaconda
+python-kitchen.noarch                  1.1.1-5.el7                     @base    
+python-libs.x86_64                     2.7.5-86.el7                    @anaconda
+python-linux-procfs.noarch             0.4.11-4.el7                    @anaconda
+python-perf.x86_64                     3.10.0-1062.el7                 @anaconda
+python-pycurl.x86_64                   7.19.0-19.el7                   @anaconda
+python-pyudev.noarch                   0.15-9.el7                      @anaconda
+python-rpm-macros.noarch               3-34.el7                        @base    
+python-schedutils.x86_64               0.4-6.el7                       @anaconda
+python-slip.noarch                     0.4.0-4.el7                     @anaconda
+python-slip-dbus.noarch                0.4.0-4.el7                     @anaconda
+python-srpm-macros.noarch              3-34.el7                        @base    
+python-urlgrabber.noarch               3.10-9.el7                      @anaconda
+python3.x86_64                         3.6.8-18.el7                    @updates 
+python3-libs.x86_64                    3.6.8-18.el7                    @updates 
+python3-pip.noarch                     9.0.3-8.el7                     @base    
+python3-setuptools.noarch              39.2.0-10.el7                   @base    
+rpm-python.x86_64                      4.11.3-48.el7_9                 @updates 
+[chenchen@grpc01 ~]$ 
 ```
 
