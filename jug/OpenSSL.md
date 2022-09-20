@@ -247,3 +247,202 @@ OpenSSL 1.0.2k-fips  26 Jan 2017
 [OpenSSL]:(https://www.openssl.org/)
 
 https://docs.python.org/3/using/unix.html
+
+
+
+
+
+
+
+
+
+## OpenSSL3.x 分支
+
+注意: 最新的稳定版本是支持到 2026 年 9 月 7 日的 3.0 系列. 这也是长期支持 (LTS) 版本. 之前的 LTS 版本(1.1.1 系列)也可用, 并且支持到 2023 年 9 月 11 日. 所有旧版本(包括 1.1.0、1.0.2、1.0.0 和 0.9.8)现在都不再支持, 应该不被使用. 鼓励这些旧版本的用户尽快升级到 3.0. 提供了对 1.0.2 的扩展支持, 以访问该版本的安全修复程序.
+
+OpenSSL 3.0 是 OpenSSL 的最新主要版本. OpenSSL FIPS 对象模块 (FOM) 3.0 是 OpenSSL 3.0 下载的集成部分. 您无需单独下载 3.0 FOM. 参考下载里面的安装说明, 使用 “enable-fips” 编译时配置选项来构建它.
+
+```shell
+1. 开始前的必要准备条件
+. make 工具
+. Perl 5 带有核心模块
+. Perl 模块 Text::Template
+. ANSI C 编译器
+. 带有 C头文件 和 开发库 的开发环境
+. 被支持的操作系统
+
+2. 快速开始和安装(默认位置)
+### Unix / Linux / macOS
+    $ ./Configure
+    $ make
+    $ make test
+上面的命令会将 OpenSSL 安装到系统默认位置.
+
+出于安全原因, 默认系统位置默认不可写对于非特权用户. 因此, 对于最终安装步骤管理特权是必需的. 
+默认系统位置和过程获得管理权限取决于操作系统. 
+建议使用 普通用户权限编译 和 测试 OpenSSL 并仅对 最终安装 步骤使用 管理权限. 
+# 普通用户权限: 编译 和 测试
+#	管理员权限: 安装
+
+在某些平台上, OpenSSL 作为操作系统的一部分预安装. 
+在这种情况下, 强烈建议不要覆盖系统版本, 因为其他应用程序或库可能依赖于它.
+要避免破坏其他应用程序, 请将 OpenSSL 的副本安装到[different location](#installing-to-a-different-location)
+[不同地点](#installing到不同位置)不在系统库的全局搜索路径.
+### Unix / Linux / macOS
+
+根据您的发行版, 您需要将以下命令作为 root 用户或命令前面附加的 "sudo":
+    $ sudo make install
+默认情况下, OpenSSL 将安装到
+    /usr/local
+更准确地说, 文件将安装到子目录中
+    /usr/local/bin
+    /usr/local/lib
+    /usr/local/include
+    ...
+取决于文件类型, 因为它是在 类Unix 操作系统上自定义的.
+
+3. 安装到其他位置
+将 OpenSSL 安装到其他位置(例如, 安装到 home 用于测试目的的目录) 运行 "配置", 如下所示, 例子 
+选项 `--prefix` and `--openssldir` 在下面的 [Directories](#directories) 中有更详细的解释, 这里使用的值只是示例.
+在 Unix 上: 
+    $ ./Configure --prefix=/opt/openssl --openssldir=/usr/local/ssl
+
+目录:
+### libdir
+    --libdir=DIR
+此目录是 库安装的位置 在顶级目录的下面, 顶级目录是 `--prefix` 选项指定的位置. 默认叫做 `lib`. 
+一些构建目标在构建配置中设置了 multilib 后缀. 对于这些目标, 默认的 libdir 是 `lib< multilib-postfix>`. 
+如果不希望添加后缀, 那么, 请用 `--libdir=lib` 覆盖 `libdir`.
+## openssldir
+    --openssldir=DIR
+OpenSSL 配置文件的目录, 以及默认证书和密钥库. 默认值为 `Unix: /usr/local/ssl`
+### prefix
+    --prefix=DIR
+安装目录的根目录, 默认: `Unix: /usr/local`
+
+4. 构建失败
+    $ make clean		# Unix
+
+5. 共享库注意事项
+在大多数 POSIX 平台上, 共享库被命名为 `libcrypto.so.1.1` 和 `libssl.so.1.1`.
+
+```
+
+
+
+
+
+```shell
+# OpenSSL3.x 
+[chenchen@grpc01 tmp]$ wget https://www.openssl.org/source/openssl-3.0.4.tar.gz.sha256 --no-check-certificate
+[chenchen@grpc01 tmp]$ sha256sum openssl-3.0.4.tar.gz
+2831843e9a668a0ab478e7020ad63d2d65e51f72977472dc73efcefbafc0c00f  openssl-3.0.4.tar.gz
+[chenchen@grpc01 tmp]$ wget https://www.openssl.org/source/openssl-3.0.4.tar.gz.sha256 --no-check-certificate
+[chenchen@grpc01 tmp]$ tar -zxvf openssl-3.0.4.tar.gz -C ./
+[chenchen@grpc01 tmp]$ cd openssl-3.0.4
+[chenchen@grpc01 tmp]$ less README.md
+[chenchen@grpc01 tmp]$ less INSTALL.md
+[chenchen@grpc01 tmp]$ ./Configure --prefix=/usr/local/openssl-3.0.4 --libdir=lib --openssldir=/usr/local/ssl
+[chenchen@grpc01 tmp]$ make
+[chenchen@grpc01 tmp]$ make test
+[chenchen@grpc01 tmp]$ sudo make install
+[chenchen@grpc01 tmp]$ make clean
+
+```
+
+```shell
+# Troubleshooting
+[chenchen@grpc01 openssl-3.0.4]$ ./Configure --prefix=/usr/local/openssl-3.0.4 --libdir=lib --openssldir=/usr/local/ssl
+Can't locate IPC/Cmd.pm in @INC (@INC contains: /home/chenchen/tmp/openssl-3.0.4/util/perl /usr/local/lib64/perl5 /usr/local/share/perl5 /usr/lib64/perl5/vendor_perl /usr/share/perl5/vendor_perl /usr/lib64/perl5 /usr/share/perl5 . /home/chenchen/tmp/openssl-3.0.4/external/perl/Text-Template-1.56/lib) at /home/chenchen/tmp/openssl-3.0.4/util/perl/OpenSSL/config.pm line 18.
+BEGIN failed--compilation aborted at /home/chenchen/tmp/openssl-3.0.4/util/perl/OpenSSL/config.pm line 18.
+Compilation failed in require at ./Configure line 24.
+BEGIN failed--compilation aborted at ./Configure line 24.
+[chenchen@grpc01 openssl-3.0.4]$ less 
+Missing filename ("less --help" for help)
+[chenchen@grpc01 openssl-3.0.4]$ less NOTES-PERL.md
+
+# Required Perl modules
+* Text::Template this is required *for building*
+* `Test::More` this is required *for testing*
+
+# Notes on installing a Perl module
+Install using CPAN.  This is very easy, but usually requires `root` access:
+       $ sudo cpan -i Text::Template
+
+# 以下是问题解决的办法, 其实是缺少了 IPC::Cmd 模块
+[chenchen@grpc01 openssl-3.0.4]$ ./Configure --prefix=/usr/local/openssl-3.0.4 --libdir=lib --openssldir=/usr/local/ssl
+Can't locate IPC/Cmd.pm in @INC (@INC contains: /home/chenchen/tmp/openssl-3.0.4/util/perl /usr/local/lib64/perl5 /usr/local/share/perl5 /usr/lib64/perl5/vendor_perl /usr/share/perl5/vendor_perl /usr/lib64/perl5 /usr/share/perl5 . /home/chenchen/tmp/openssl-3.0.4/external/perl/Text-Template-1.56/lib) at /home/chenchen/tmp/openssl-3.0.4/util/perl/OpenSSL/config.pm line 18.
+BEGIN failed--compilation aborted at /home/chenchen/tmp/openssl-3.0.4/util/perl/OpenSSL/config.pm line 18.
+Compilation failed in require at ./Configure line 24.
+BEGIN failed--compilation aborted at ./Configure line 24.
+[chenchen@grpc01 openssl-3.0.4]$ vim /home/chenchen/tmp/openssl-3.0.4/util/perl/OpenSSL/config.pm
+# 这里插播, 初次安装模块时, 会让选择全自动方式还是交互方式, 我选的是全自动方式
+[chenchen@grpc01 openssl-3.0.4]$ sudo cpan -i IPC::Cmd
+[chenchen@grpc01 openssl-3.0.4]$ ./Configure --prefix=/usr/local/openssl-3.0.4 --libdir=lib --openssldir=/usr/local/ssl
+Configuring OpenSSL version 3.0.4 for target linux-x86_64
+Using os-specific seed configuration
+Created configdata.pm
+Running configdata.pm
+Created Makefile.in
+Created Makefile
+Created include/openssl/configuration.h
+
+**********************************************************************
+***                                                                ***
+***   OpenSSL has been successfully configured                     ***
+***                                                                ***
+***   If you encounter a problem while building, please open an    ***
+***   issue on GitHub <https://github.com/openssl/openssl/issues>  ***
+***   and include the output from the following command:           ***
+***                                                                ***
+***       perl configdata.pm --dump                                ***
+***                                                                ***
+***   (If you are new to OpenSSL, you might want to consult the    ***
+***   'Troubleshooting' section in the INSTALL.md file first)      ***
+***                                                                ***
+**********************************************************************
+[chenchen@grpc01 openssl-3.0.4]$ make
+[chenchen@grpc01 openssl-3.0.4]$ make test
+[chenchen@grpc01 openssl-3.0.4]$ sudo make install
+[chenchen@grpc01 openssl-3.0.4]$ make clean
+
+
+
+
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -6,7 +6,7 @@
 
 ### 介绍
 
-```
+```shell
 rpm 是 redhat 公司的一种软件包管理机制, 直接通过 rpm 命令进行安装删除等操作, 最大的优点是自己内部自动处理了各种软件包可能的依赖关系.
 *.rpm 形式的二进制软件包
 ```
@@ -17,7 +17,7 @@ rpm 是 redhat 公司的一种软件包管理机制, 直接通过 rpm 命令进�
 
 ##### 查询已经安装的软件包
 
-```
+```shell
 # rpm -qi 已安装的包名			// 查看一个包的详细信息, 服务安装后查看已经安装包的名字
 # rpm -qi 未安装的包名			// 后面如果跟一个未安装的包名，会显示什么信息？// 包名 is not installed
 # rpm -qc 包名						 // 显示软件包中的配置文件, 这些文件一般是安装后需要用户手工修改的, 例如：sendmail.cf,passwd,inittab等
@@ -36,7 +36,7 @@ sinasrv2-php-redis-2.2.7-1.x86_64
 
 ##### 查询软件包安装位置
 
-```
+```shell
 [root@dev_10.211.21.18 redis_6379]# rpm -ql rc-redis-3.0.7-1.x86_64			// 用查到的安装包的名字全称查找安装目录, 查看一个包安装了哪些文件
 /usr/local/rc-redis-3.0.7/.gitignore
 /usr/local/rc-redis-3.0.7/00-RELEASENOTES
@@ -47,7 +47,7 @@ sinasrv2-php-redis-2.2.7-1.x86_64
 
 ##### 通过进程名字获取软件包名称
 
-```
+```shell
 如果用户碰到一个认不出来的文件, 想要知道它是属于那一个软件包:
 [chenchen@hathor122 sbin]$ rpm -qf /usr/sbin/sshd
 openssh-server-6.6.1p1-11.el7.x86_64
@@ -60,15 +60,16 @@ sinaopenssh-6.7p1-1.x86_64
 
 ### 校验软件包
 
-```
-rpm -Vf 需要验证到包
+```shell
+sudo rpm -Vf 需要验证的包名字
+sudo rpm –Va 对整个系统进行校验，以了解哪些部分可能已经损坏
 ```
 
 
 
 ### 安装软件包
 
-```
+```shell
 rpm -i 包名 
 rpm -i example.rpm			  // 安装 example.rpm 包；
 rpm -iv example.rpm			  // 安装 example.rpm 包并在安装过程中显示正在安装的文件信息；
@@ -83,7 +84,7 @@ rpm -i --nodeps 包名			 // 有依赖关系时, 忽略依赖关系, 强制安�
 
 ### 升级软件包
 
-```
+```shell
 rpm -Uvh 包名
 
 用户要注意的是：rpm会自动卸载相应软件包的老版本。如果老版本软件的配置文件通新版本的不兼容，rpm会自动将其保存为另外一个文件，用户会看到下面的信息：
@@ -102,7 +103,7 @@ error:example.rpm cannot be installed
 
 ### 卸载已经安装的软件包
 
-```
+```shell
 卸载所有匹配名字的包:
 一般在发现安装有包冲突版本号不对时, 
 就会先卸载已有的包, 重新让yum自动安装依赖包.
@@ -135,6 +136,41 @@ rpm --erase 包名
 
 
 
+### rpm 命令参数详解
+
+```shell
+rpm命令参数详解
+
+详细选项：
+
+－ivh：安装显示安装进度--install--verbose--hash
+－Uvh：升级软件包--Update；
+－qpl：列出RPM软件包内的文件信息[Query Package list]；
+－qpi：列出RPM软件包的描述信息[Query Package install package(s)]；
+－qf：查找指定文件属于哪个RPM软件包[Query File]；
+－Va：校验所有的RPM软件包，查找丢失的文件[View Lost]；
+－e：删除包
+
+-h (or –hash) 安装时输出hash记号 (“#’)
+–test 只对安装进行测试，并不实际安装。
+–percent 以百分比的形式输出安装的进度。
+–excludedocs 不安装软件包中的文档文件
+–includedocs 安装文档
+–replacepkgs 强制重新安装已经安装的软件包
+–replacefiles 替换属于其它软件包的文件
+–force 忽略软件包及文件的冲突
+–noscripts 不运行预安装和后安装脚本
+–prefix 将软件包安装到由 指定的路径下
+–ignorearch 不校验软件包的结构
+–ignoreos 不检查软件包运行的操作系统
+–nodeps 不检查依赖性关系
+–ftpproxy 用 作为 FTP代理
+–ftpport 指定FTP的端口号为
+
+```
+
+
+
 ### FAQ
 
 ```shell
@@ -146,6 +182,7 @@ error: Failed dependencies:
 解决:
 # --force (强制) 和 --nodeps (不查找依赖关系)
 sudo rpm -e python-2.7.5-86.el7.x86_64 --nodeps
+# --force, rpm: only installation and upgrading may be forced, 仅用于安装和升级
 ```
 
 ```shell

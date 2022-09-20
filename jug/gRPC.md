@@ -195,42 +195,64 @@ rpc BidiHello(stream HelloRequest) returns (stream HelloResponse);
 
 - 我可以在浏览器中使用它吗？
   gRPC-Web 项目已正式发布。
-
 - 我可以将gRPC与我最喜欢的数据格式（JSON，Protobuf，Thrift，XML）一起使用吗？
   是的。gRPC 旨在可扩展以支持多种内容类型。初始版本包含对 Protobuf 的支持，以及对其他内容类型（如 FlatBuffers 和 Thrift）的外部支持，具有不同的成熟度。
-
 - 是否可以在服务网格中使用 gRPC？
   是的。gRPC 应用程序可以像任何其他应用程序一样部署在服务网格中。gRPC 还支持 xDS API，支持在没有 sidecar 代理的服务网格中部署 gRPC 应用程序。此处列出了 gRPC 中支持的无代理服务网格功能。
-
 - gRPC 如何帮助开发移动应用程序？
   gRPC 和 Protobuf 提供了一种简单的方法来精确定义服务，并为 iOS、Android 和提供后端的服务器自动生成可靠的客户端库。客户端可以利用高级流和连接功能，这些功能有助于节省带宽，通过更少的 TCP 连接执行更多操作，并节省 CPU 使用率和电池寿命。
-
 - 为什么 gRPC 比 HTTP/2 上的任何二进制 blob 都好？
   这在很大程度上就是gRPC在网络上的内容。但是，gRPC 也是一组库，它们将跨平台一致地提供更高级别的功能，而常见的 HTTP 库通常不会这样做。此类功能的示例包括：
   - 在应用层与流量控制交互
   - 级联呼叫取消
   - 负载平衡和故障转移
-
 - 为什么gRPC比REST更好/更差？
   gRPC 在很大程度上遵循 HTTP/2 上的 HTTP 语义，但我们明确允许全双工流式处理。我们偏离了典型的 REST 约定，因为我们在调用调度期间出于性能原因使用静态路径，因为从路径、查询参数和有效负载正文解析调用参数会增加延迟和复杂性。我们还正式确定了一组错误，我们认为这些错误比HTTP状态代码更直接地适用于API用例。
 
 
 
-## Installation(错误, 废弃)
+## 什么是
 
-- import
+```shell
+1. 什么是 protobuf
+	 是 google (Protocol Buffer) 的一种数据交换的格式, 它独立于语言, 独立于平台.
+	 
+2. 什么是 protoc
+	 是 .proto 文件的编译器, 可以借助这个工具把 .proto 文件转译成各种编程语言对应的源码, 包含数据类型定义、调用接口等.
+	 protoc 在设计上把 protobuf 和不同的语言解耦了, 底层用 c++ 来实现 protobuf 结构的存储, 然后通过插件的形式来生成不同语言的源码. 
+	 可以把 protoc 的编译过程分成简单的两个步骤: 
+	 1）解析 .proto文件, 转译成 protobuf 的原生数据结构在内存中保存; (创建内存结构)
+	 2）把 protobuf 相关的数据结构传递给相应语言的编译插件, 由插件负责根据接收到的 protobuf 原生结构渲染输出特定语言的模板. 
+	 
+3. 什么是 protoc-gen-go
+	 是 protobuf 编译插件系列中的 Go 版本. 从上一小节知道原生的 protoc 并不包含 Go 版本的插件, 不过可以在github上发现专门的代码库, 参见 github 库: https://studygolang.com/articles/github.com/golang/protobuf/protoc-gen-go
+	 由于 protoc-gen-go 是 Go 写的, 所以安装它变得很简单, 只需要运行: 
+	 $ go get -u github.com/golang/protobuf/protoc-gen-go，
+	 便可以在 $GOBIN 目录下发现这个工具. 至此, 就可以通过下面的命令来使用 protoc-gen-go 了
+	 $ protoc --go_out=output_directory input_directory/file.proto
+	 其中 "--go_out=" 表示生成 Go 文件, protoc 会自动寻找 PATH（系统执行路径）中的 protoc-gen-go 执行文件.
+```
 
-	```golang
-	import "google.golang.org/grpc"
-	```
 
-- go get
 
-  ```shell
-  $ go get -u google.golang.org/grpc
-  ```
+## 结语
 
-  > 从中国访问 grpc-go, [I/O Timeout Errors](https://github.com/grpc/grpc-go#FAQ)
+```shell
+从巴别塔的传说可以知道, 欲要构建大系统, 个体之间的沟通规范很重要.
+protobuf 的出现, 为不同系统之间的连接提供了一种语言规范, 只要遵循了这个规范, 各个系统之间就是解耦的, 非常适合近年来流行的微服务架构.
+如果把 protoc 和 protoc-gen-go 看成两个微服务, 可以发现这两个服务就是完全解耦的; 
+两者完全负责不同的功能, 可以分别编码、升级, 串接这两个服务的就是proto规范.
+protoc, 可以产生序列化和反序列化的代码, 无 go 相关代码.
+protoc-gen-go, 可以产生go相关代码, 除上述序列化和反序列化代码之外, 还增加了一些通信公共库.
+```
+
+```shell
+https://baike.baidu.com/item/%E5%B7%B4%E5%88%AB%E5%A1%94/67557?fr=aladdin
+巴别塔 (宗教传说中的高塔)
+巴别塔是《圣经·旧约·创世记》第11章故事中人们建造的塔.
+根据篇章记载, 当时人类联合起来兴建希望能通往天堂的高塔;
+为了阻止人类的计划, 上帝让人类说不同的语言, 使人类相互之间不能沟通, 计划因此失败, 人类自此各散东西. 此事件, 为世上出现不同语言和种族提供解释.
+```
 
 
 
@@ -277,7 +299,7 @@ libprotoc 3.19.4
 ## Go plugins for the protocol compiler
 
 ```go
-// 安装 Go 编译器插件
+// 安装 Go 编译器插件, protoc-gen-go 和 protoc-gen-go-grpc 是编译工具, 配合 protoc 编译 proto 文件
 // 1. 因为 go install 会将 compiler 安装到 GOBIN 下面. protoc-gen-go 和 protoc-gen-go-grpc
 $ go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
 $ go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
@@ -309,6 +331,77 @@ protoc-gen-go v1.27.1
 
 
 
+## 编译 .proto
+
+```shell
+$ protoc --go_out=. --go-grpc_out=. ./*.proto
+
+$ protoc --go_out=. --go_opt=paths=source_relative \
+    --go-grpc_out=. --go-grpc_opt=paths=source_relative \
+    helloworld/helloworld.proto
+    
+$ protoc --go_out=. --plugin=/home/chenchen/tmp/go1172/gobin /home/chenchen/tmp/go1172/gopath/src/pb/grpc-go/examples/helloworld/helloworld/helloworld.proto
+[chenchen@grpc01 pb]$ protoc --go_out=. --plugin=/home/chenchen/tmp/go1172/gobin /home/chenchen/tmp/go1172/gopath/src/pb/grpc-go/examples/helloworld/helloworld/helloworld.proto
+/home/chenchen/tmp/go1172/gopath/src/pb/grpc-go/examples/helloworld/helloworld/helloworld.proto: File does not reside within any path specified using --proto_path (or -I).  You must specify a --proto_path which encompasses this file.  Note that the proto_path must be an exact prefix of the .proto file names -- protoc is too dumb to figure out when two paths (e.g. absolute and relative) are equivalent (it's harder than you think).
+
+[chenchen@grpc01 pb]$ protoc --go_out=. --plugin=/home/chenchen/tmp/go1172/gobin --proto_path=/home/chenchen/tmp/go1172/gopath/src/pb/grpc-go/examples/helloworld/helloworld/helloworld.proto
+Missing input file.
+ 
+[chenchen@grpc01 pb]$ protoc --go_out=./ --plugin=/home/chenchen/tmp/go1172/gobin/protoc-gen-go --proto_path=/home/chenchen/tmp/go1172/gopath/src/pb/grpc-go/examples/helloworld/helloworld/helloworld.proto
+Missing input file.
+[chenchen@grpc01 pb]$ protoc --go_out=./ --plugin=/home/chenchen/tmp/go1172/gobin/protoc-gen-go-grpc --proto_path=/home/chenchen/tmp/go1172/gopath/src/pb/grpc-go/examples/helloworld/helloworld/helloworld.proto
+Missing input file.
+
+执行：protoc --go_out=plugins=grpc:. xxx.proto
+注意：xxx是你要编译的.proto文件名，grpc:. xxx.proto冒号后面那个点和文件名之间有个空格，忘记加空格了不会编译通过，会报错：Missing input file.
+$ protoc --go_out=plugins=grpc:/home/chenchen/tmp/go1172/gobin/protoc-gen-go-grpc /home/chenchen/tmp/go1172/gopath/src/pb/grpc-go/examples/helloworld/helloworld/helloworld.proto
+[chenchen@grpc01 pb]$ protoc --go_out=plugins=grpc:/home/chenchen/tmp/go1172/gobin/protoc-gen-go-grpc /home/chenchen/tmp/go1172/gopath/src/pb/grpc-go/examples/helloworld/helloworld/helloworld.proto
+/home/chenchen/tmp/go1172/gopath/src/pb/grpc-go/examples/helloworld/helloworld/helloworld.proto: File does not reside within any path specified using --proto_path (or -I).  You must specify a --proto_path which encompasses this file.  Note that the proto_path must be an exact prefix of the .proto file names -- protoc is too dumb to figure out when two paths (e.g. absolute and relative) are equivalent (it's harder than you think).
+[chenchen@grpc01 pb]$ 
+
+# 参考: https://developers.google.com/protocol-buffers/docs/gotutorial
+protoc -I=$SRC_DIR --go_out=$DST_DIR $SRC_DIR/addressbook.proto
+protoc --plugin=插件位置 --go_out=输出生成文件目录 -I=输入源.proto文件目录 输入源.proto文件目录/.proto文件
+
+# 参数说明:
+protoc --proto_path=$GOPATH/src --proto_path=. --go_out=. ./*.proto
+-I, --proto_path: .proto 文件目录位置, .proto 文件是可以彼此互相依赖的, 也就是会有多个目录位置, 没有指定则从当前目录查找.
+--go_out: 输出生成的go文件, 及其go文件的路径.
+--go_out=plugins=grpc:helloworld: 使用grpc插件, 输出生成的go文件在 helloworld 目录下
+--go_out=plugins=grpc:.: 使用grpc插件, 输出生成的go文件在当前目录下
+
+protoc --go_out=plugins=grpc:. --go_opt=paths=source_relative ./update.proto
+--go_opt=paths=source_relative: 表示生成的go文件时候的目录选项, 表示生成的go文件与proto在同一目录.
+
+# 以下为proto文件中的关键词:
+package, 避免命名冲突, 不同项目指定不同的package
+import, proto文件可以嵌套, 通过import引入
+option go_package = "github.com/protocolbuffers/protobuf/examples/go/tutorialpb": 如果引用当前这个proto文件生成的go文件时, import后面的路径. 如果不指定 --go_opt, 表示生成的go文件应该存放的位置.
+go_package, 是用来显式指定生成的go文件的package的名字
+
+package 和 go_package 的最后一个单词不一样, 
+package tutorial;
+option go_package = "github.com/protocolbuffers/protobuf/examples/go/tutorialpb";
+他们的含义分别是:
+package 用于防止不同 project 之间定义了同名 message 结构的冲突, 因为 package 名的一个作用是用于init方法中的注册:
+而当 go_package 存在时, 其最后一个单词是生成的go文件的package名字:
+而当 go_package 不存在时, go文件件的package名字就变成了proto中package指定的名字了.
+
+
+# 生成 helloworld.pb.go
+$ protoc --go_out=./ --plugin=/home/chenchen/tmp/go1172/gobin/protoc-gen-go -I=/home/chenchen/tmp/go1172/gopath/src/pb/grpc-go/examples/helloworld/helloworld/ /home/chenchen/tmp/go1172/gopath/src/pb/grpc-go/examples/helloworld/helloworld/helloworld.proto
+
+# 生成 helloworld_grpc.pb.go
+$ protoc --go-grpc_out=./ --plugin=/home/chenchen/tmp/go1172/gobin/protoc-gen-go-grpc -I/home/chenchen/tmp/go1172/gopath/src/pb/grpc-go/examples/helloworld/helloworld/ /home/chenchen/tmp/go1172/gopath/src/pb/grpc-go/examples/helloworld/helloworld/helloworld.proto
+
+# 参考: https://www.cnblogs.com/zhangcaiwang/p/15755264.html
+
+# example
+protoc --go_out=. -I=./ ./sh.proto
+```
+
+
+
 ## 说明
 
 ```shell
@@ -328,7 +421,7 @@ https://grpc.io/docs/protoc-installation/
 
 https://grpc.io/docs/languages/go/quickstart/
 
-
+https://www.cnblogs.com/zhangcaiwang/p/15755264.html
 
 
 

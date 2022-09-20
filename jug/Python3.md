@@ -736,6 +736,62 @@ Successfully installed pip-21.2.4 setuptools-58.1.0
 
 
 
+### Python 3 on CentOS 8.x
+
+```shell
+Python 3 on CentOS 8.x
+Python 3 can be installed on CentOS 8.x using DNF package manager. Use the below command to start Python 3 install:
+
+$ sudo dnf install python3
+When prompted, please confirm by pressing ‘y’:
+
+Is this ok [y/N]: y
+Log snippet of Python 3 install on CentOS 8 is shown below:
+
+$ sudo dnf install python3
+Last metadata expiration check: 6:25:17 ago on Friday 11 December 2020 12:44:46 PM IST.
+Package python36-3.6.8-2.module_el8.1.0+245+c39af44f.x86_64 is already installed.
+Dependencies resolved.
+==========================================================================================================================================================================
+Package Architecture Version Repository Size
+==========================================================================================================================================================================
+Upgrading:
+python36 x86_64 3.6.8-2.module_el8.3.0+562+e162826a AppStream 19 k
+
+Transaction Summary
+==========================================================================================================================================================================
+Upgrade 1 Package
+
+Total download size: 19 k
+Is this ok [y/N]: y
+Downloading Packages:
+python36-3.6.8-2.module_el8.3.0+562+e162826a.x86_64.rpm 5.6 kB/s | 19 kB 00:03
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Total 4.6 kB/s | 19 kB 00:04
+Running transaction check
+Transaction check succeeded.
+Running transaction test
+Transaction test succeeded.
+Running transaction
+Preparing : 1/1
+Upgrading : python36-3.6.8-2.module_el8.3.0+562+e162826a.x86_64 1/2
+Running scriptlet: python36-3.6.8-2.module_el8.3.0+562+e162826a.x86_64 1/2
+Cleanup : python36-3.6.8-2.module_el8.1.0+245+c39af44f.x86_64 2/2
+Running scriptlet: python36-3.6.8-2.module_el8.1.0+245+c39af44f.x86_64 2/2
+Verifying : python36-3.6.8-2.module_el8.3.0+562+e162826a.x86_64 1/2
+Verifying : python36-3.6.8-2.module_el8.1.0+245+c39af44f.x86_64 2/2
+Installed products updated.
+
+Upgraded:
+python36-3.6.8-2.module_el8.3.0+562+e162826a.x86_64
+
+Complete!
+$
+
+```
+
+
+
 
 
 ### See Also

@@ -106,7 +106,10 @@ Golang 需要 vim 8+, 但 CentOS 7 的 yum 是 vim 7+, 需要更高版本
       [chenchen@localhost vim]$ ./configure --prefix=/usr/local/vim8
       [chenchen@localhost vim]$ make clean
       [chenchen@localhost vim]$ make
-      [chenchen@localhost vim]$ make install
+      [chenchen@localhost vim]$ sudo make install
+      
+      $ make distclean, 类似 make clean, 但同时也将 configure 生成的文件全部删除掉, 包括 Makefile.
+      $ make clean, 清除上次的 make 命令所产生的 object 文件(后缀为 ".o" 的文件)及可执行文件.
       
       
       # 修改配置 ~/.bashrc or ~/.bash_profile
@@ -433,5 +436,5 @@ $ vim -u NONE -c "helptags ~/.vim/pack/vendor/start/nerdtree/doc" -c q			# 设�
 [tabby]: https://tabby.sh/
 [vim8原生内置(naive)插件管理器安装]: https://blog.csdn.net/qq_27825451/article/details/100557133
 
-
+[nerdtree]: https://vimawesome.com/plugin/nerdtree-red
 

@@ -2,11 +2,11 @@
 
 ---
 
-
+[toc]
 
 ### 配置
 
-```
+```shell
 YUM 配置
 yum 的配置有两个地方:
 1. (yum 软件的全局配置) 直接配置 /etc/yum.conf 文件
@@ -77,7 +77,7 @@ gpgcheck=1 	# 这个选项表示这个repo中下载的rpm将进行gpg的校验�
 gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-fedora-$basearch		# 定义用于校验的gpg密钥
 ```
 
-```
+```shell
 // 例子: 
 -$-$-$-$-$-$-$-$-$-$-$-$-$-$-$-$-$-$-$-$-$-$-$-$-$-$-$-$-$-$-
 文件位置: /etc/yum.repos.d/nux-dextop.repo
@@ -103,7 +103,7 @@ protect=0, 默认为1; 只有那些拥有 protect=1 的软件库才能更新来�
 
 ### 插件
 
-```
+```shell
 // 加速 yum 更新速度
 // 安装 yum 的 fast mirror插件, 可以加快 CentOS/RHEL yum 的速度和提高稳定性, 效果显著.
 # yum -y install yum-fastestmirror							// Centos5
@@ -128,7 +128,7 @@ plugins=1						// 改为 0, 不使用插件
 
 ### 仓库
 
-```
+```shell
 .repo 文件, 字段说明: 
 [nux-dextop]: 仓库名字
 name: 描述性文字
@@ -139,7 +139,7 @@ gpgkey:
 protect: 更新相关
 ```
 
-```
+```shell
 直接找一个 repo 文件
 cd /etc/yum.repos.d/
 wget http://mirrors.163.com/.help/CentOS-Base-163.repo
@@ -147,7 +147,7 @@ yum makecache  //生成缓存
 yum update
 ```
 
-```
+```shell
 通过安装特定插件来自动找最快的镜像
 安装好yum-fastestmirror后,每次用yum安装就会自动检查速度最快的镜像了
 yum install yum-fastestmirror
@@ -155,7 +155,7 @@ yum clean all
 安装好yum-fastestmirror后,每次用yum安装就会自动检查速度最快的镜像了
 ```
 
-```
+```shell
 刷新仓库
 # yum clean								// 
 # yum clean all           // 刷新仓库配置
@@ -171,7 +171,7 @@ yum clean all
 
 ### 查询
 
-```
+```shell
 # yum											// 查看 软件 来自哪个 仓库
 
 # yum repolist
@@ -206,7 +206,7 @@ yum clean all
 
 ### 安装
 
-```
+```shell
 
 # yum -y install ffmpeg ffmpeg-devel --enablerepo=nux-dextop		// 通过制定仓库来安装 FFmpeg 和 FFmpeg-devel 包
 [root@Linux modules]# yum install subversion --enablerepo=WandiscoSVN			// 安装 SVN
@@ -219,7 +219,7 @@ yum clean all
 
 ### 更新
 
-```
+```shell
 # yum check-update					// *.rpm 包的更新, 检查可更新的 rpm 包; 查看那些可以升级, 返回 第二列是升级后的版本, 最后一列是来自哪里仓库
 
 # yum update								// 升级全部; update改变软件设置和系统设置, 系统版本内核都升级; update主要是使软件达到最新, 会频繁的发布升级;
@@ -233,7 +233,7 @@ yum clean all
 
 ### 卸载
 
-```
+```shell
 [root@Linux modules]# yum remove subversion
 # yum remove licq			// 删除 rpm 包, 包括与该包有倚赖性的包; 注: 同时会提示删除 licq-gnome, licq-qt, licq-text
 ```
@@ -242,7 +242,7 @@ yum clean all
 
 ### 服务
 
-```
+```shell
 // 每天定期执行系统更新
 # chkconfig yum on
 # service yum start
@@ -252,8 +252,467 @@ yum clean all
 
 ### 杂项
 
-```
+```shell
 安装 rz sz
 yum -y install lrzsz
 ```
 
+
+
+### 常用命令
+
+```shell
+yum安装常用软件的命令
+#yum check-update
+#yum remove 软件包名
+#yum install 软件包名
+#yum update 软件包名
+
+    参数				说明
+
+check-update	显示可升级的软件包
+clean	删除下载后的旧的header。和clean all相同
+clean oldheaders	删除旧的headers
+clean packages	删除下载后的软件包
+info	显示可用软件包信息
+info 软件包名	显示指定软件包信息
+install 软件包名	安装指定软件包
+list	显示可用软件包
+list installed	显示安装了的软件包
+list updates	显示可升级的软件包
+provides 软件包名	显示软件包所包含的文件
+remove 软件包名	删除制定的软件包，确认判定指定软件包的依存关系。
+ 
+search 关键字	利用关键字搜索软件包。搜索对象是，RPM文件名，Packager（包），Dummary，Description的各型
+ 
+update	升级所有的可升级的软件包
+update 软件包名	升级指定的软件包
+
+yum -y install httpd　 ← 在线安装httpd Apache服务器及相关组件
+yum -y install php　 ← 在线安装PHP
+yum -y install mysql-server　 ← 安装MySQL
+yum -y install php-mysql　 ← 安装php-mysql
+```
+
+
+
+### 案例 1
+
+```shell
+# 查看本地系统已经安装的软件
+[chenchen@grpc01 ~]$ sudo rpm -qa | grep ssl
+openssl-1.0.2k-24.el7_9.x86_64
+openssl-devel-1.0.2k-24.el7_9.x86_64
+openssl-libs-1.0.2k-24.el7_9.x86_64
+
+# 查看系统本
+[chenchen@grpc01 ~]$ cat /proc/version
+Linux version 3.10.0-1062.el7.x86_64 (mockbuild@kbuilder.bsys.centos.org) (gcc version 4.8.5 20150623 (Red Hat 4.8.5-36) (GCC) ) #1 SMP Wed Aug 7 18:08:02 UTC 2019
+[chenchen@grpc01 ~]$ cat /etc/redhat-release
+CentOS Linux release 7.7.1908 (Core)
+```
+
+### 案例 2
+
+```shell
+# 机器上以前手动删除了 yum 安装的 python3, 导致 新装python3不管是源码编译安装还是 yum 安装均有问题. 同时 OpenSSL 可能也有问题, 因为同一机器上, 除了系统自带的 OpenSSL 之外, 还有自己安装的 OpenSSL3.x 最新版版. 本案例就是为了解决这些混合问题, 我们会从分析开始, 一步一步最终让整个系统健康起来.
+
+1. 先看一下本地系统 yum, rpm 都装了啥
+[chenchen@grpc01 ~]$ sudo rpm -qa | grep python
+...
+python3-3.6.8-18.el7.x86_64
+...
+
+2. 试图绕过原有系统安装的 python3-3.6.8-18.el7.x86_64 而直接安装一个新的 python3-3.6.8-10.el7.i686.rpm
+	 提示错误, 依赖一系列库或者软件.
+[chenchen@grpc01 tmp]$ sudo rpm -ivh python3-3.6.8-10.el7.i686.rpm
+error: Failed dependencies:
+        libc.so.6 is needed by python3-3.6.8-10.el7.i686
+        libc.so.6(GLIBC_2.0) is needed by python3-3.6.8-10.el7.i686
+        libc.so.6(GLIBC_2.3.4) is needed by python3-3.6.8-10.el7.i686
+        libdl.so.2 is needed by python3-3.6.8-10.el7.i686
+        libm.so.6 is needed by python3-3.6.8-10.el7.i686
+        libpthread.so.0 is needed by python3-3.6.8-10.el7.i686
+        libpython3.6m.so.1.0 is needed by python3-3.6.8-10.el7.i686
+        libutil.so.1 is needed by python3-3.6.8-10.el7.i686
+        python3-libs(x86-32) = 3.6.8-10.el7 is needed by python3-3.6.8-10.el7.i686
+[chenchen@grpc01 tmp]$ 
+
+3. 查看 python3-3.6.8-10.el7.i686.rpm 软件包的全部依赖关系.
+	 可以看到依赖了很多, 第二步报错依赖失败中只是一部分, 另一部依赖是没问题的.
+[chenchen@grpc01 tmp]$ sudo rpm -qpR python3-3.6.8-10.el7.i686.rpm
+libc.so.6
+libc.so.6(GLIBC_2.0)
+libc.so.6(GLIBC_2.3.4)
+libdl.so.2
+libm.so.6
+libpthread.so.0
+libpython3.6m.so.1.0
+libutil.so.1
+python3-libs(x86-32) = 3.6.8-10.el7
+python3-pip
+python3-setuptools
+rpmlib(CompressedFileNames) <= 3.0.4-1
+rpmlib(FileDigests) <= 4.6.0-1
+rpmlib(PartialHardlinkSets) <= 4.0.4-1
+rpmlib(PayloadFilesHavePrefix) <= 4.0-1
+rtld(GNU_HASH)
+rpmlib(PayloadIsXz) <= 5.2-1
+
+[chenchen@grpc01 tmp]$ sudo rpm -Uvh python3-3.6.8-18.el7.x86_64
+error: open of python3-3.6.8-18.el7.x86_64 failed: No such file or directory
+
+4. 第二步种的依赖失败, 逐一解决.
+	 搜索找到, libc.so.6，该库对应的软件包名称为 glibc
+	 
+	 # 查找该软件包
+	 yum list glibc*     // *.rpm 包列表; 列出资源库中所有可以安装或更新的 rpm 包
+
+# 列出资源库中所有可以安装或更新的 rpm 包, glibc*
+[chenchen@grpc01 tmp]$ sudo yum list glibc*
+Loaded plugins: fastestmirror
+Repodata is over 2 weeks old. Install yum-cron? Or run: yum makecache fast
+Determining fastest mirrors
+ * base: mirrors.huaweicloud.com
+ * extras: mirrors.huaweicloud.com
+ * updates: mirrors.huaweicloud.com
+Installed Packages
+glibc.x86_64													2.17-324.el7_9										@updates
+glibc-common.x86_64										2.17-324.el7_9										@updates
+glibc-devel.x86_64										2.17-324.el7_9										@updates
+glibc-headers.x86_64									2.17-324.el7_9										@updates
+Available Packages
+glibc.i686														2.17-325.el7_9										updates 
+glibc.x86_64													2.17-325.el7_9										updates 
+glibc-common.x86_64										2.17-325.el7_9										updates 
+glibc-devel.i686											2.17-325.el7_9										updates 
+glibc-devel.x86_64										2.17-325.el7_9										updates 
+glibc-headers.x86_64									2.17-325.el7_9										updates 
+glibc-static.i686											2.17-325.el7_9										updates 
+glibc-static.x86_64										2.17-325.el7_9										updates 
+glibc-utils.x86_64										2.17-325.el7_9										updates 
+[chenchen@grpc01 tmp]$ 
+
+# 用 yum 安装 glibc.i686
+[chenchen@grpc01 tmp]$ sudo yum install glibc.i686
+Loaded plugins: fastestmirror
+Loading mirror speeds from cached hostfile
+ * base: mirrors.huaweicloud.com
+ * extras: mirrors.huaweicloud.com
+ * updates: mirrors.huaweicloud.com
+base															| 3.6 kB  00:00:00
+docker-ce-stable															| 3.5 kB  00:00:00     
+extras															| 2.9 kB  00:00:00     
+updates															| 2.9 kB  00:00:00     
+(1/3): docker-ce-stable/7/x86_64/primary_db															|  80 kB  00:00:01     
+(2/3): extras/7/x86_64/primary_db															| 247 kB  00:00:07     
+(3/3): updates/7/x86_64/primary_db															|  16 MB  00:16:47     
+Resolving Dependencies
+--> Running transaction check
+---> Package glibc.i686 0:2.17-326.el7_9 will be installed
+--> Processing Dependency: glibc-common = 2.17-326.el7_9 for package: glibc-2.17-326.el7_9.i686
+--> Processing Dependency: libfreebl3.so(NSSRAWHASH_3.12.3) for package: glibc-2.17-326.el7_9.i686
+--> Processing Dependency: libfreebl3.so for package: glibc-2.17-326.el7_9.i686
+--> Running transaction check
+---> Package glibc-common.x86_64 0:2.17-324.el7_9 will be updated
+--> Processing Dependency: glibc-common = 2.17-324.el7_9 for package: glibc-2.17-324.el7_9.x86_64
+---> Package glibc-common.x86_64 0:2.17-326.el7_9 will be an update
+---> Package nss-softokn-freebl.x86_64 0:3.44.0-5.el7 will be updated
+---> Package nss-softokn-freebl.i686 0:3.67.0-3.el7_9 will be installed
+--> Processing Dependency: nss-util >= 3.67.0-1 for package: nss-softokn-freebl-3.67.0-3.el7_9.i686
+--> Processing Dependency: nspr >= 4.30.0 for package: nss-softokn-freebl-3.67.0-3.el7_9.i686
+---> Package nss-softokn-freebl.x86_64 0:3.67.0-3.el7_9 will be an update
+--> Running transaction check
+---> Package glibc.x86_64 0:2.17-324.el7_9 will be updated
+--> Processing Dependency: glibc = 2.17-324.el7_9 for package: glibc-devel-2.17-324.el7_9.x86_64
+--> Processing Dependency: glibc = 2.17-324.el7_9 for package: glibc-headers-2.17-324.el7_9.x86_64
+---> Package glibc.x86_64 0:2.17-326.el7_9 will be an update
+---> Package nspr.x86_64 0:4.21.0-1.el7 will be updated
+---> Package nspr.x86_64 0:4.32.0-1.el7_9 will be an update
+---> Package nss-util.x86_64 0:3.44.0-3.el7 will be updated
+---> Package nss-util.x86_64 0:3.67.0-1.el7_9 will be an update
+--> Running transaction check
+---> Package glibc-devel.x86_64 0:2.17-324.el7_9 will be updated
+---> Package glibc-devel.x86_64 0:2.17-326.el7_9 will be an update
+---> Package glibc-headers.x86_64 0:2.17-324.el7_9 will be updated
+---> Package glibc-headers.x86_64 0:2.17-326.el7_9 will be an update
+--> Finished Dependency Resolution
+
+Dependencies Resolved
+
+=============================================================================================================
+ Package                                                             Arch                                                    Version                                                          Repository                                                Size
+=============================================================================================================
+Installing:
+ glibc									i686							2.17-326.el7_9					updates					4.3 M
+Installing for dependencies:
+ nss-softokn-freebl			i686							3.67.0-3.el7_9					updates					325 k
+Updating for dependencies:
+ glibc					x86_64					2.17-326.el7_9					updates					3.6 M
+ glibc-common					x86_64					2.17-326.el7_9					updates					12 M
+ glibc-devel					x86_64					2.17-326.el7_9					updates					1.1 M
+ glibc-headers					x86_64					2.17-326.el7_9					updates					691 k
+ nspr					x86_64					4.32.0-1.el7_9					updates					127 k
+ nss-softokn-freebl					x86_64					3.67.0-3.el7_9					updates					337 k
+ nss-util					x86_64					3.67.0-1.el7_9					updates					79 k
+
+Transaction Summary
+=============================================================================================================
+Install  1 Package  (+1 Dependent package)
+Upgrade             ( 7 Dependent packages)
+
+Total download size: 22 M
+Is this ok [y/d/N]: 
+Is this ok [y/d/N]: y
+Downloading packages:
+Delta RPMs disabled because /usr/bin/applydeltarpm not installed.
+(1/9): glibc-common-2.17-326.el7_9.x86_64.rpm					|  12 MB  00:00:06     
+(2/9): nspr-4.32.0-1.el7_9.x86_64.rpm					| 127 kB  00:00:00     
+(3/9): nss-softokn-freebl-3.67.0-3.el7_9.i686.rpm					| 325 kB  00:00:00     
+(4/9): nss-softokn-freebl-3.67.0-3.el7_9.x86_64.rpm					| 337 kB  00:00:00     
+(5/9): nss-util-3.67.0-1.el7_9.x86_64.rpm					|  79 kB  00:00:00     
+(6/9): glibc-headers-2.17-326.el7_9.x86_64.rpm					| 691 kB  00:00:06     
+(7/9): glibc-devel-2.17-326.el7_9.x86_64.rpm					| 1.1 MB  00:00:08     
+(8/9): glibc-2.17-326.el7_9.x86_64.rpm					| 3.6 MB  00:00:10     
+(9/9): glibc-2.17-326.el7_9.i686.rpm					| 4.3 MB  00:00:30     
+-------------------------------------------------------------------------------------------------------------
+Total                                                                                                                                                                                                                        730 kB/s |  22 MB  00:00:30     
+Running transaction check
+Running transaction test
+Transaction test succeeded
+Running transaction
+Warning: RPMDB altered outside of yum.
+** Found 5 pre-existing rpmdb problem(s), 'yum check' output follows:
+python3-libs-3.6.8-18.el7.x86_64 has missing requires of python(abi) = ('0', '3.6', None)
+python3-pip-9.0.3-8.el7.noarch has missing requires of /usr/bin/python3
+python3-pip-9.0.3-8.el7.noarch has missing requires of python(abi) = ('0', '3.6', None)
+python3-setuptools-39.2.0-10.el7.noarch has missing requires of /usr/bin/python3
+python3-setuptools-39.2.0-10.el7.noarch has missing requires of python(abi) = ('0', '3.6', None)
+  Updating   : nss-softokn-freebl-3.67.0-3.el7_9.x86_64					1/16 
+  Updating   : glibc-common-2.17-326.el7_9.x86_64					2/16 
+  Updating   : glibc-2.17-326.el7_9.x86_64					3/16 
+  Updating   : nspr-4.32.0-1.el7_9.x86_64					4/16 
+  Updating   : nss-util-3.67.0-1.el7_9.x86_64					5/16 
+  Updating   : glibc-headers-2.17-326.el7_9.x86_64					6/16 
+  Installing : nss-softokn-freebl-3.67.0-3.el7_9.i686					7/16 
+  Installing : glibc-2.17-326.el7_9.i686					8/16 
+  Updating   : glibc-devel-2.17-326.el7_9.x86_64					9/16 
+  Cleanup    : glibc-devel-2.17-324.el7_9.x86_64					10/16 
+  Cleanup    : glibc-headers-2.17-324.el7_9.x86_64					11/16 
+  Cleanup    : nspr-4.21.0-1.el7.x86_64					12/16 
+  Cleanup    : nss-util-3.44.0-3.el7.x86_64					13/16 
+  Cleanup    : nss-softokn-freebl-3.44.0-5.el7.x86_64					14/16 
+  Cleanup    : glibc-common-2.17-324.el7_9.x86_64					15/16 
+  Cleanup    : glibc-2.17-324.el7_9.x86_64					16/16 
+  Verifying  : glibc-common-2.17-326.el7_9.x86_64					1/16 
+  Verifying  : nss-softokn-freebl-3.67.0-3.el7_9.x86_64					2/16 
+  Verifying  : glibc-2.17-326.el7_9.x86_64					3/16 
+  Verifying  : glibc-devel-2.17-326.el7_9.x86_64					4/16 
+  Verifying  : nss-util-3.67.0-1.el7_9.x86_64					5/16 
+  Verifying  : nspr-4.32.0-1.el7_9.x86_64					6/16 
+  Verifying  : glibc-headers-2.17-326.el7_9.x86_64					7/16 
+  Verifying  : glibc-2.17-326.el7_9.i686					8/16 
+  Verifying  : nss-softokn-freebl-3.67.0-3.el7_9.i686					9/16 
+  Verifying  : glibc-devel-2.17-324.el7_9.x86_64					10/16 
+  Verifying  : glibc-2.17-324.el7_9.x86_64					11/16 
+  Verifying  : glibc-common-2.17-324.el7_9.x86_64					12/16 
+  Verifying  : nspr-4.21.0-1.el7.x86_64					13/16 
+  Verifying  : glibc-headers-2.17-324.el7_9.x86_64					14/16 
+  Verifying  : nss-softokn-freebl-3.44.0-5.el7.x86_64					15/16 
+  Verifying  : nss-util-3.44.0-3.el7.x86_64					16/16 
+
+Installed:
+  glibc.i686 0:2.17-326.el7_9                                                                                                                                                                                                                                
+
+Dependency Installed:
+  nss-softokn-freebl.i686 0:3.67.0-3.el7_9                                                                                                                                                                                                                   
+
+Dependency Updated:
+  glibc.x86_64 0:2.17-326.el7_9 glibc-common.x86_64 0:2.17-326.el7_9 glibc-devel.x86_64 0:2.17-326.el7_9 glibc-headers.x86_64 0:2.17-326.el7_9 nspr.x86_64 0:4.32.0-1.el7_9 nss-softokn-freebl.x86_64 0:3.67.0-3.el7_9 nss-util.x86_64 0:3.67.0-1.el7_9
+
+Complete!
+[chenchen@grpc01 tmp]$ 
+
+# 重新再次安装 python3-3.6.8-10.el7.i686.rpm, 发现还有依赖, 这两个依赖搜一通, 没有搜到, 还不行, 遂放弃.
+[chenchen@grpc01 tmp]$ sudo rpm -ivh python3-3.6.8-10.el7.i686.rpm
+error: Failed dependencies:
+        libpython3.6m.so.1.0 is needed by python3-3.6.8-10.el7.i686
+        python3-libs(x86-32) = 3.6.8-10.el7 is needed by python3-3.6.8-10.el7.i686
+[chenchen@grpc01 tmp]$ 
+
+# 继续重新安装 yum 默认安装的 pyton3, 提示此 python3.x86_64 0:3.6.8-18.el7 已经安装, 其实是被手动删除过的, 不可用的.
+[chenchen@grpc01 tmp]$ sudo yum install python3
+Loaded plugins: fastestmirror
+Loading mirror speeds from cached hostfile
+ * base: mirrors.huaweicloud.com
+ * extras: mirrors.huaweicloud.com
+ * updates: mirrors.huaweicloud.com
+Resolving Dependencies
+--> Running transaction check
+---> Package python3.x86_64 0:3.6.8-18.el7 will be installed
+--> Finished Dependency Resolution
+
+Dependencies Resolved
+
+=============================================================================================================
+ Package									Arch									Version									Repository									Size
+=============================================================================================================
+Installing:
+ python3									x86_64									3.6.8-18.el7									updates									70 k
+
+Transaction Summary
+=============================================================================================================
+Install  1 Package
+
+Total download size: 70 k
+Installed size: 39 k
+Is this ok [y/d/N]: y
+Downloading packages:
+python3-3.6.8-18.el7.x86_64.rpm                                                                                                                                                                                                       |  70 kB  00:00:00     
+Running transaction check
+Running transaction test
+Transaction test succeeded
+Running transaction
+  Installing : python3-3.6.8-18.el7.x86_64                                                                                                                                                                                                               1/1 
+  Verifying  : python3-3.6.8-18.el7.x86_64                                                                                                                                                                                                               1/1 
+
+Installed:
+  python3.x86_64 0:3.6.8-18.el7                                                                                                                                                                                                                              
+
+Complete!
+
+# 试着通过 yum 删除 python3.x86_64 0:3.6.8-18.el7, 然后再重新全新安装. 结果虽然损坏了, 但删除软件包成功了
+[chenchen@grpc01 tmp]$ sudo yum remove python3.x86_64 0:3.6.8-18.el7
+Loaded plugins: fastestmirror
+No Match for argument: 0:3.6.8-18.el7
+Resolving Dependencies
+--> Running transaction check
+...
+...
+...
+...
+Removed:
+  python3.x86_64 0:3.6.8-18.el7                                                                                                                                                                                                                              
+
+Dependency Removed:
+  python3-libs.x86_64 0:3.6.8-18.el7                                                python3-pip.noarch 0:9.0.3-8.el7                                                python3-setuptools.noarch 0:39.2.0-10.el7                                               
+
+Complete!
+
+# 重新通过 yum 安装 python3.x86_64 0:3.6.8-18.el7, 也成功了
+[chenchen@grpc01 tmp]$ sudo yum install python3.x86_64 0:3.6.8-18.el7
+Loaded plugins: fastestmirror
+Loading mirror speeds from cached hostfile
+ * base: mirrors.huaweicloud.com
+ * extras: mirrors.huaweicloud.com
+ * updates: mirrors.huaweicloud.com
+No package 0:3.6.8-18.el7 available.
+Resolving Dependencies
+--> Running transaction check
+---> Package python3.x86_64 0:3.6.8-18.el7 will be installed
+--> Processing Dependency: python3-libs(x86-64) = 3.6.8-18.el7 for package: python3-3.6.8-18.el7.x86_64
+--> Processing Dependency: python3-setuptools for package: python3-3.6.8-18.el7.x86_64
+--> Processing Dependency: python3-pip for package: python3-3.6.8-18.el7.x86_64
+--> Processing Dependency: libpython3.6m.so.1.0()(64bit) for package: python3-3.6.8-18.el7.x86_64
+--> Running transaction check
+---> Package python3-libs.x86_64 0:3.6.8-18.el7 will be installed
+---> Package python3-pip.noarch 0:9.0.3-8.el7 will be installed
+---> Package python3-setuptools.noarch 0:39.2.0-10.el7 will be installed
+--> Finished Dependency Resolution
+
+Dependencies Resolved
+
+=============================================================================================================
+ Package									Arch									Version									Repository									Size
+=============================================================================================================
+Installing:
+ python3									x86_64									3.6.8-18.el7									updates									70 k
+Installing for dependencies:
+ python3-libs						x86_64									3.6.8-18.el7									updates									6.9 M
+ python3-pip						noarch						9.0.3-8.el7						base						1.6 M
+ python3-setuptools						noarch						39.2.0-10.el7						base						629 k
+
+Transaction Summary
+=============================================================================================================
+Install  1 Package (+3 Dependent packages)
+
+Total download size: 9.3 M
+Installed size: 47 M
+Is this ok [y/d/N]: y
+Downloading packages:
+(1/4): python3-3.6.8-18.el7.x86_64.rpm                                                                                                                                                                                                |  70 kB  00:00:00     
+(2/4): python3-pip-9.0.3-8.el7.noarch.rpm                                                                                                                                                                                             | 1.6 MB  00:00:01     
+(3/4): python3-setuptools-39.2.0-10.el7.noarch.rpm                                                                                                                                                                                    | 629 kB  00:00:08     
+(4/4): python3-libs-3.6.8-18.el7.x86_64.rpm                                                                                                                                                                                           | 6.9 MB  00:01:21     
+-------------------------------------------------------------------------------------------------------------
+Total                                                                                                                                                                                                                        116 kB/s | 9.3 MB  00:01:21     
+Running transaction check
+Running transaction test
+Transaction test succeeded
+Running transaction
+  Installing : python3-libs-3.6.8-18.el7.x86_64                                                                                                                                                                                                          1/4 
+  Installing : python3-3.6.8-18.el7.x86_64                                                                                                                                                                                                               2/4 
+  Installing : python3-setuptools-39.2.0-10.el7.noarch                                                                                                                                                                                                   3/4 
+  Installing : python3-pip-9.0.3-8.el7.noarch                                                                                                                                                                                                            4/4 
+  Verifying  : python3-setuptools-39.2.0-10.el7.noarch                                                                                                                                                                                                   1/4 
+  Verifying  : python3-libs-3.6.8-18.el7.x86_64                                                                                                                                                                                                          2/4 
+  Verifying  : python3-3.6.8-18.el7.x86_64                                                                                                                                                                                                               3/4 
+  Verifying  : python3-pip-9.0.3-8.el7.noarch                                                                                                                                                                                                            4/4 
+
+Installed:
+  python3.x86_64 0:3.6.8-18.el7                                                                                                                                                                                                                              
+
+Dependency Installed:
+  python3-libs.x86_64 0:3.6.8-18.el7                                                python3-pip.noarch 0:9.0.3-8.el7                                                python3-setuptools.noarch 0:39.2.0-10.el7                                               
+
+Complete!
+[chenchen@grpc01 tmp]$ python3 -V
+Python 3.6.8
+
+# 再次重新检查没有问题了, 
+# sudo rpm -Va, 是校验所有的 RPM 软件包, 查找丢失的文件
+[chenchen@grpc01 tmp]$ sudo rpm -Va
+S.5....T.  c /etc/sudoers
+.M.......  g /etc/pki/ca-trust/extracted/java/cacerts
+.M.......  g /etc/pki/ca-trust/extracted/openssl/ca-bundle.trust.crt
+.M.......  g /etc/pki/ca-trust/extracted/pem/email-ca-bundle.pem
+.M.......  g /etc/pki/ca-trust/extracted/pem/objsign-ca-bundle.pem
+.M.......  g /etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem
+S.5....T.  c /etc/sysctl.conf
+.......T.    /usr/bin/yum
+.M.......  g /etc/lvm/cache/.cache
+....L....  c /etc/pam.d/fingerprint-auth
+....L....  c /etc/pam.d/password-auth
+....L....  c /etc/pam.d/postlogin
+....L....  c /etc/pam.d/smartcard-auth
+....L....  c /etc/pam.d/system-auth
+S.5....T.  c /etc/security/limits.conf
+S.5....T.  c /etc/security/limits.d/20-nproc.conf
+.......T.  c /etc/selinux/targeted/contexts/customizable_types
+[chenchen@grpc01 tmp]$ 
+
+# 之前检查时有 missing 错误. 很多
+# sudo rpm -Va, 是校验所有的 RPM 软件包, 查找丢失的文件, 可见丢失了很多文件都是 python 的, 这符合手动删除的结果
+[chenchen@grpc01 ~]$ sudo rpm -Va
+S.5....T.  c /etc/sudoers
+missing     /usr/lib/python3.6
+missing     /usr/lib/python3.6/site-packages
+missing     /usr/lib/python3.6/site-packages/__pycache__
+.M.......  g /etc/pki/ca-trust/extracted/java/cacerts
+.M.......  g /etc/pki/ca-trust/extracted/openssl/ca-bundle.trust.crt
+.M.......  g /etc/pki/ca-trust/extracted/pem/email-ca-bundle.pem
+.M.......  g /etc/pki/ca-trust/extracted/pem/objsign-ca-bundle.pem
+.M.......  g /etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem
+missing     /usr/lib/python3.6/site-packages/pip
+missing     /usr/lib/python3.6/site-packages/pip-9.0.3.dist-info
+missing     /usr/lib/python3.6/site-packages/pip-9.0.3.dist-info/INSTALLER
+.......
+.......
+
+```
+
+
+
+### See Also
+
+https://blog.csdn.net/SUNbrightness/article/details/80642925
