@@ -1,5 +1,248 @@
 APACHE KAFKA
 
+
+
+[toc]
+
+
+
+## Overview
+
+### Kafka结构
+
+1. 一个 kafka 集群服务, 称作 Kafka
+
+2. kafka 集群服务是由若干个实例组成的, 每个 服务实例 就叫做一个 Broker
+
+   当 customer 消费者 消费一条消息或者 producer 生产者推送一条消息, 是其中一个 Broker 提供的服务
+
+3. 一个 Broker 里面包含多个  Topic
+
+   每个 消息体 都有一个 Topic 主题, 不同的 Topic 之间消息是隔离的, customer 消费者 订阅的粒度是 Topic 主题
+
+   只订阅了 Topic1 的 customer  消费者不会收到主题是 Topic2 的消息, 他们之间的消息互不影响, Topic 毕竟一个逻辑概念
+
+4. 一个 Topic 里面包含多个分区(Partition), 分区的目的是分担磁盘IO压力, 解决物理极限
+
+   换个角度说, Partition 分区是独立于 Broker 和 Topic 的, 是存储的分布, 是为解决存储的物理极限
+
+   ![img](https://pic4.zhimg.com/80/v2-d546f8f57242d65a86c492ec7e714cc3_1440w.webp)
+
+
+
+### 生产消息
+
+#### 消息落在那个分区(物理存储)
+
+1. 轮询法, 有多少个分区逐个轮询保存, 好处是均匀, 但会有读取顺序问题. 不同的分区会存在于不同的Topic和Broker上, 那么读取就不一定是顺序的了.
+2. 哈西法, 并不能解决所有消息都有序, 只能解决某个消费者A的消息都保存在同一个分区上, 同一个分区上的消息是有序的. 
+
+#### 生产者给 Kafka 发消息三种策略
+
+1. 生产者只管推不用考虑 Kafka 是否接收到, 好处是吞吐量最大, 但消息可能丢失
+2. 生产者发消息给 Kafka,  分区的 Leader 写完就响应, 不管 Follower 是不是完成写入
+3. 生产者发消息给 Kafka,  分区的 Leader 写完而且 Follower 也必须完成写入
+
+
+
+### 消费消息
+
+![在这里插入图片描述](https://img-blog.csdnimg.cn/4d9b9fbaf8914ffc85ebf23d34f87945.png)
+
+![img](https://pic1.zhimg.com/80/v2-08bfc4015ee62ce844b10420652f34c0_1440w.webp)
+
+
+
+
+
+
+
+### PHP 扩展, rdkafka
+
+#### 扩展 rdkafka 是 PHP 的客户端, 支持高等级 KafkaConsumer 和 Producer, 也支持 低等级 Consumer, 和 Metadata API
+
+https://github.com/arnaud-lb/php-rdkafka
+
+https://arnaud.le-blanc.net/php-rdkafka-doc/phpdoc/book.rdkafka.html
+
+```php
+// 生产相关
+// 创建 conf 实例
+$conf = new RdKafka\Conf();
+$conf->set('log_level', (string) LOG_DEBUG);
+$conf->set('debug', 'all');
+// 创建 producer 实例
+$rk = new RdKafka\Producer($conf);
+// 添加服务器(brokers)列表
+$rk->addBrokers("10.0.0.1:9092,10.0.0.2:9092");
+
+// 生产消息
+// 从 producer 实例中创建 topic 实例
+$topic = $rk->newTopic("test");
+// 使用 topic 的 produce() 方法生产消息
+$topic->produce(RD_KAFKA_PARTITION_UA, 0, "Message payload");			// 分区, 一条还是多条, 消息负荷
+```
+
+```php
+# 正确关机, 停服务流程
+1. 先销毁生产实例(为了确保所有消息都完成整个kafka周期)
+2. $rk->flush($timeout_ms);				// 不调用 flush 会导致消息丢失, 并配以合理的 $timeout_ms
+   or 
+   // 如果您不关心发送尚未发送的消息，则可以在调用 flush() 之前使用 purge():
+   // Forget messages that are not fully sent yet
+	 $rk->purge(RD_KAFKA_PURGE_F_QUEUE);
+	 $rk->flush($timeout_ms);
+```
+
+```php
+// 消费相关
+// https://github.com/arnaud-lb/php-rdkafka
+// https://arnaud.le-blanc.net/php-rdkafka-doc/phpdoc/rdkafka.examples-high-level-consumer.html
+
+// 高等级消费 (优先使用高等级消费, 而不是老式低等级消费)
+RdKafka\KafkaConsumer 类支持自动分区 分配/吊销 (assignment/revocation)
+
+// 低等级消费(老式)
+// 创建 conf 实例
+$conf = new RdKafka\Conf();
+$conf->set('log_level', (string) LOG_DEBUG);
+$conf->set('debug', 'all');
+// 创建 consumer 实例
+$rk = new RdKafka\Consumer($conf);
+// 添加服务器(brokers)列表
+$rk->addBrokers("10.0.0.1,10.0.0.2");
+// 从 consumer 实例中创建 topic 实例
+$topic = $rk->newTopic("test");
+// 从分区0开始消费
+$topic->consumeStart(0, RD_KAFKA_OFFSET_BEGINNING);			// 消费起始分区, 开始的偏移量(三种常量, 开头, 结尾, 已经存储)
+// 检索消费到的消息, 通过 topic 实例的 consume() 方法
+while (true) {
+    // The first argument is the partition (again).
+    // The second argument is the timeout.
+    $msg = $topic->consume(0, 1000);
+    if (null === $msg || $msg->err === RD_KAFKA_RESP_ERR__PARTITION_EOF) {
+        // Constant check required by librdkafka 0.11.6. Newer librdkafka versions will return NULL instead.
+        continue;
+    } elseif ($msg->err) {
+        echo $msg->errstr(), "\n";
+        break;
+    } else {
+        echo $msg->payload, "\n";
+    }
+}
+
+// 从多个 topics/partitions 低等级消费(老式)
+// 从多个主题和/或分区消费可以通过告诉 librdkafka 将 来自这些主题/分区的所有消息 转发 到 内部队列, 然后从此 队列 消费来完成:
+// 创建 queue 实例
+$queue = $rk->newQueue();
+// 添加 topic 的分区到这个队列
+$topic1 = $rk->newTopic("topic1");
+$topic1->consumeQueueStart(0, RD_KAFKA_OFFSET_BEGINNING, $queue);
+$topic1->consumeQueueStart(1, RD_KAFKA_OFFSET_BEGINNING, $queue);
+
+$topic2 = $rk->newTopic("topic2");
+$topic2->consumeQueueStart(0, RD_KAFKA_OFFSET_BEGINNING, $queue);
+
+// 检索从队列消费到的消息, 通过 queue 实例的 consume() 方法
+while (true) {
+    // The only argument is the timeout.
+    $msg = $queue->consume(1000);
+    if (null === $msg || $msg->err === RD_KAFKA_RESP_ERR__PARTITION_EOF) {
+        // Constant check required by librdkafka 0.11.6. Newer librdkafka versions will return NULL instead.
+        continue;
+    } elseif ($msg->err) {
+        echo $msg->errstr(), "\n";
+        break;
+    } else {
+        echo $msg->payload, "\n";
+    }
+}
+```
+
+```php
+// 使用已经存储的偏移量
+librdkafka 默认将 offsets 存储在 broker 上
+```
+
+```php
+// 消费者设置
+低级别消费者: 自动提交设置
+. 要手动控制偏移量, 需要先将 enable.auto.offset.store 设置为 false
+. 要将偏移量自动提交给 broker 保存, 
+	auto.commit.interval.ms, 设置自动提交到 broker 的时间间隔
+  auto.commit.enable, 
+如果存储的偏移量将自动提交到代理以及间隔。
+
+高级别消费者: 自动提交设置
+. 要手动控制偏移量, 请将 enable.auto.commit 设置为 false
+
+高级别消费者: max.poll.interval.ms
+允许两次调用之间为高等级消费者消费消息的最大时间.
+如果超过此间隔, 则认为消费者失败, 并且该组将重新平衡, 以便将分区重新分配给另一个消费者组成员.
+  
+使用者组 ID (常规)
+group.id 负责设置您的消费者组 ID, 并且它应该是唯一的(并且不应更改). Kafka 使用它来识别应用程序并存储它们的偏移量
+// 创建 topic conf 实例
+$topicConf = new RdKafka\TopicConf();
+$topicConf->set("auto.commit.interval.ms", 1e3);
+// 用 topic conf 实例来创建 topic 实例
+$topic = $rk->newTopic("test", $topicConf);
+// 用 topic 
+$topic->consumeStart(0, RD_KAFKA_OFFSET_STORED);
+
+// 更多 librbkafka 配置参数, 参考
+https://github.com/confluentinc/librdkafka/blob/master/CONFIGURATION.md
+```
+
+
+
+### 术语
+
+1）Producer ：消息生产者，就是向 kafka broker 发消息的客户端；
+2）Consumer ：消息消费者，向 kafka broker 取消息的客户端；
+3）Consumer Group （CG）：消费者组，由多个 consumer 组成。消费者组内每个消费者负责消费不同分区的数据，一个分区只能由一个组内消费者消费；消费者组之间互不影响。所有的消费者都属于某个消费者组，即消者组是逻辑上的一个订阅者。可以提高消费者的能力（并发最好的时候： 消费者组里面消费者的个数=Topic里面的分区数）。
+4）Broker ：一台 kafka 服务器就是一个 broker。一个集群由多个 broker 组成。一个 broker可以容纳多topic。
+5）Topic ：可以理解为消息的分类，生产者和消费者面向的都是同一个 topic；
+6）Partition：为了实现扩展性，一个非常大的 topic 可以分布到多个 broker（即服务器）上，一个 topic 可以分为多个 partition，每个 partition 是一个有序的队列；(往同一个主题发送的消息不会同时发给多个分区)，存放消息的地方
+
+7）Replica（slave）：副本，为保证集群中的某个节点发生故障时，该节点上的 partition 数据不丢失，且kafka 仍然能够继续工作，kafka 提供了副本机制，一个 topic 的每个分区都有若干个副本，一个 Master和若干个 Slave(Replica)。
+8）leader[master]：每个分区(针对Patition)多个副本的“主”，生产者发送数据的对象，以及消费者消费数据的对象都是 leader。
+9）follower[slave]：每个分区多个副本中的“从”，实时从 leader 中同步数据，保持和 leader 数据的同步。leader 发生故障时，某个 follower 会成为新的 leader。
+
+
+
+## FAQ
+
+
+
+## See Also
+
+https://github.com/arnaud-lb/php-rdkafka
+
+https://blog.csdn.net/weixin_39104010/article/details/125313440
+
+http://events.jianshu.io/p/3d3af71a1171
+
+https://blog.csdn.net/qq_19634033/article/details/115337987
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 在《财富》 100 强公司中，超过 80％的人信任并使用 Kafka。
 Apache Kafka 是一个开放源代码的分布式事件流平台，成千上万的公司使用它来实现高性能数据管道，流分析，数据集成和关键任务应用程序。
 

@@ -10,6 +10,26 @@
 
 
 
+
+
+## Overview of Networking Modes
+
+See Also: https://docs.oracle.com/en/virtualization/virtualbox/7.0/user/networkingdetails.html#networkingmodes
+
+Table 6.1 Overview of Networking Modes
+
+| ***\*Mode\**** | ***\*VM→Host\**** |                      ***\*VM←Host\****                       | ***\*VM1↔VM2\**** | ***\*VM→Net/LAN\**** |                     ***\*VM←Net/LAN\****                     |
+| :------------- | :---------------: | :----------------------------------------------------------: | :---------------: | :------------------: | :----------------------------------------------------------: |
+| Host-only      |    ***\*+\****    |                         ***\*+\****                          |    ***\*+\****    |          –           |                              –                               |
+| Internal       |         –         |                              –                               |    ***\*+\****    |          –           |                              –                               |
+| Bridged        |    ***\*+\****    |                         ***\*+\****                          |    ***\*+\****    |     ***\*+\****      |                         ***\*+\****                          |
+| NAT            |    ***\*+\****    | [Port forward](https://docs.oracle.com/en/virtualization/virtualbox/7.0/user/networkingdetails.html#natforward) |         –         |     ***\*+\****      | [Port forward](https://docs.oracle.com/en/virtualization/virtualbox/7.0/user/networkingdetails.html#natforward) |
+| NATservice     |    ***\*+\****    | [Port forward](https://docs.oracle.com/en/virtualization/virtualbox/7.0/user/networkingdetails.html#network_nat_service) |    ***\*+\****    |     ***\*+\****      | [Port forward](https://docs.oracle.com/en/virtualization/virtualbox/7.0/user/networkingdetails.html#network_nat_service) |
+
+> 根据这张图, 我一直采用 Host-only + NAT/NATservice 的方法.
+
+
+
 ## 新建虚拟电脑
 
 ##### 虚拟电脑名称和系统类型
@@ -58,8 +78,60 @@
     1. 选择 ‘没有盘片’
     2. 点‘光盘图标’选择一个虚拟光盘文件, 选择 CentOS-8.1.1911-x86_86-boot.iso
 
+
+
 ##### 网络
 
+```shell
+2022-12-04
+网卡1
+		勾选 '启用网络连接'
+		连接方式: Host-only Network
+		名称: Legacy vboxnet1 Network
+		Advanced
+		控制芯片: Intel PRO/1000 MT 桌面 (82540EM)
+		混杂模式: 拒绝
+		MAC 地址: 0800275FF5F3                          # 不能重复
+		勾选 '接入网线'
+网卡2
+		勾选 '启用网络连接'
+    连接方式: NAT 网络
+    名称: NatNetwork
+    高级, Advanced
+    控制芯片: Intel PRO/1000 MT 桌面 (82540EM)
+    混杂模式: 拒绝
+    MAC 地址: 0800275FE82C3                          # 不能重复
+    勾选 '接入网线'
+```
+
+
+
+```shell
+2022-12-04
+网卡1
+		勾选 '启用网络连接'
+		连接方式: Host-only Network
+		名称: Legacy vboxnet0 Network
+		Advanced
+		控制芯片: Intel PRO/1000 MT 服务器 (82545EM)
+		混杂模式: 拒绝
+		MAC 地址: 0800275F485A                          # 不能重复
+		勾选 '接入网线'
+网卡2
+		勾选 '启用网络连接'
+    连接方式: 网络地址转换 NAT
+    名称: 
+    高级, Advanced
+    控制芯片: Intel PRO/1000 MT 服务器 (82545EM)
+    混杂模式: 拒绝
+    MAC 地址: 0800275FE82C3                          # 不能重复
+    勾选 '接入网线'
+    端口转发 按钮 为空
+```
+
+
+
+    2022-08-04
     网卡1
         勾选 ‘启用网络连接’
         连接方式: NAT 网络
@@ -237,7 +309,7 @@ $ service network restart
 
 ##### /etc/sysconfig/network-script/ifcnf-enp0s3 文件
 
-```
+```shell
 TYPE="Ethernet"
 PROXY_METHOD="none"
 BROWSER_ONLY="no"
@@ -255,8 +327,53 @@ DEVICE="enp0s3"
 ONBOOT="yes"                                        // yes 开启
 ```
 
+```shell
+TYPE=Ethernet
+PROXY_METHOD=none
+BROWSER_ONLY=no
+#BOOTPROTO=static
+BOOTPROTO=dhcp
+#NM_CONTROLLED=no
+DEFROUTE=yes
+IPV4_FAILURE_FATAL=no
+IPV6INIT=yes
+IPV6_AUTOCONF=yes
+IPV6_DEFROUTE=yes
+IPV6_FAILURE_FATAL=no
+IPV6_ADDR_GEN_MODE=stable-privacy
+NAME=enp0s17
+UUID=da54e839-61b7-48d8-b424-cb4fac3ac99e
+DEVICE=enp0s17
+ONBOOT=yes
+#IPADDR=10.236.56.12
+#GATEWAY=10.236.56.254
+#NETMASK=255.255.254.0
+#DNS1=10.211.1.8
+#DNS2=10.211.133.8
+```
+
 
 
 ## See Also
 
+https://docs.oracle.com/en/virtualization/virtualbox/7.0/user/networkingdetails.html#networkingmodes
+
+Table 6.1 Overview of Networking Modes
+
+| ***\*Mode\**** | ***\*VM→Host\**** |                      ***\*VM←Host\****                       | ***\*VM1↔VM2\**** | ***\*VM→Net/LAN\**** |                     ***\*VM←Net/LAN\****                     |
+| :------------- | :---------------: | :----------------------------------------------------------: | :---------------: | :------------------: | :----------------------------------------------------------: |
+| Host-only      |    ***\*+\****    |                         ***\*+\****                          |    ***\*+\****    |          –           |                              –                               |
+| Internal       |         –         |                              –                               |    ***\*+\****    |          –           |                              –                               |
+| Bridged        |    ***\*+\****    |                         ***\*+\****                          |    ***\*+\****    |     ***\*+\****      |                         ***\*+\****                          |
+| NAT            |    ***\*+\****    | [Port forward](https://docs.oracle.com/en/virtualization/virtualbox/7.0/user/networkingdetails.html#natforward) |         –         |     ***\*+\****      | [Port forward](https://docs.oracle.com/en/virtualization/virtualbox/7.0/user/networkingdetails.html#natforward) |
+| NATservice     |    ***\*+\****    | [Port forward](https://docs.oracle.com/en/virtualization/virtualbox/7.0/user/networkingdetails.html#network_nat_service) |    ***\*+\****    |     ***\*+\****      | [Port forward](https://docs.oracle.com/en/virtualization/virtualbox/7.0/user/networkingdetails.html#network_nat_service) |
+
+> NAT 和 NATservice 是类似的, 区别是 NAT 在每个 VM 上单独设置转发, 而 NATservice 是在一个总网络配置上设置转发
+
+
+
     https://www.virtualbox.org/
+    https://docs.oracle.com/en/virtualization/virtualbox/7.0/user/networkingdetails.html#network_nat
+    
+    https://blog.csdn.net/k2325/article/details/118711232
+    https://blog.csdn.net/tangyi2008/article/details/89036433

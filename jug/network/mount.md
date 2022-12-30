@@ -82,6 +82,16 @@ UUID=5844f801-0e31-4932-afa2-cf3df7bfbacf /boot                   xfs     defaul
 
 ```
 
+```shell
+/var/spool/clientmqueue/ 目录下文件过多, 占用太多空间问题解决:
+问题现象:
+     /var/spool/clientmqueue/ 目录下存在大量文件.
+    # df -h         发现 /var 空间不够了, 占用了 100%
+    # du . -sh *    查看哪个个目录大
+    # du -hs * | sort -rn | head      前十大文件
+    # du -s * | sort -rn | head      前十大文件
+```
+
 
 
 ## iso

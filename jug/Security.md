@@ -2,6 +2,73 @@
 
 ---
 
+## FAQ
+
+```shell
+# 自签名 私有证书
+1. [.key] 生成私钥, -des3 私钥是否加密算法, 生成 rsa 私钥, openssl格式, 2048位强度
+openssl genrsa -des3 -out ./yocc2022102403.key 2048			# 需要一个至少四位的密码
+openssl genrsa -out ./yocc2022102403.key 1024						# 无密码私钥
+openssl rsa -in ./private.key -out ./private.key 2048		# 无密码私钥
+
+2. [.csr] 生成申请文件, 由 1. 私钥 生成 证书申请文件.
+openssl req -new -key ./yocc2022102403.key -out ./yocc2022102403.csr
+
+3. [.crt] 生成证书文件, 由 1. 和 2. 一起生成证书文件. -days 3650 当前之后的证书过期时间. -sha1 算法. 
+openssl x509 -req -days 3650 -sha1 -extensions v3_ca -signkey ./yocc2022102403.key -in ./yocc2022102403.csr -out ./yocc2022102403.crt
+```
+
+```shell
+# 自签名 CA 证书
+CA 机构, 又称为证书认证中心 (Certificate Authority) 中心
+. 自签名私有证书无法被吊销，自签名CA证书可以被吊销. 
+. 为什么吊销, 吊销的必要性: 私钥泄露后挽救的办法, 否则就无能为力了.
+. 如果你的规划需要创建多个客户端证书, 那么使用自建 CA 签名证书的方法比较合适, 只要给所有的客户端都安装了 CA 根证书, 那么以该 CA 根证书签名过的客户端证书都是信任的, 不需要重复的安装客户端证书.
+. 请注意由于是自建 CA 证书, 在使用这个临时证书的时候, 会在客户端浏览器报一个错误, 签名证书授权未知或不可 (signing certificate authority is unknown and not trusted.), 但只要配置正确, 继续操作并不会影响正常通信. 自签名证书的 Issuer 和 Subject 是一样的. 
+# 创建自签名 CA 证书, 主要分为两个部分:
+1. 创建 CA 根证书
+2. 签发客户端证书
+
+# 
+1. 创建 CA 根证书
+1.1. 查看服务器 CentOS 6.x 上有关 ssl 证书的目录结构. 
+[root@dev3_10.211.21.18 CA]# pwd
+/etc/pki/CA
+[root@dev3_10.211.21.18 CA]# tree
+.
+├── certs
+├── crl							# 吊销的证书
+├── newcerts				# 存放 CA 签署(颁发)过的数字证书(证书备份目录)
+└── private					# 用于存放 CA 的私钥
+
+4 directories, 0 files
+[root@dev3_10.211.21.18 CA]# 
+[root@dev3_10.211.21.18 tls]# pwd
+/etc/pki/tls
+[root@dev3_10.211.21.18 tls]# tree
+.
+├── cert.pem -> /etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem
+├── certs
+│   ├── ca-bundle.crt -> /etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem
+│   ├── ca-bundle.trust.crt -> /etc/pki/ca-trust/extracted/openssl/ca-bundle.trust.crt
+│   ├── make-dummy-cert
+│   ├── Makefile
+│   └── renew-dummy-cert
+├── misc
+│   ├── CA
+│   ├── c_hash
+│   ├── c_info
+│   ├── c_issuer
+│   └── c_name
+├── openssl.cnf
+└── private
+
+3 directories, 12 files
+[root@dev3_10.211.21.18 tls]# 
+```
+
+
+
 
 
 SSL, OpenSSL, HTTPS
@@ -288,14 +355,71 @@ Linux系统中的Openssl工具可以用来生成自签名证书，实现通信�
     openssl x509 -req -in /path/to/ssl.csr -signkey /path/to/ssl.key -out /path/to/ssl.crt
    1.5. 查看证书信息
     openssl x509 -in /path/to/certfile -noout -text
-* 上面的1-4步也可以通过命令行合并为一步实现
+   
+   ```shell
+   [root@dev3_10.211.21.18 tmp]# openssl x509 -in ./server.crt -noout -text
+   Certificate:
+       Data:
+           Version: 1 (0x0)
+           Serial Number:
+               bf:a9:07:0b:87:84:67:88
+       Signature Algorithm: sha1WithRSAEncryption
+           Issuer: C=CN, ST=BeiJing, L=BeiJing, O=SinaSports Corp.
+           Validity
+               Not Before: Dec 12 07:54:51 2018 GMT
+               Not After : Dec 12 07:54:51 2019 GMT
+           Subject: C=CN, ST=BeiJing, L=BeiJing, O=SinaSports Corp.
+           Subject Public Key Info:
+               Public Key Algorithm: rsaEncryption
+                   Public-Key: (1024 bit)
+                   Modulus:
+                       00:b9:c3:9f:9b:62:03:54:64:ff:7a:c7:ff:d1:97:
+                       c5:75:be:3a:fd:8a:ed:00:ec:f3:88:f9:66:7c:0d:
+                       34:1d:20:c6:48:ff:f6:b6:59:00:a7:32:30:f3:62:
+                       cb:ed:9a:08:6a:2d:e2:a1:3a:58:6f:cb:9e:fe:ee:
+                       7d:14:eb:a5:d6:33:5c:c2:7d:5e:64:31:55:23:c0:
+                       95:e7:16:d4:1c:9f:d7:45:88:f5:5e:52:15:28:4d:
+                       86:12:02:76:d4:bb:4b:0e:15:46:2d:10:42:dc:14:
+                       61:13:fc:61:78:e6:6f:0e:1d:ca:34:c6:0c:56:25:
+                       27:ee:b3:d3:66:ee:3f:b5:47
+                   Exponent: 65537 (0x10001)
+       Signature Algorithm: sha1WithRSAEncryption
+            09:d5:06:cb:b7:db:27:90:7b:41:58:64:a6:91:67:95:f4:15:
+            9f:f3:02:1a:a2:8c:e2:d8:a4:c0:7e:ad:07:b1:d8:00:32:e4:
+            5d:37:99:ff:6f:78:c9:d9:13:9b:0c:02:86:bf:81:ae:c2:ae:
+            5d:66:e0:29:a6:21:64:ca:64:16:f1:60:c0:77:bb:86:92:69:
+            b8:a4:6b:46:8e:f5:ef:0a:65:e8:f4:5e:0d:53:a0:91:f3:a3:
+            05:e2:96:1a:6d:72:c7:17:f3:19:c7:3b:5d:e2:81:fc:c0:8b:
+            bb:a3:7e:25:bc:78:1a:ba:f1:82:30:15:68:fc:9d:92:63:a2:
+            70:f5
+   [root@dev3_10.211.21.18 tmp]# 
+   ```
+   
+   
+* 上面的1-4步也可以通过命令行合并为一步实现(有问题, 不灵)
     openssl req -new -x509 -newkey rsa:2048 -keyout /path/to/server.key -out /path/to/server.crt
+    
+    ```shell
+    [root@dev3_10.211.21.18 tmp]# mkdir ssl20221024
+    [root@dev3_10.211.21.18 tmp]# openssl req -new -x509 -newkey rsa:2048 -keyout ~/tmp/ssl20221024/server.key -out ~/tmp/ssl20221024/server.crt
+    Generating a 2048 bit RSA private key
+    .................................+++
+    ..........................................+++
+    writing new private key to '/usr/home/chenchen/tmp/ssl20221024/server.key'
+    Enter PEM pass phrase:
+    139720476161952:error:28069065:lib(40):UI_set_result:result too small:ui_lib.c:831:You must type in 4 to 1024 characters
+    139720476161952:error:0906406D:PEM routines:PEM_def_callback:problems getting password:pem_lib.c:116:
+    139720476161952:error:0907E06F:PEM routines:DO_PK8PKEY:read key:pem_pk8.c:130:
+    [root@dev3_10.211.21.18 tmp]# l
+    ```
+    
+    
 
 
 2. 生成自签名 CA 证书
-创建自签 CA 证书，主要分为两个部分:
-1. 创建 CA 根证书
-2. 签发客户端证书
+  创建自签 CA 证书，主要分为两个部分:
+3. 创建 CA 根证书
+4. 签发客户端证书
 
 2.1. 创建 CA 根证书
     使用 OpenSSL 可以创建自己的 CA, 给需要验证的用户或服务器颁发证书, 这就需要创建一个 CA 根证书. 

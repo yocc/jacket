@@ -35,6 +35,46 @@ $ git branch -d <本地分支名>
 $ git push <远程主机名> <本地分支名>:<远程分支名>		# 连接远程主机, 然后将本地推到远程, 其中冒号:后不写为当前本地分支
 $ git pull <远程主机名> <远程分支名>:<本地分支名>		# 连接远程主机, 然后将远程拉回本地, 其中冒号:后不写为当前本地分支
 $ git push origin(远端主机) master(本地分支)
+
+$ git pull origin master:chenchen
+$ git pull origin test:test
+
+$ git remote -vvv		# 查看远程仓库地址
+
+# 创建分支, 
+# git branch 分支名称 					# 创建, 不切换分支
+# git checkout -b 分支名称			# 创建, 切换到新建分支上
+[chenchen@dev3_10.211.21.18 trim.sports.weibo.cn]$ git branch chenchen
+[chenchen@dev3_10.211.21.18 trim.sports.weibo.cn]$ git br
+  chenchen              df0984d init
+* master                df0984d init
+  remotes/origin/master df0984d init
+[chenchen@dev3_10.211.21.18 trim.sports.weibo.cn]$ git checkout -b test
+Switched to a new branch 'test'
+[chenchen@dev3_10.211.21.18 trim.sports.weibo.cn]$ git br
+  chenchen              df0984d init
+  master                df0984d init
+* test                  df0984d init
+  remotes/origin/master df0984d init
+[chenchen@dev3_10.211.21.18 trim.sports.weibo.cn]$ 
+
+# 和远程仓库建立关联
+[chenchen@dev3_10.211.21.18 trim.sports.weibo.cn]$ git remote add origin ssh://git@git.intra.weibo.com:2222/weibo_sports/trim.sports.weibo.cn.git			# 在本地项目中给 远程仓库地址 起一个别名叫 origin
+[chenchen@dev3_10.211.21.18 trim.sports.weibo.cn]$ git pull --rebase origin master		# 这里省了, 冒号和当前分支(git pull --rebase origin master:master, 省了最后的 ':master')
+[chenchen@dev3_10.211.21.18 trim.sports.weibo.cn]$ git push origin master		# 这里省了, 当前分支和冒号(git push origin master:master, 省了倒数第二'master:')
+
+# 新建远程分支
+# 新建一个本地分支：$ git checkout -b 分支名
+# 查看一下现在的分支状态：$ git branch    //星号(*)表示当前所在分支。现在的状态是成功创建的新的分支并且已经切换到新分支上。
+# 把新建的本地分支push到远程服务器，远程分支与本地分支同名（当然可以随意起名）：$ git push origin 分支名:分支名
+# // 使用git branch -a查看所有分支，会看到remotes/origin/localbranch这个远程分支，说明新建远程分支成功。
+
+# 删除远程分支
+# 我比较喜欢的简单方式，推送一个空分支到远程分支，其实就相当于删除远程分支：
+$ git push origin :localbranch
+# 也可以使用：
+$ git push origin --delete localbranch
+# 这两种方式都可以删除指定的远程分支
 ```
 
 
@@ -86,6 +126,7 @@ doc/**/*.pdf
 $ git rm -r --cached .
 $ git add .
 $ git commit -m 'update .gitignore'
+$ git commit -m "fixed untracked files"
 
 
 
@@ -491,6 +532,249 @@ gitproxy=default-proxy ; for all the rest
                    gitproxy=proxy-command for kernel.org
                    gitproxy=default-proxy ; for all the rest
 ```
+
+
+
+```shell
+$ git remote add origin ssh://git@git.intra.weibo.com:2222/weibo_sports/pugr.sports.weibo.com.git
+git remote 设置跟踪的远程仓库地址
+
+git remote add <name> <url>, 这是给远程仓库的 url 起个别名, 省去每次都要敲很长的 url, 通常叫 origin
+
+
+
+git branch -d test (删本地分支)
+
+git push origin --delete 分支名字 (删远程分支)
+git push origin --delete chenchen 
+
+
+[chenchen@dev3_10.211.21.18 vendor]$ find ./ -type d -name '.git*'
+[chenchen@dev3_10.211.21.18 vendor]$ find ./ -type f -name .git*
+./sina_sports/phplib/.gitignore
+./mongodb/mongodb/.gitignore
+./sunny-daisy/mongodb/.gitignore
+[chenchen@dev3_10.211.21.18 vendor]$ 
+
+
+[chenchen@dev3_10.211.21.18 trim.sports.weibo.cn]$ git st
+[chenchen@dev3_10.211.21.18 trim.sports.weibo.cn]$ git br -avv
+[chenchen@dev3_10.211.21.18 trim.sports.weibo.cn]$ git init
+[chenchen@dev3_10.211.21.18 trim.sports.weibo.cn]$ git add .
+[chenchen@dev3_10.211.21.18 trim.sports.weibo.cn]$ git commit -m'init' .
+[chenchen@dev3_10.211.21.18 trim.sports.weibo.cn]$ git remote add origin ssh://git@git.intra.weibo.com:2222/weibo_sports/trim.sports.weibo.cn.git
+[chenchen@dev3_10.211.21.18 trim.sports.weibo.cn]$ git pull --rebase origin master
+[chenchen@dev3_10.211.21.18 trim.sports.weibo.cn]$ git push origin master		# 这里省了 当前分支和冒号
+
+
+拓展：
+状态查询命令
+git status
+git查看远程仓库地址命令
+git remote -v
+如果想要修改远程仓库地址：
+$ git remote set-url origin git@github.com:mkl34367803/WebAjax.git
+然后再push：
+$ git push origin master
+
+```
+
+```shell
+# 通过 web 删了远程分支, 但本地 git branch -avv 时还有显示.
+[chenchen@dev3_10.211.21.18 trim.sports.weibo.cn]$ git br
+* chenchen                             c31705a comm
+  master                               36dc4c4 Merge branch 'test'
+  test                                 c31705a comm
+  remotes/origin/master                36dc4c4 Merge branch 'test'
+  remotes/origin/remotes/origin/master 2321c5a public/index
+  remotes/origin/test                  c31705a comm
+[chenchen@dev3_10.211.21.18 trim.sports.weibo.cn]$ git branch -avv
+* chenchen                             c31705a comm
+  master                               36dc4c4 Merge branch 'test'
+  test                                 c31705a comm
+  remotes/origin/master                36dc4c4 Merge branch 'test'
+  remotes/origin/remotes/origin/master 2321c5a public/index
+  remotes/origin/test                  c31705a comm
+[chenchen@dev3_10.211.21.18 trim.sports.weibo.cn]$ git remote prune origin
+Pruning origin
+URL: ssh://git@git.intra.weibo.com:2222/weibo_sports/trim.sports.weibo.cn.git
+ * [pruned] origin/remotes/origin/master
+[chenchen@dev3_10.211.21.18 trim.sports.weibo.cn]$ git branch -avv
+* chenchen              c31705a comm
+  master                36dc4c4 Merge branch 'test'
+  test                  c31705a comm
+  remotes/origin/master 36dc4c4 Merge branch 'test'
+  remotes/origin/test   c31705a comm
+[chenchen@dev3_10.211.21.18 trim.sports.weibo.cn]$ 
+```
+
+## tag 和 branch 区别
+
+```shell
+区别: 
+1. tag 是一系列 commit 的中的一个点, 对应某次 commit, 是一个点, 只能查看, 不能移动. 是 Git 版本库的一个快照, 指向某个 commit 的指针; 
+	 而 branch 是一系列串联的 commit 的线, 对应一系列 commit, 是很多点连成的一根线, 可以继续延展. 有一个HEAD 指针, 是可以依靠 HEAD 指针移动的.
+2. tag 是静态的, branch 是动态的, 要向前走.
+3. 两者的区别决定了使用方式, 改动代码用 branch, 不改动只查看用 tag
+```
+
+## tag
+
+```shell
+# 创建 tag
+git tag <tagName>							// 创建本地 tag, 最后一次 commit, 省略不写 <commitId>
+git tag <tagName> <commitId>	// 创建本地 tag, 以指定特定 <commitId> 的方式
+git tag -a V1.2 -m 'release 1.2'	// 同上, 创建的同时增加了附加信息
+git push origin <tagName>			// 显式 push 到远程仓库, 默认 git push 并不会推送 tag 到远程, 需显式 git push
+git push origin --tags				// 一次批量 push 所有本地 tag 到远程仓库
+git log --pretty=online				// 查看当前分支的提交历史, 里面包含 commit id
+
+# 查看 tag
+git show <tagName>						// 查看本地指定 tagName 的 tag 的详细信息
+git tag												// 查看本地所有 tag
+git tag -l										// 同上
+git tag -l "2.3.5."						// 同上, 只看 2.3.5.*
+git ls-remote --tags origin		// 查看远程所有 tag
+
+# 删除 tag
+git tag -d <tagName>					// 删除本地 tag
+git push origin :<tagName>		// 删除远程 tag, 用本地空 tagName 覆盖远程指定 tagName
+git push origin :refs/tags/V1.2		// 同上, 写法不同而已
+
+# 重命名 tag
+# 重命名 = 删掉旧 tagName, 然后再新建新 tagName
+## 只重命名本地 tagName = 删掉本地旧 tagName, 然后新建新 tagName
+git tag -d <oldTagName>				// 删掉本地旧 tagName
+git tag -a <newTagName>				// 然后新建新 tagName
+git push origin <newTagName>	// 如果推送远程仓库
+## 重命名本地 tagName, 并且同时还要重命名远程仓库中的 tagName = 删除本地旧+删除远程旧, 然后新建本地新+推送远程新
+git tag -d <oldTagName>				// 删掉本地旧 tagName
+git push origin :<oldTagName>	// 删掉远程旧 tagName, 用空 tagName 覆盖
+git tag -a <newTagName>				// 然后新建本地新 tagName
+git push origin <newTagName>	// 推送远程新 tagName
+
+# 切换 tag
+git checkout <tagName>				// 切换到指定的 tag, 会提示错误, tag 不是分支不能切换
+## 因为 tag 本身指向的就是一个 commit, 所以和根据 commit id 检出分支是一个道理
+git checkout -b <branchName> <tagName>	// 以 tag 为基点创建一个 branch
+## 但是需要特别说明的是, 如果我们想要修改 tag 检出代码分支, 那么虽然分支中的代码改变了, 但是 tag 标记的 commit 还是同一个, 标记的代码是不会变的, 这个要格外的注意
+
+# 获取 tag
+git fetch origin tag V1.2			// 准确获取指定的某个版本
+```
+
+
+
+## github 常见目录
+
+```shell
+src: 源码文件
+dist: 编译出来的发布版, 编译后或者压缩后的代码. 注: 最后编译发布的时候会将所有的静态资源整合到 /dist/static/ 目录下, 包括assets文件夹中的静态资源.
+docs: 文档
+examples: 示例文件
+assets: 储存js、css、图片等静态资源
+static: 储存第三方静态资源(例如jquery.js, bootstrap.css等)
+build: 用来构建源码的脚本
+test: 用来测试的测试脚本
+LICENSE: 授权协议
+README.md: 自述文件
+.gitignore 哪些文件不要上传到 GitHub, 定义不想在git中提交的文件
+```
+
+
+
+## Example of case
+
+```shell
+# 案例1
+本地有3个分支 chenchen, test, master,
+远程有2个分支 test, master, 
+其中, 远程master 分支已经被别人更新了很多版本了, 我由于没有在add之前先 pull, 所以造成了本地chenchen分支的版本和远程master分支版本不同, 造成了冲突;
+
+# 解决
+参考: https://stackoverflow.com/questions/1709177/pull-a-certain-branch-from-the-remote-server/1710474#1710474
+以下在 chenchen 上操作:
+git fetch origin master				# 先把远程master取回来
+git merge origin/master				# 与本地chenchen合并
+合并命令之后会有提示, 有些文件自动合后不存在冲突, 有些存在冲突, 有冲突的需要手动解决, 这些待手动的文件会有提示, 按提示手动解决.
+git add .											# 解决后就可以正常 add 了
+git commit -m'resolve conflicts'
+
+# 过程
+[chenchen@dev3_10.211.21.18 april.sports.sina.com.cn]$ git pull origin master:chenchen
+From git.staff.sina.com.cn:SINA_SPORTS/super.sports.sina.cn
+ ! [rejected]        master     -> chenchen  (non-fast-forward)
+[chenchen@dev3_10.211.21.18 april.sports.sina.com.cn]$ git fetch orgin master
+fatal: 'orgin' does not appear to be a git repository
+fatal: Could not read from remote repository.
+
+Please make sure you have the correct access rights
+and the repository exists.
+[chenchen@dev3_10.211.21.18 april.sports.sina.com.cn]$ git fetch origin master
+From git.staff.sina.com.cn:SINA_SPORTS/super.sports.sina.cn
+ * branch            master     -> FETCH_HEAD
+[chenchen@dev3_10.211.21.18 april.sports.sina.com.cn]$ git merge origin/master
+Auto-merging app/players/templates/index.html
+CONFLICT (content): Merge conflict in app/players/templates/index.html
+Auto-merging app/live/templates/index.html
+CONFLICT (content): Merge conflict in app/live/templates/index.html
+Automatic merge failed; fix conflicts and then commit the result.
+[chenchen@dev3_10.211.21.18 april.sports.sina.com.cn]$ 
+
+手动修改以上两个文件
+然后 git add .
+git commit -m'resolve conflicts'
+
+[chenchen@dev3_10.211.21.18 april.sports.sina.com.cn]$ git br
+* chenchen              bb4d423 resolve conflicts
+  master                9b5a5f8 模版刷新
+  test                  e89e520 邱添更改live, player 两页面模版20221222
+  remotes/origin/master 9b5a5f8 模版刷新
+  remotes/origin/test   e89e520 邱添更改live, player 两页面模版20221222
+[chenchen@dev3_10.211.21.18 april.sports.sina.com.cn]$ git co test
+Switched to branch 'test'
+[chenchen@dev3_10.211.21.18 april.sports.sina.com.cn]$ git merge chenchen
+Updating e89e520..bb4d423
+Fast-forward
+ app/leaders/templates/index.html                               |  15 +--------------
+ app/live/templates/index.html                                  | 102 +++++++++++++++++++++++++++++++++++++++++++++++++++---------------------------------------------------
+ app/players/templates/index.html                               |  88 ++++++++++++++++++++++++++++++++++++++++++++--------------------------------------------
+ app/schedule/templates/index.html                              |  44 +++++++++++++++++++++++++++-----------------
+ app/st/controller/DefaultController.php                        |  36 ++++++++++++++++++++++++++++++++++++
+ app/st/controller/SerialController.php                         | 108 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ app/st/controller/StruggleController.php                       | 108 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ app/st/controller/VariousController.php                        | 108 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ app/standings/templates/index.html                             |   4 ++--
+ app/teams/controller/ItemiseController.php                     |   3 +++
+ app/teams/controller/SerialController.php                      |   3 +++
+ app/teams/controller/VariousController.php                     |   3 +++
+ app/teams/templates/index.html                                 |   4 ++--
+ model/MiningRohtLiveModel.php                                  |   1 +
+ model/SoccerCatalogItemiseTeamsProModel.php                    |   6 +++++-
+ model/SoccerDatumVariousLiveModel.php                          |   2 +-
+ model/SoccerDatumVariousLiveProModel.php                       |  28 ++++++++++++++--------------
+ model/SoccerDatumVariousPlayersDefModel.php                    |  22 ++++++++++++++++++++++
+ model/SoccerDatumVariousPlayersModel.php                       |   9 +++++++--
+ model/SoccerDatumVariousPlayersProModel.php                    |  84 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++--
+ model/SoccerDatumVariousTeamsDefModel.php                      |   1 +
+ model/SoccerDatumVariousTeamsModel.php                         |  19 ++++++++++++++++---
+ model/SoccerDatumVariousTeamsProModel.php                      |  17 +++++++++--------
+ model/SoccerGloryStruggleTeamsProModel.php                     |   6 +++++-
+ model/Utils.php                                                |   2 +-
+ model/composer.lock                                            |   6 +++---
+ model/vendor/composer/installed.json                           |   8 ++++----
+ model/vendor/composer/installed.php                            |  10 +++++-----
+ model/vendor/sinasports/sportsdata/src/OPTA/Football.php       |   4 ++--
+ model/vendor/sinasports/sportsdata/src/OPTA/FootballPlayer.php |  16 ++++++++++++----
+ 30 files changed, 686 insertions(+), 181 deletions(-)
+ create mode 100644 app/st/controller/DefaultController.php
+ create mode 100644 app/st/controller/SerialController.php
+ create mode 100644 app/st/controller/StruggleController.php
+ create mode 100644 app/st/controller/VariousController.php
+[chenchen@dev3_10.211.21.18 april.sports.sina.com.cn]$ 
+```
+
+
 
 
 

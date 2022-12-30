@@ -160,10 +160,10 @@ Go 代码组织结构:
 2. 增加环境变量 /etc/profile(全局) 或者 $HOME/.profile(局部) 配置的是PATH
         export PATH=$PATH:/usr/local/go/bin
         source 之后立即生效
-3. workspace 配置(GOPATH, 用来指定工作区, 一定不能与 Go 安装目录一致), (工作空间下必须3目录: src(源码), pkg(库, 包), bin(二进制))
+3. workspace 配置(GOPATH, 用来指定工作区, 一定不能与 Go 本体安装目录(GOROOT)一致), (工作空间下必须3目录: src(源码), pkg(库, 包), bin(二进制))
         编辑 ~/.bash_profile 文件
         增加 export GOPATH=$HOME/go 配置 或者 GOBIN 环境变量
-         使之立即生效 source ~/.bash_profile
+        使之立即生效 source ~/.bash_profile
 
 同一台机器同时安装多个 Go 版本: 配置(GOROOT), GOROOT 是描述 Go 安装目录的环境变量.
 ```

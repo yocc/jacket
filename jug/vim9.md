@@ -748,6 +748,15 @@ nnoremap = normal no recursion map
 
 
 
+```shell
+
+:1,90s/redis/Redis/g ;把1-90行的redis替换为Redis。语法n1,n2s/原关键字/新关键字/g，n1
+代表其实行,n2代表结尾行,g是必须要的
+
+```
+
+
+
 
 
 ## See Also
