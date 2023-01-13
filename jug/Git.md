@@ -149,6 +149,34 @@ $ git commit -m "fixed untracked files"
         }   
     ]   
 }
+
+
+
+
+# no .a files
+# 忽略所有.a文件
+*.a
+
+# but do track lib.a, even though you're ignoring .a files above
+# 表示不忽略(跟踪)匹配到的lib.a文件或目录
+!lib.a
+
+# only ignore the TODO file in the current directory,
+# 只忽略当前目录中的TODO文件，而不是子目录/TODO
+not subdir/TODO /TODO
+
+# ignore all files in the build/ directory
+# 忽略build/目录中的所有文件
+build/
+
+# ignore doc/notes.txt, but not doc/server/arch.txt
+# 忽略doc/notes.txt，但不要忽略doc/server/arch.txt
+doc/*.txt
+
+# ignore all .pdf files in the doc/ directory
+# 忽略doc/目录下的所有。pdf文件
+doc/**/*.pdf
+
 ```
 
 
@@ -618,9 +646,33 @@ URL: ssh://git@git.intra.weibo.com:2222/weibo_sports/trim.sports.weibo.cn.git
 3. 两者的区别决定了使用方式, 改动代码用 branch, 不改动只查看用 tag
 ```
 
+## clone, fetch 区别
+
+```shell
+clone 从无到有的克隆操作
+git clone gitxxxxxxx
+
+fetch FETCH_HEAD指: 某个branch在服务器上的最新状态. 这个列表保存在.git/FETCH_HEAD文件中, 其中每一行对应于远程服务器的一个分支.
+一般两种情况: 
+如果没有显式指定远程分支, 则以master分支为默认的FETCH_HEAD
+如果指定了远程分支, 将这个远程分支作为FETCH_HEAD
+git fetch origin master //从远程origin仓库的master分支下载代码到本地的origin master
+
+
+
+```
+
+
+
 ## tag
 
 ```shell
+tag目的: 分支会被改动而不断变化, 而tag会永久的里程碑, 引用时又和分支一样方便.
+git tag v1 C1, 建立标签, 指向提交记录 C1, 命名为 v1
+git tag v1, 不指定提交记录, 默认是 HEAD 位置.
+
+
+git 的 tag 功能是为了将代码的某个状态打上一个戳, 通过 tag 我们可以很轻易的找到对应的提交
 # 创建 tag
 git tag <tagName>							// 创建本地 tag, 最后一次 commit, 省略不写 <commitId>
 git tag <tagName> <commitId>	// 创建本地 tag, 以指定特定 <commitId> 的方式
@@ -776,11 +828,301 @@ Fast-forward
 
 
 
+## FAQ
+
+### log
+
+```shell
+$ git log -p
+$ git log -p model/PugrListCronModel.php
+$ git log -p --stat  model/PugrListCronModel.php
+
+$ git log -S [keyword]
+$ git log -L 15,+1:'model/PugrListCronModel.php'
+
+$ git log --graph
+$ git log --stat
+$ git log --oneline
+$ git log --author="author"
+$ git log --pretty=oneline
+
+查看提交历史: git log
+查看命令历史: git reflog
+
+$ git show 61d69aa3051b469b4858f707b5035af3450ecf12
+$ git show --stat 61d69aa3051b469b4858f707b5035af3450ecf12
+```
+
+### diff
+
+```shell
+$ git diff filepath
+. git diff filepath 工作区与暂存区比较
+
+2. git diff HEAD filepath 工作区与HEAD ( 当前工作分支) 比较
+
+3. git diff --staged 或 --cached filepath 暂存区与HEAD比较
+
+4. git diff branchName filepath 当前分支的文件与branchName 分支的文件进行比较
+
+5. git diff commitId filepath 与某一次提交进行比较
+
+git diff 比较的是工作区和暂存区的差别
+git diff HEAD 可以查看工作区和版本库的差别
+git diff --cached(===staged) 比较的是暂存区和版本库的差别
+```
+
+### HEAD
+
+```shell
+HEAD 报告您现在所在(活跃分支)的位置. 
+HEAD 表示当前版本
+HEAD^ 上一个版本
+HEAD^^ 上上一个版本
+HEAD~100 上100个版本
+
+HEAD 大写, 当前分支的当前位置
+head 小写, 是非当前分支的其他分支或者标签的位置
+
+实际上, 整个 git 只有一条版本线路, 不同分支或者标签在这条线路上的位置不同, 切换不同分支或者标签时, HEAD也会随分支或者标签的变化而变化. 
+HEAD 保存在 .git/HEAD 文件里, 比如: ref: refs/heads/master
+在 refs/heads/master 文件里, 有一串 40 位的 SHA-1 字符串, 7e136f508b982790db5686482075c60ee3ee4fed, 这是 master 分支上最新提交的 commit id
+HEAD 它即可以指代当前分支, 也可以指代当前分支的最新提交, 而当前分支与最新提交本是两个不同层面的概念. 类比于 C/C++ 语言中的指针, 后者即可以指代数组, 也可以指代数组的第一个元素. 凡是出现指针的地方, 都应该小心行事.
+
+查看 HEAD 指向
+git symbolic-ref HEAD
+$ git symbolic-ref HEAD
+refs/heads/master
+
+$ git cat-file -p 82cc50567233979153512361eb6faa83102cf2ce
+tree 169805f1d5dbcd2d321c5eaa8681c4f2f0bd07d7
+parent b96ea95f69175a32be478c25c28fc3e4c1bacb9d
+author chenchen <chenchen@staff.sina.com> 1672369018 +0800
+committer chenchen <chenchen@staff.sina.com> 1672369018 +0800
+
+root
+第一行, tree 和对应的 hash 值, 根据这个 hash 值我们可以得到本次提交的整个目录树和对应的 hash 值
+第二行, parent，是当前查看的 commit 的上一条(第二条) commit 的 id
+第三行, 作者信息以及提交时的时间戳
+第四行, 提交者的信息以及提交时的时间戳
+根据 head 对应的提交信息生成其 sha-1 值的命令如下:
+(printf "commit %s\0" $(git cat-file commit HEAD | wc -c); git cat-file commit HEAD) | shasum
+
+$ git cat-file commit HEAD
+tree 169805f1d5dbcd2d321c5eaa8681c4f2f0bd07d7
+parent b96ea95f69175a32be478c25c28fc3e4c1bacb9d
+author chenchen <chenchen@staff.sina.com> 1672369018 +0800
+committer chenchen <chenchen@staff.sina.com> 1672369018 +0800
+
+root
+
+
+git reset --hard commitid	撤销
+git reflog 用来记录你的每一次命令
+
+版本号没必要写全，前几位就可以了
+
+
+
+```
+
+### reset 和 revert, 回退到指定版本
+
+```shell
+git reset 重置当前 HEAD 到特定位置. 用于回退版本. 
+
+带有3个参数
+--mixed 等同于不带参数, 工作区不动 workspace, 清空暂存区 stage
+--soft 
+--hard 
+
+
+git revert
+
+
+https://blog.csdn.net/qq_44646343/article/details/125415768
+在利用github实现多人合作程序开发的过程中，我们有时会出现错误提交的情况，此时我们希望能撤销提交操作，让程序回到提交前的样子，本文总结了两种解决方法：回退（reset）、反做（revert）。
+
+使用git的每次提交，Git都会自动把它们串成一条时间线，这条时间线就是一个分支。如果没有新建分支，那么只有一条时间线，即只有一个分支，在Git里，这个分支叫主分支，即master分支。有一个HEAD指针指向当前分支（只有一个分支的情况下会指向master，而master是指向最新提交）。每个版本都会有自己的版本信息，如特有的版本号、版本名等。如下图，假设只有一个分支：
+
+解决方法
+方法一：git reset
+原理： git reset的作用是修改HEAD的位置，即将HEAD指向的位置改变为之前存在的某个版本，
+适用场景： 如果想恢复到之前某个提交的版本，且那个版本之后提交的版本我们都不要了，就可以用这种方法。
+具体操作：
+1. 查看版本号：
+可以使用命令“git log”查看：
+2. 使用“git reset --hard 目标版本号”命令将版本回退：
+再用“git log”查看版本信息，此时本地的HEAD已经指向之前的版本：
+3. 使用“git push -f”提交更改：
+此时如果用“git push”会报错，因为我们本地库HEAD指向的版本比远程库的要旧：
+所以我们要用“git push -f”强制推上去，就可以了：
+
+方法二：git revert
+原理： git revert是用于“反做”某一个版本，以达到撤销该版本的修改的目的。比如，我们commit了三个版本（版本一、版本二、 版本三），突然发现版本二不行（如：有bug），想要撤销版本二，但又不想影响撤销版本三的提交，就可以用 git revert 命令来反做版本二，生成新的版本四，这个版本四里会保留版本三的东西，但撤销了版本二的东西。
+适用场景： 如果我们想撤销之前的某一版本，但是又想保留该目标版本后面的版本，记录下这整个版本变动流程，就可以用这种方法。
+
+具体操作：
+举个例子，现在库里面有三个文件：READ.md、text.txt、text2.txt。
+1. 查看版本号：
+可以通过命令行查看（输入git log）：
+2.使用“git revert -n 版本号”反做，并使用“git commit -m 版本名”提交：
+（1）反做，使用“git revert -n 版本号”命令。如下命令，我们反做版本号为8b89621的版本：
+注意： 这里可能会出现冲突，那么需要手动修改冲突的文件。而且要git add 文件名。
+（2）提交，使用“git commit -m 版本名”，如：
+此时可以用“git log”查看本地的版本信息，可见多生成了一个新的版本，该版本反做了“add text.txt”版本，但是保留了“add text2.txt”版本：
+3.使用“git push”推上远程库：
+
+
+
+撤销变更由底层部分(暂存区的独立文件或者片段)和上层部分(变更到底是通过哪种方式被撤销的)组成.
+git reset HEAD~1
+回退本地可以, 但是远程分支是无效
+
+git revert HEAD
+
+```
+
+### FE
+
+```shell
+index/stage 暂存区, 目的是对工作区内容进行追踪(track), add 添加进暂存区的不是文件名, 而是具体的文件改动内容
+
+push 时需要将当前分支和上游远程分支做关联
+$ git push --set-upstream origin master		// origin 是远程仓库的代指. master 是远程仓库上的分支名
+
+⚠️ 如果你不是 clone 而是直接本地 init 一个仓库再去远程仓库关联的话, 直接 push 会遇到 
+![rejected] master -> master (fetch first)
+这是因为在远程仓库上创建新的项目时勾选了自动生成 readme/.gitignore, 它们就作为远程仓库的第一次 commit, 而我们本地 git init 的仓库没有远程仓库的 readme/.gitignore 文件, 所以无法提交成功. 所以要先拉取一下远端的代码同步到本地, 再把我们的改动提交上去. 先 pull 再 push. 当然如果你创建远程仓库时不勾选 readme/.gitignore 就可以直接 push 上去.
+但是光执行 pull 也是不够的, 远程仓库有一个提交, 我们本地仓库也有一个提交, 直接拉取远端的代码, 这两个提交谁先谁后呢? 没有操作相同文件时可能无所谓, 但是一旦都修改了同一个文件, 就涉及到哪次提交在后, 覆盖的问题, 所以要执行:
+git pull --rebase origin master
+这条指令的意思是把远程库中的更新合并到本地库中, --rebase 的作用是取消掉本地库中刚刚的 commit, 并把他们接到更新后的版本库之中.
+
+
+
+```
+
+### rebase, merge, cherry-pick
+
+```shell
+修改基础点
+站在分支1点上执行 git rebase master, 那么是将分支1合并(迁移到)到master上, 也就是将master作为基础点
+
+rebase: 将站在的位置迁到命中的分支点
+交互式 rebase, -i
+
+merge: 将命令中分支点迁到站在的位置
+
+git cherry-pick C2 C4: 同merge, 将站在以外的迁过来
+```
+
+
+
+git merge --abort //取消merge操作, 执行之后回去看冲突文件，就变回了merge之前的状态。
+
+fast-forward 快速前移, 当**我们所在分支落后于目标分支**时（目标分支包含当前分支所有的提交记录），在当前分支对目标分支执行merge，就是直接把HEAD和所在分支都指向目标分支最新的commit，也称为
+
+关于rebase，只要记住，它是修改需要**被合并**的分支的基础点，同时与merge相反，需要在**被合并**的分支上操作的指令
+
+
+
+#### branch
+
+```shell
+git branch -f master HEAD~4
+强制修改分支位置, 强制移动分支到某个位置, 一次后退四步
+-f 选项让分支指向另一个提交
+某个位置有2个标记, 一个是分支标记, 一个是 HEAD. 分支标记并不是标记整颗tree, 而是标记某个节点.
+
+git branch -f master C6
+git branch -f bugFix HEAD~1
+```
+
+#### describe
+
+```shell
+在 tree 茫茫提交记录点中, 站在所在地查看距离最近的 tag(路标).
+git describe
+
+$ git describe HEAD
+v0.1.3-alpha
+
+<tag>_<numCommits>_g<hash>
+tag 表示的是离 ref 最近的标签, 
+numCommits 是表示这个 ref 与 tag 相差有多少个提交记录, 
+hash 表示的是你所给定的 ref 所表示的提交记录哈希值的前几位.
+当 ref 提交记录上有某个标签时, 则只输出标签名称
+```
+
+#### bisect
+
+```shell
+```
+
+#### ref
+
+```shell
+ref 可引用的一切都称为 ref, refs
+提交记录的id, 分支标记, tag, HEAD, 都是 ref
+```
+
+
+
+
+
+
+
+#### git remote
+
+```shell
+https://blog.csdn.net/HaveFun_Wine/article/details/127074637
+前提说明:
+本地安装完 git 客户端之后就默认带有了 本地 git 仓库.
+$ git init
+站在当前目录创建一个默认 master 分支和暂存区index/stage, 也就是初始化当前目录为一个git仓库. 在文件夹下看到隐藏的.git目录
+$ git checkout -b 本地新分支
+checkout 是从本地仓库向工作区迁出一个名为‘本地新分支’的分支, 即创建一个新分支, 本地仓库里也有了
+
+
+$ git remote -v
+查看远程仓库, 为关联为空
+
+$ git remote add <自定义仓库名><仓库地址>
+
+$ git remote show
+查看远程仓库信息
+
+$ git fetch <远程仓库名>
+$ git remote update
+$ git remote update --prune
+
+$ git branch --set-upstream-to=<远程仓库名><远程分支名>
+站在本地某个分支上
+
+$ git branch -vv
+查看分支关联情况
+
+$ git remote rm <远程仓库名>
+$ git remote remove <远程仓库名>
+删除远程仓库
+
+$ git remote rename <远程仓库旧名字><远程仓库新名字>
+重命名远程仓库
+```
+
+
+
+![2E69B0B5-EE02-4793-88C1-7211E70F3102](/var/folders/g1/6bv__wz96ps83psq19r2fy_w0000gn/T/com.yinxiang.Mac/WebKitDnD.MptN3E/2E69B0B5-EE02-4793-88C1-7211E70F3102.png)
+
+
+
+
+
 
 
 ## See Also
 
-
+https://zhuanlan.zhihu.com/p/51844762 index/stage
 
 
 
