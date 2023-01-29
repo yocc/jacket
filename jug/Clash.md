@@ -115,6 +115,18 @@ ping www.google.com
 
 ```
 
+### 长时间不用, 重新配置使用
+
+```shell
+1. 检查 clash 服务
+
+2. 关闭 代理
+
+2. 更新 config.yaml 文件
+
+3. 
+```
+
 
 
 ### config.yaml
@@ -271,6 +283,13 @@ Sep 26 11:01:49 grpc01 clash[9467]: time="2022-09-26T11:01:49+08:00" level=info 
 Sep 26 11:01:49 grpc01 clash[9467]: time="2022-09-26T11:01:49+08:00" level=info msg="Start initial compatible provider 🎬国外媒体"
 Sep 26 11:01:49 grpc01 clash[9467]: time="2022-09-26T11:01:49+08:00" level=info msg="Start initial compatible provider 🚀直接连接"
 [chenchen@grpc01 clash]$ 
+
+# 以下用不到, 不用管, 调试关开防火墙
+[chenchen@grpc01 tmp]$ sudo systemctl stop firewalld
+[chenchen@grpc01 tmp]$ sudo systemctl disable firewalld
+
+[chenchen@grpc01 tmp]$ sudo systemctl start firewalld
+[chenchen@grpc01 tmp]$ sudo systemctl enable firewalld
 ```
 
 
@@ -280,6 +299,7 @@ Sep 26 11:01:49 grpc01 clash[9467]: time="2022-09-26T11:01:49+08:00" level=info 
 ```shell
 [chenchen@grpc01 clash]$ unset http_proxy
 [chenchen@grpc01 clash]$ unset https_proxy
+⚠️ unset 是针对每个 shell 的, 也就是每个终端打开都需要 unset, 除非是从根本上修改 ~/.bashrc 的配置.
 ```
 
 
@@ -287,6 +307,19 @@ Sep 26 11:01:49 grpc01 clash[9467]: time="2022-09-26T11:01:49+08:00" level=info 
 
 
 ## FAQ & troubleshooting
+
+```shell
+# 问题1: 
+## Unable to establish SSL connection.
+[chenchen@grpc01 tmp]$ wget 'https://www.python.org/ftp/python/3.11.1/Python-3.11.1.tgz'
+--2023-01-19 02:31:42--  https://www.python.org/ftp/python/3.11.1/Python-3.11.1.tgz
+Connecting to 127.0.0.1:7890... connected.
+Unable to establish SSL connection.
+# 排查: 
+先将 clash 代理模式 从rule 改为 global, 结果可以下载, 那就是 rule 的配置不对.
+# 原因: 
+还是 clash 配置文件的配置问题, debug 模式下可以看到下载请求通过代理时 match 匹配走到了'其他流量', '其他流量'里又走回'国外流量', 这里错误, 应该走'直接连接'
+```
 
 
 

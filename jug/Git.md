@@ -650,7 +650,13 @@ URL: ssh://git@git.intra.weibo.com:2222/weibo_sports/trim.sports.weibo.cn.git
 
 ```shell
 clone 从无到有的克隆操作
-git clone gitxxxxxxx
+git clone ssh://git@git.intra.weibo.com:2222/weibo_rd_operation/brandevent/backend/sports.git
+git clone ssh://git@git.intra.weibo.com:2222/weibo_rd_operation/brandevent/backend/sports.git ./
+以上二者区别: 
+- 如果不写最后的位置, 那么会在当前执行此命令的位置上再自动新建一个子目录, 子目录名字为 sports.git 里的 sports/, 然后所有代码都下载进这个子目录.
+- 如果写有最后的位置, 那么就将 Git 里的根目录的代码直接放到当前执行此命令的目录里, 不会新建子目录.
+
+
 
 fetch FETCH_HEAD指: 某个branch在服务器上的最新状态. 这个列表保存在.git/FETCH_HEAD文件中, 其中每一行对应于远程服务器的一个分支.
 一般两种情况: 

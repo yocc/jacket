@@ -20,7 +20,7 @@ $ gpg --verify Python-3.8.5.tgz.asc
 $ gpg --search-keys E3FF2839C048B25C084DEBE9B26995E310250568
 $ gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys E3FF2839C048B25C084DEBE9B26995E310250568
 $ gpg --verify Python-3.8.5.tgz.asc
-或者
+或者(采用)
 [chenchen@localhost tmp]$ md5sum Python-3.8.5.tgz
 e2f52bcf531c8cc94732c0b6ff933ff0  Python-3.8.5.tgz
 ```
@@ -59,7 +59,11 @@ $ sudo yum -y install libffi libffi-devel
 
 $ sudo yum -y install bzip2 bzip2-devel
 $ sudo yum -y install readline readline-devel
+$ sudo yum -y install tcl tcl-devel
 $ sudo yum -y install tk tk-devel
+$ sudo yum -y install tkinter
+$ sudo yum -y install python3-tkinter
+$ sudo yum -y install libX11 libX11-devel
 $ sudo yum -y install sqlite sqlite-devel
 $ sudo yum -y install xz lzma xz-devel
 $ sudo yum -y install uuid uuid-devel
@@ -94,6 +98,7 @@ $ ln -s 原文件 软连接名
 ./configure --prefix=$HOME/program/python3 --enable-shared --enable-big-digits  --with-system-ffi  (使用2, 参考 FAQ)
 ./configure --prefix=$HOME/tmp/python37 --enable-shared --enable-big-digits  --with-system-ffi --with-openssl=/usr/local/openssl111m (成功, --with-openssl=OpenSSL本体根目录)
 ./configure --prefix=$HOME/tmp/python39 --enable-shared --enable-big-digits  --with-system-ffi --with-openssl=/usr/local/openssl111m (成功, --with-openssl=OpenSSL本体根目录)
+./configure --prefix=$HOME/tmp/python311 --enable-shared --enable-big-digits  --with-system-ffi --with-openssl=/usr/local/openssl111m (成功, --with-openssl=OpenSSL本体根目录)
 
 ./configure --prefix=$HOME/program/python3 --exec-prefix=$HOME/bin --enable-shared --enable-optimizations --enable-big-digits  --with-system-ffi
 ```
@@ -104,9 +109,10 @@ $ ln -s 原文件 软连接名
 
 ```shell
 make distclean 	# 清除 configure
-./configure ...
 make clean
-make                    
+./configure ...
+make
+make test
 make install
 (VirtualBox 上需要30分钟左右)
 ```
@@ -131,11 +137,10 @@ total 14M
 $ ~/tmp/python37/bin/python3 --version
 .......
 $ sudo vim /etc/ld.so.conf.d/python37.conf
+$ sudo vim /etc/ld.so.conf.d/python39.conf		# 增加 3.9 的配置
 vim 编辑添加一行 /home/chenchen/tmp/python37/lib
+/home/chenchen/tmp/python39/lib		# 增加 3.9 的配置
 $ sudo ldconfig -vvv
- 
-
-
 ```
 
 
@@ -205,6 +210,7 @@ $ deactivate											// 退出虚拟环境
 在 Unix shell 下使用 source 可以确保将虚拟环境的变量设置在当前shell中, 而不是在子进程中(子进程随后会消失, 没有任何作用)
 
 直接管理多个虚拟环境可能变得很乏味, 因此依赖性管理指南引入了更高级别的工具 Pipenv, 该工具自动为您处理的每个项目和应用程序管理一个单独的虚拟环境. 
+[chenchen@grpc01 ~]$ python3.6 -m venv --help
 ```
 
 ```shell
@@ -683,7 +689,32 @@ openssl: error while loading shared libraries: libssl.so.1.1: cannot open shared
 ```
 
 ```shell
+问题:
+The necessary bits to build these optional modules were not found:
+_tkinter                                                       
+To find the necessary bits, look in setup.py in detect_modules() for the module's name.
 
+原因:
+tkinter 简介
+tkinter 是 python 的一个模块, 封装了 Tcl/Tk 接口, Tcl/Tk 是跨平台脚本图形界面接口. tk 的底层 C 语言接口在动态链接库_tkinter 中.
+估计很多图线需要此库支持.
+
+setup.py 源码, 没找到这2个文件所以报错:
+    def detect_tkinter(self):
+        self.addext(Extension('_tkinter', ['_tkinter.c', 'tkappinit.c']))
+
+解决: 
+先不安装 python 3.11 了, 先用 python 3.9 吧
+从 python3.10 开始, tkinter 需要8.6 版本, 而 contos7 的 yum 能安装到的最新版本是 8.5. 因此不能用python 3.10, 只能到 python 3.9.
+
+依据参考文档: 
+https://docs.python.org/3.9/library/tkinter.html python3.9
+https://docs.python.org/3.10/library/tkinter.html python3.10
+https://docs.python.org/3.11/library/tkinter.html python3.11
+TK 参考:
+https://tkdocs.com/tutorial/install.html
+https://www.tcl.tk/doc/howto/compile.html
+https://ksvi.mff.cuni.cz/~dingle/2021-2/prog_1/tkinter_reference.html#introduction|outline
 ```
 
 ```shell
@@ -732,6 +763,33 @@ Successfully installed pip-21.2.4 setuptools-58.1.0
 
 解决:
 
+```
+
+```shell
+问题:
+ERROR: pip's dependency resolver does not currently take into account all the packages that are installed. This behaviour is the source of the following dependency conflicts.
+grpcio-tools 1.51.1 requires protobuf<5.0dev,>=4.21.6, but you have protobuf 3.19.6 which is incompatible.
+
+原因:
+是在 安装 tensorflow 时报错
+(grpc02) [chenchen@grpc01 grpc02]$ ./bin/python3.9 -m pip install tensorflow
+
+解决:
+需要将 protobuf 包的版本控制在 <5.0dev, >=4.21.6
+先看看现在是什么版本. pip show protobuf
+(grpc02) [chenchen@grpc01 grpc02]$ ./bin/python3.9 -m pip show protobuf
+Name: protobuf
+Version: 3.19.6
+Summary: Protocol Buffers
+Home-page: https://developers.google.com/protocol-buffers/
+Author: 
+Author-email: 
+License: 3-Clause BSD License
+Location: /home/chenchen/tmp/venv/python39/grpc02/lib/python3.9/site-packages
+Requires: 
+Required-by: grpcio-tools, tensorboard, tensorflow
+
+包参考: https://pypi.org/project/protobuf/#history, 从这里找特定包的特定版本. 好搜完之后点进去
 ```
 
 
@@ -790,11 +848,223 @@ $
 
 ```
 
+### Python-3.11.1 源码安装过程
+
+```shell
+1. 下载, 通过 clash 翻墙工具下载, 参考: Clash.md
+[chenchen@grpc01 ~]$ wget 'https://www.python.org/ftp/python/3.11.1/Python-3.11.1.tgz'
+--2023-01-19 06:57:28--  https://www.python.org/ftp/python/3.11.1/Python-3.11.1.tgz
+Connecting to 127.0.0.1:7890... connected.
+Proxy request sent, awaiting response... 200 OK
+Length: 26394378 (25M) [application/octet-stream]
+Saving to: ‘Python-3.11.1.tgz’
+
+100%[========================================================================================================================================================================================>] 26,394,378  28.6KB/s   in 19m 24s
+
+2023-01-19 07:16:53 (22.2 KB/s) - ‘Python-3.11.1.tgz’ saved [26394378/26394378]
+
+[chenchen@grpc01 ~]$ 
+
+2. md5sum 校验, https://www.python.org/downloads/release/python-3111/
+[chenchen@grpc01 tmp]$ md5sum Python-3.11.1.tgz 
+5c986b2865979b393aa50a31c65b64e8  Python-3.11.1.tgz
+[chenchen@grpc01 tmp]$ 
+
+3. 解压缩
+[chenchen@grpc01 tmp]$ tar zxvf Python-3.11.1.tgz -C ./
+134289413 drwxr-xr-x. 16 chenchen chenchen 4.0K Dec  7 03:20 Python-3.11.1
+  2453768 -rw-rw-r--.  1 chenchen chenchen  26M Dec  7 03:26 Python-3.11.1.tgz
+
+4. 检查/查询已安装软件和依赖
+上面有需要事先安装的软件库和依赖库
+[chenchen@grpc01 tmp]$ yum list installed
+[chenchen@grpc01 tmp]$ rpm -qa
+
+5. ./configure
+[chenchen@grpc01 tmp]$ mkdir python311
+[chenchen@grpc01 tmp]$ cd Python-3.11.1
+./configure --prefix=$HOME/tmp/python311 --enable-shared --enable-big-digits  --with-system-ffi --with-openssl=/usr/local/openssl111m (成功, --with-openssl=OpenSSL本体根目录, 执行大约1分钟)
+./configure --prefix=/local/usr/local/python3 --enable-shared --with-ensurepip=install --enable-optimizations
+./configure --prefix=/usr        \
+            --enable-shared      \
+            --with-system-expat  \
+            --with-system-ffi    \
+            --enable-optimizations &&
+            
+yum update
+yum install openssl-devel bzip2-devel libffi-devel
+
+6. make, make install
+make distclean 	# 清除 configure
+make clean 			# 同上
+./configure ...
+make
+make -j4
+make test
+make install
+(VirtualBox 上需要30分钟左右)
+# make -j 带一个参数, 可以把项目在进行并行编译, 比如在一台双核的机器上, 完全可以用 make -j4, 让 make 最多允许4个编译命令同时执行, 这样可以更有效的利用 CPU 资源. 但并行的任务不宜太多, 一般是以CPU的核心数目的两倍为宜.
+
+7. 创建软连接在 PATH 中, 方便使用
+[chenchen@grpc01 bin]$ pwd
+/usr/bin
+[chenchen@grpc01 bin]$ sudo ln -s ~/tmp/python39/bin/python3.9 python3.9
+
+8. 查看版本和模块
+[chenchen@grpc01 bin]$ python3.9 -V
+Python 3.9.10
+[chenchen@grpc01 bin]$ python3.6 -V
+Python 3.6.8
+[chenchen@grpc01 ld.so.conf.d]$ python3.7 -m pydoc modules
+[chenchen@grpc01 ld.so.conf.d]$ python3.9 -m pydoc modules
+[chenchen@grpc01 bin]$ python3.7 -m pydoc modules | wc -l
+/home/chenchen/tmp/python37/lib/python3.7/site-packages/_distutils_hack/__init__.py:30: UserWarning: Setuptools is replacing distutils.
+  warnings.warn("Setuptools is replacing distutils.")
+88
+[chenchen@grpc01 ld.so.conf.d]$ python3.9 -m pydoc modules | wc -l
+/home/chenchen/tmp/python39/lib/python3.9/site-packages/_distutils_hack/__init__.py:30: UserWarning: Setuptools is replacing distutils.
+  warnings.warn("Setuptools is replacing distutils.")
+86
+[chenchen@grpc01 bin]$ python3 -m pydoc modules | wc -l
+80
+
+[chenchen@grpc01 ~]$ python3
+Python 3.6.8 (default, Nov 16 2020, 16:55:22) 
+[GCC 4.8.5 20150623 (Red Hat 4.8.5-44)] on linux
+Type "help", "copyright", "credits" or "license" for more information.
+>>> import sys
+>>> sys.modules.keys()
+dict_keys(['builtins', 'sys', '_frozen_importlib', '_imp', '_warnings', '_thread', '_weakref', '_frozen_importlib_external', '_io', 'marshal', 'posix', 'zipimport', 'encodings', 'codecs', '_codecs', 'encodings.aliases', 'encodings.utf_8', '_signal', '__main__', 'encodings.latin_1', 'io', 'abc', '_weakrefset', 'site', 'os', 'errno', 'stat', '_stat', 'posixpath', 'genericpath', 'os.path', '_collections_abc', '_sitebuiltins', 'sysconfig', '_sysconfigdata_m_linux_x86_64-linux-gnu', 'readline', 'atexit', 'rlcompleter'])
+>>> len(sys.modules)
+38
+[chenchen@grpc01 ~]$ python3.7
+Python 3.7.12 (default, Mar 12 2022, 16:23:39) 
+[GCC 4.8.5 20150623 (Red Hat 4.8.5-44)] on linux
+Type "help", "copyright", "credits" or "license" for more information.
+>>> import sys
+>>> sys.modules.keys()
+dict_keys(['sys', 'builtins', '_frozen_importlib', '_imp', '_thread', '_warnings', '_weakref', 'zipimport', '_frozen_importlib_external', '_io', 'marshal', 'posix', 'encodings', 'codecs', '_codecs', 'encodings.aliases', 'encodings.utf_8', '_signal', '__main__', 'encodings.latin_1', 'io', 'abc', '_abc', 'site', 'os', 'stat', '_stat', '_collections_abc', 'posixpath', 'genericpath', 'os.path', '_sitebuiltins', '_bootlocale', '_locale', '_distutils_hack', 'readline', 'atexit', 'rlcompleter'])
+>>> len(sys.modules)
+38
+[chenchen@grpc01 ~]$ python3.9
+Python 3.9.10 (main, Mar 12 2022, 17:09:05) 
+[GCC 4.8.5 20150623 (Red Hat 4.8.5-44)] on linux
+Type "help", "copyright", "credits" or "license" for more information.
+>>> import sys
+>>> sys.modules.keys()
+dict_keys(['sys', 'builtins', '_frozen_importlib', '_imp', '_thread', '_warnings', '_weakref', '_io', 'marshal', 'posix', '_frozen_importlib_external', 'time', 'zipimport', '_codecs', 'codecs', 'encodings.aliases', 'encodings', 'encodings.utf_8', '_signal', 'encodings.latin_1', '_abc', 'abc', 'io', '__main__', '_stat', 'stat', '_collections_abc', 'genericpath', 'posixpath', 'os.path', 'os', '_sitebuiltins', '_locale', '_bootlocale', '_distutils_hack', 'site', 'readline', 'atexit', 'rlcompleter'])
+>>> len(sys.modules)
+39
+
+9. 虚拟环境
+# 创建虚拟环境
+[chenchen@grpc01 python39]$ python3.9 -m venv ./grpc02
+# 激活, 本质是执行 activate 脚本, 启动了一个 shell 环境. 一旦激活进入虚拟环境, 那么连 python 解释器也应该用虚拟环境下的 ./bin/python3.9
+[chenchen@grpc01 grpc02]$ . ./bin/activate
+# 撤销, 是新 shell 环境下的方法, 退出这个新 shell 环境
+[chenchen@grpc01 grpc02]$ . ./bin/deactivate
+# pip, 查看 pip 是否已经安装, 有没有 pip
+(grpc02) [chenchen@grpc01 grpc02]$ ./bin/python3.9 -m pip -V
+pip 22.3.1 from /home/chenchen/tmp/venv/python39/grpc02/lib/python3.9/site-packages/pip (python 3.9)
+(grpc02) [chenchen@grpc01 grpc02]$ ./bin/python3.9 -m pip --version
+pip 22.3.1 from /home/chenchen/tmp/venv/python39/grpc02/lib/python3.9/site-packages/pip (python 3.9)
+# pip, 查看已经安装过的模块, list
+(grpc02) [chenchen@grpc01 grpc02]$ ./bin/python3.9 -m pip list
+Package    Version
+---------- -------
+pip        21.2.4
+setuptools 58.1.0
+WARNING: You are using pip version 21.2.4; however, version 22.3.1 is available.
+You should consider upgrading via the '/home/chenchen/tmp/venv/python39/grpc02/bin/python3.9 -m pip install --upgrade pip' command.
+(grpc02) [chenchen@grpc01 grpc02]$
+# pip, 升级 pip 本身, -U 同 --upgrade
+(grpc02) [chenchen@grpc01 grpc02]$ ./bin/python3.9 -m pip install --upgrade pip
+Requirement already satisfied: pip in ./lib/python3.9/site-packages (21.2.4)
+Collecting pip
+  Downloading pip-22.3.1-py3-none-any.whl (2.1 MB)
+     |████████████████████████████████| 2.1 MB 237 kB/s 
+Installing collected packages: pip
+  Attempting uninstall: pip
+    Found existing installation: pip 21.2.4
+    Uninstalling pip-21.2.4:
+      Successfully uninstalled pip-21.2.4
+Successfully installed pip-22.3.1
+# pip, 再次查看 pip 模块, 升级提示消失
+(grpc02) [chenchen@grpc01 grpc02]$ ./bin/python3.9 -m pip list
+Package    Version
+---------- -------
+pip        22.3.1
+setuptools 58.1.0
+# pip, 查看安装过的包名的详细信息
+(grpc02) [chenchen@grpc01 grpc02]$ ./bin/python3.9 -m pip show pip
+Name: pip
+Version: 22.3.1
+Summary: The PyPA recommended tool for installing Python packages.
+Home-page: https://pip.pypa.io/
+Author: The pip developers
+Author-email: distutils-sig@python.org
+License: MIT
+Location: /home/chenchen/tmp/venv/python39/grpc02/lib/python3.9/site-packages
+Requires: 
+Required-by: 
+# pip, 从远程PyPI里找包, 不再支持 pip search, 而是通过 浏览器在 https://pypi.org/search/ 页面上搜索.
+# 包参考: https://pypi.org/project/protobuf/#history, 从这里找特定包的特定版本. 好搜完之后点进去
+(grpc02) [chenchen@grpc01 grpc02]$ ./bin/python3.9 -m pip search pip  # 已经废弃, 不能使用了
+# pip inspect, 试验性的
+(grpc02) [chenchen@grpc01 grpc02]$ ./bin/python3.9 -m pip inspect ./
+WARNING: pip inspect is currently an experimental command. The output format may change in a future release without prior warning.
+{
+  "version": "0",
+  "pip_version": "22.3.1",
+  "installed": [
+# pip, 安装 gRPC
+# pip 安装 gRPC 工具, 工具包括 protoc(protocol buffer 编译器) 和 插件(从 .proto 服务定义文件 生成 server 和 client 代码)
+(grpc02) [chenchen@grpc01 grpc02]$ ./bin/python3.9 -m pip install grpcio
+(grpc02) [chenchen@grpc01 grpc02]$ ./bin/python3.9 -m pip install grpcio-tools
+# pip, 安装 tensorflow 有错误
+(grpc02) [chenchen@grpc01 grpc02]$ ./bin/python3.9 -m pip install tensorflow
+# pip, 升级 tensorflow
+(grpc02) [chenchen@grpc01 grpc02]$ ./bin/python3.9 -m pip install -U tensorflow
+# pip, 二次安装 tensorflow, 无错误
+(grpc02) [chenchen@grpc01 grpc02]$ ./bin/python3.9 -m pip install tensorflow
+# 这种报错仅仅是提示, 已经自动修复版本范围了, 如果紧接着二次执行 pip install tensorflow 的话就不报错了.
+ERROR: pip's dependency resolver does not currently take into account all the packages that are installed. This behaviour is the source of the following dependency conflicts.
+错误：pip 的依赖项解析器当前未考虑已安装的所有软件包。此行为是以下依赖项冲突的根源。 grpcio-tools 1.51.1 需要 protobuf<5.0dev，>=4.21.6，但你有 protobuf 3.19.6 不兼容。
+grpcio-tools 1.51.1 requires protobuf<5.0dev,>=4.21.6, but you have protobuf 3.19.6 which is incompatible.
+# pip, 查看 protobuf 包的详细信息
+(grpc02) [chenchen@grpc01 grpc02]$ ./bin/python3.9 -m pip show protobuf
+Name: protobuf
+Version: 3.19.6
+Summary: Protocol Buffers
+Home-page: https://developers.google.com/protocol-buffers/
+Author: 
+Author-email: 
+License: 3-Clause BSD License
+Location: /home/chenchen/tmp/venv/python39/grpc02/lib/python3.9/site-packages
+Requires: 
+Required-by: grpcio-tools, tensorboard, tensorflow
+# venv, 虚拟环境目录结构
+bin 虚拟环境下的 python 解释器和模块的二进制命令.
+lib 解释器版本, 比如, python3.9, 然后是 site-packages(固定的), 然后是各种包和模块目录和文件.
+lib64 lib 的软连接, 同上
+include 空目录
+pyvenv.cfg 虚拟环境配置文件, 虚拟环境的主环境命令python解释器位置和python解释器版本, 虚拟环境目录位置.
+```
+
+```shell
+urllib, urllib2, urllib3
+https://blog.csdn.net/jiduochou963/article/details/87564467
+https://developer.aliyun.com/article/796828
+https://zhuanlan.zhihu.com/p/92847111
+```
+
 
 
 
 
 ### See Also
+
+https://www.python.org/downloads/release/python-3111/	下载
 
 https://www.python.org/downloads/source/
 

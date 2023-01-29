@@ -511,6 +511,12 @@ rr                                   v4                6278d941ad4a   13 months 
 registry.nevis.sina.com.cn/tiyu/rr   v7                6278d941ad4a   13 months ago    123MB
 kk                                   latest            6278d941ad4a   13 months ago    123MB
 python                               3.6-slim-buster   eb32e0d643ed   13 months ago    112MB
+
+[chenchen@dev3_10.211.21.18 sports.weibo.com]$ sudo docker pull registry.nevis.sina.com.cn/tiyu/env.sports.weibo.com@sha256:794f18aa827a172d73eeeb1a5644e2c1cb23fc486023940376411d7ef9e2e1f1
+registry.nevis.sina.com.cn/tiyu/env.sports.weibo.com@sha256:794f18aa827a172d73eeeb1a5644e2c1cb23fc486023940376411d7ef9e2e1f1: Pulling from tiyu/env.sports.weibo.com
+Digest: sha256:794f18aa827a172d73eeeb1a5644e2c1cb23fc486023940376411d7ef9e2e1f1
+Status: Image is up to date for registry.nevis.sina.com.cn/tiyu/env.sports.weibo.com@sha256:794f18aa827a172d73eeeb1a5644e2c1cb23fc486023940376411d7ef9e2e1f1
+registry.nevis.sina.com.cn/tiyu/env.sports.weibo.com@sha256:794f18aa827a172d73eeeb1a5644e2c1cb23fc486023940376411d7ef9e2e1f1
 ```
 
 ```shell
@@ -535,6 +541,21 @@ sudo docker run -d c5e9de8c315c
 [chenchen@grpc01 tefd]$  sudo docker run -it python:3.6-slim-buster
 [chenchen@grpc01 tefd]$  sudo docker run -it --name t01 python:3.6-slim-buster
 [chenchen@grpc01 tefd]$  sudo docker run -it --name t02 --rm python:3.6-slim-buster
+
+sudo docker run -it --rm -d -p 8088:80 -v /usr/home/chenchen/htdocs/sports.weibo.com:/data1/www/htdocs/sports.weibo.com --name chenchen.env.sports.weibo.com registry.nevis.sina.com.cn/tiyu/env.sports.weibo.com
+
+[chenchen@dev3_10.211.21.18 _docker-env]$ sudo docker run -it --rm -d -p 8088:80 -v /usr/home/chenchen/htdocs/sports.weibo.com:/data1/www/htdocs/sports.weibo.com --name chenchen registry.nevis.sina.com.cn/tiyu/env.sports.weibo.com8d2ebabd56cf51640acc35c525d1b9b114810be30280de748687ddfede3ac142
+
+[chenchen@dev3_10.211.21.18 _docker-env]$ sudo docker run --rm -d -p 8089:80 -v /usr/home/chenchen/htdocs/sports.weibo.com:/data1/www/htdocs/sports.weibo.com --name chenchen01 fromimage
+5c1866c770430eb4a5e07b0f10368658df167060081af5917f94dbcc43320f2b
+[chenchen@dev3_10.211.21.18 _docker-env]$ sudo docker ps
+CONTAINER ID   IMAGE                                                  COMMAND                  CREATED          STATUS          PORTS                   NAMES
+5c1866c77043   fromimage                                              "/etc/dAppCluster/st…"   3 minutes ago    Up 3 minutes    0.0.0.0:8089->80/tcp    chenchen01
+8d2ebabd56cf   registry.nevis.sina.com.cn/tiyu/env.sports.weibo.com   "/etc/dAppCluster/st…"   21 minutes ago   Up 21 minutes   0.0.0.0:8088->80/tcp    chenchen
+90c415a55723   sports.weibo.com-env                                   "/etc/dAppCluster/st…"   3 days ago       Up 3 days       0.0.0.0:8080->80/tcp    wenqiang1
+5746fece6316   sports.weibo.com-env                                   "/etc/dAppCluster/st…"   2 weeks ago      Up 2 weeks      0.0.0.0:21576->80/tcp   runyan1
+[chenchen@dev3_10.211.21.18 _docker-env]$ sudo docker exec -it 5c1866c77043 /bin/bash
+[root@5c1866c77043 /]# cd ~
 ```
 
 ```shell
@@ -571,7 +592,60 @@ sudo docker stop b249de0d65e6 -t 1
 
 [chenchen@grpc01 tefd]$ sudo docker stop 800705c96724
 800705c96724
+[chenchen@dev3_10.211.21.18 _docker-env]$ sudo docker stop 5c1866c77043 8d2ebabd56cf -t 1
+5c1866c77043
+8d2ebabd56cf
 ```
+
+```shell
+Usage:  docker kill [OPTIONS] CONTAINER [CONTAINER...]
+杀掉容器
+
+-s, --signal string   Signal to send to the container (default "KILL")
+
+sudo docker kill 800705c96724
+```
+
+```shell
+Usage:  docker exec [OPTIONS] CONTAINER COMMAND [ARG...]
+在指定的容器ID上运行一个命令
+
+  -d, --detach               Detached mode: run command in the background
+      --detach-keys string   Override the key sequence for detaching a container
+  -e, --env list             Set environment variables
+      --env-file list        Read in a file of environment variables
+  -i, --interactive          Keep STDIN open even if not attached
+      --privileged           Give extended privileges to the command
+  -t, --tty                  Allocate a pseudo-TTY
+  -u, --user string          Username or UID (format: <name|uid>[:<group|gid>])
+  -w, --workdir string       Working directory inside the container
+
+sudo docker exec -it 07228ec25756 /bin/bash
+```
+
+```shell
+Usage:  docker commit [OPTIONS] CONTAINER [REPOSITORY[:TAG]]
+从容器的变化来创建新镜像
+
+  -a, --author string    Author (e.g., "John Hannibal Smith <hannibal@a-team.com>")
+  -c, --change list      Apply Dockerfile instruction to the created image
+  -m, --message string   Commit message
+  -p, --pause            Pause container during commit (default true)
+
+sudo docker commit -m 'openssh' -a 'Docker for ssh' ffe81683c404 ssh_box
+
+[chenchen@dev3_10.211.21.18 _docker-env]$ sudo docker commit -m 'yocc' -a 'for yocc' 8d2ebabd56cf fromimage
+sha256:3b4c5efbc6338a0fd0a1cb6f18cca94e09fadb129ebc6284ab4d345e73ca6a7a
+[chenchen@dev3_10.211.21.18 _docker-env]$ sudo docker images
+REPOSITORY                                             TAG       IMAGE ID       CREATED         SIZE
+fromimage                                              latest    3b4c5efbc633   2 minutes ago   855MB
+sports.weibo.com-env                                   latest    b4eaf9315a8d   2 weeks ago     853MB
+registry.nevis.sina.com.cn/tiyu/env.sports.weibo.com   latest    b4eaf9315a8d   2 weeks ago     853MB
+registry.api.weibo.com/csmonitor/php_base.php71        1.7       362185d8bf02   3 months ago    2.2GB
+registry.dpool.sina.com.cn/dpool/dpool-web5            v33       c8a990b8d391   10 months ago   852MB
+```
+
+
 
 ```shell
 Usage:  docker rmi [OPTIONS] IMAGE [IMAGE...]
@@ -1261,9 +1335,28 @@ docker push <tagname>
 
 
 
+sudo docker run --rm -d -p 8088:80 -p 2222:22 -v /usr/home/chenchen/htdocs/sports.weibo.com:/data1/www/htdocs/sports.weibo.com --name chenchen.env.sports.weibo.com registry.nevis.sina.com.cn/tiyu/env.sports.weibo.com
 
 
 
+sudo docker run --rm -d -p 8088:80 -p 2222:22 -v /usr/home/chenchen/htdocs/sports.weibo.com:/data1/www/htdocs/sports.weibo.com --name chenchen.env.sports.weibo.com registry.nevis.sina.com.cn/tiyu/env.sports.weibo.com /bin/bash
+
+
+
+sudo docker run -it --rm -d -p 8088:80 -v /usr/home/chenchen/htdocs/sports.weibo.com:/data1/www/htdocs/sports.weibo.com --name chenchen.env.sports.weibo.com registry.nevis.sina.com.cn/tiyu/env.sports.weibo.com /bin/bash
+
+
+
+docker exec -it 8b1de32984a1 /bin/bash
+
+
+
+[chenchen@dev3_10.211.21.18 _docker-env]$ sudo docker ps -a
+CONTAINER ID   IMAGE                                                  COMMAND                  CREATED         STATUS         PORTS                   NAMES
+ebc5ce0efc81   registry.nevis.sina.com.cn/tiyu/env.sports.weibo.com   "/etc/dAppCluster/st…"   6 minutes ago   Up 6 minutes   0.0.0.0:8088->80/tcp    chenchen.env.sports.weibo.com
+90c415a55723   sports.weibo.com-env                                   "/etc/dAppCluster/st…"   3 days ago      Up 3 days      0.0.0.0:8080->80/tcp    wenqiang1
+5746fece6316   sports.weibo.com-env                                   "/etc/dAppCluster/st…"   2 weeks ago     Up 2 weeks     0.0.0.0:21576->80/tcp   runyan1
+[chenchen@dev3_10.211.21.18 _docker-env]$ sudo docker stop ebc5ce0efc81
 
 
 

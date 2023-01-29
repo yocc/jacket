@@ -338,6 +338,7 @@ OpenSSL 配置文件的目录, 以及默认证书和密钥库. 默认值为 `Uni
 [chenchen@grpc01 tmp]$ sha256sum openssl-3.0.4.tar.gz
 2831843e9a668a0ab478e7020ad63d2d65e51f72977472dc73efcefbafc0c00f  openssl-3.0.4.tar.gz
 [chenchen@grpc01 tmp]$ wget https://www.openssl.org/source/openssl-3.0.4.tar.gz.sha256 --no-check-certificate
+[chenchen@grpc01 tmp]$ less openssl-3.0.4.tar.gz.sha256
 [chenchen@grpc01 tmp]$ tar -zxvf openssl-3.0.4.tar.gz -C ./
 [chenchen@grpc01 tmp]$ cd openssl-3.0.4
 [chenchen@grpc01 tmp]$ less README.md
