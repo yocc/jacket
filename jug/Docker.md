@@ -76,7 +76,7 @@ $ sudo yum remove docker \
 
 ##### 使用仓库安装
 
-在新主机上首次安装 Docker Engine 之前，您需要设置 Docker 仓库。之后，您可以从仓库安装和更新 Docker。
+在新主机上首次安装 Docker Engine 之前，您需要设置yum 的  Docker 仓库。之后，您可以从仓库安装和更新 Docker。
 
 ###### 设置仓库
 安装 yum-utils 包（提供 yum-config-manager 实用程序）并设置稳定版仓库。
@@ -689,6 +689,7 @@ sudo docker rm edea8185e3c3
 Usage:  docker tag SOURCE_IMAGE[:TAG] TARGET_IMAGE[:TAG]
 创建一个 tag, 这个 tag 指向原 image.
 标记本地 image, 将其归入某一仓库.
+我觉得是 docker tag image repository:tag
 
 [chenchen@grpc01 tefd]$ sudo docker tag 6278d941ad4a rr:v3
 [chenchen@grpc01 tefd]$ sudo docker images
@@ -737,6 +738,22 @@ docker image inspect --format='' myimage
 [chenchen@grpc01 tefd]$ sudo docker inspect -s rr:v4
 [chenchen@grpc01 tefd]$ sudo docker inspect -s --type container 11280031f06e
 [chenchen@grpc01 tefd]$ sudo docker inspect -s --type=container t01
+```
+
+### 通过已有容器得到镜像, container -> image
+
+```sh
+1. 停容器
+sudo docker stop <容器名|容器ID>
+$ sudo docker stop v801
+
+2. 将容器打包成镜像
+sudo commit <容器名|容器ID> <镜像名>
+$ sudo docker commit v801 centos:802
+
+3. 用新镜像开启新容器
+$ sudo docker run -itd --rm -p 5173:5173 -name <新容器名> <镜像名>
+$ sudo docker run -itd --rm -p 5173:5173 --name v802 centos:802
 ```
 
 
@@ -1244,6 +1261,160 @@ Login Succeeded
 [chenchen@grpc01 tefd]$ echo 'Y2hlbmNoZW46NTY3ODkwMjg3MjAy' | base64 --decode
 chenchen:567890287202
 [chenchen@grpc01 tefd]$ 
+
+```
+
+### login 官方 hub.docker.io
+
+```shell
+
+
+# 以下是 登录 hub.docker.com
+# 如果未指定镜像仓库地址, 默认为官方仓库 Docker Hub.
+[chenchen@grpc01 dc8]$ sudo docker login
+Login with your Docker ID to push and pull images from Docker Hub. If you don't have a Docker ID, head over to https://hub.docker.com to create one.
+Username: yocczr@gmail.com
+Password: 
+Error response from daemon: Get "https://registry-1.docker.io/v2/": unauthorized: incorrect username or password
+[chenchen@grpc01 dc8]$ sudo docker login
+Login with your Docker ID to push and pull images from Docker Hub. If you don't have a Docker ID, head over to https://hub.docker.com to create one.
+Username: yocc
+Password: 
+WARNING! Your password will be stored unencrypted in /home/chenchen/.docker/config.json.
+Configure a credential helper to remove this warning. See
+https://docs.docker.com/engine/reference/commandline/login/#credentials-store
+
+Login Succeeded
+[chenchen@grpc01 dc8]$ 
+
+# 登录成功后, Docker 会将 token 存储在 ~/.docker/config.json 文件中, 从而作为拉取私有镜像的凭证.
+我们使用 cat 命令, 查看 token 凭证信息. 通过 $ echo 'Y2hlbmNoZW46NTY3ODkwMjg3MjAy' | base64 --decode
+
+~/.docker/config.json
+{
+        "auths": {
+                "https://index.docker.io/v1/": {
+                        "auth": "eW9jYzp0amNlbnRlaw=="
+                },
+                "registry.nevis.sina.com.cn": {
+                        "auth": "Y2hlbmNoZW46NTY3ODkwMjg3MjAy"
+                }
+        }
+}
+```
+
+### docker pull centos:8
+
+```sh
+[chenchen@grpc01 dc8]$ sudo docker pull centos:8
+8: Pulling from library/centos
+a1d0c7532777: Pulling fs layer 
+error pulling image configuration: Get "https://production.cloudflare.docker.com/registry-v2/docker/registry/v2/blobs/sha256/5d/5d0da3dc976460b72c77d94c8a1ad043720b0416bfc16c52c45d4847e53fadb6/data?verify=1676282218-p5yDzl%2Fkr3Umi66ejuygwVU4wmQ%3D": dial tcp 104.18.122.25:443: i/o timeout
+# 本地物理存放位置, image 和 container, root 权限
+[root@grpc01 docker]# pwd
+/var/lib/docker
+```
+
+### 代理网络环境下配置Docker联网拉取镜像
+
+```sh
+问题:
+系统已经配置代理, 但 docker pull 依然很慢
+[chenchen@grpc01 dc8]$ sudo docker pull centos:8
+8: Pulling from library/centos
+a1d0c7532777: Pulling fs layer 
+error pulling image configuration: Get "https://production.cloudflare.docker.com/registry-v2/docker/registry/v2/blobs/sha256/5d/5d0da3dc976460b72c77d94c8a1ad043720b0416bfc16c52c45d4847e53fadb6/data?verify=1676282218-p5yDzl%2Fkr3Umi66ejuygwVU4wmQ%3D": dial tcp 104.18.122.25:443: i/o timeout
+
+原因:
+事实与真相: 
+Docker这个程序只是一个控制台程序，用于attach，真正操作docker的是运行在后台的docker daemon，也就是我们需要通过systemctl start docker来启动docker daemon。所以说即使我们设置了环境变量http_proxy，那么也只是针对前台docker console使用，而真正访问pull镜像的确是后台的daemon，因此，需要设置daemon访问proxy。
+
+解决: 
+1. 给 systemctl 服务做配置, 让所有 daemon 服务进程走代理
+sudo mkdir -p /etc/systemd/system/docker.service.d/		# 创建目录
+sudo vim /etc/systemd/system/docker.service.d/http-proxy.conf		# 创建并编辑文件
+文件内容如下:
+[Service]
+Environment="HTTP_PROXY=http://127.0.0.1:7890"
+Environment="HTTPS_PROXY=http://127.0.0.1:7890"
+#Environment="ALL_PROXY=socks5://127.0.0.1:7891"
+#Environment="NO_PROXY=localhost,127.0.0.1,docker-registry.example.com,.corp,.docker.io,.docker.com"
+⚠️ 要注释掉 所有代理和 不需要代理域名, 也就是让所有都走代理
+2. 重启 systemctl 和 docker 服务
+~# systemctl daemon-reload
+~# systemctl restart docker
+3. 验证配置是否生效
+~# docker info
+4. 拉镜像
+[root@grpc01 dc8]# docker pull centos:8
+Error response from daemon: Get "https://registry-1.docker.io/v2/": read tcp 127.0.0.1:52246->127.0.0.1:7890: read: connection reset by peer
+[root@grpc01 dc8]# docker pull centos:8
+8: Pulling from library/centos
+a1d0c7532777: Pull complete 
+Digest: sha256:a27fd8080b517143cbbbab9dfb7c8571c40d67d534bbdee55bd6c473f432b177
+Status: Downloaded newer image for centos:8
+docker.io/library/centos:8
+[root@grpc01 dc8]# docker images
+REPOSITORY                           TAG               IMAGE ID       CREATED         SIZE
+registry.nevis.sina.com.cn/tiyu/rr   v6                c957dd44cd57   4 weeks ago     123MB
+rr                                   v3                6278d941ad4a   14 months ago   123MB
+rr                                   v4                6278d941ad4a   14 months ago   123MB
+kk                                   latest            6278d941ad4a   14 months ago   123MB
+pp                                   latest            6278d941ad4a   14 months ago   123MB
+pp                                   v2                6278d941ad4a   14 months ago   123MB
+py                                   latest            6278d941ad4a   14 months ago   123MB
+python                               3.6-slim-buster   eb32e0d643ed   14 months ago   112MB
+centos                               8                 5d0da3dc9764   17 months ago   231MB
+5. 通过镜像创建容器, --name <容器名>, --it 交互终端, centos:8 镜像名
+[root@grpc01 dc8]# docker create --name v801 -it centos:8
+sudo docker create -it --name 容器名 镜像名
+[chenchen@grpc01 dc8]$ sudo docker ps -a
+CONTAINER ID   IMAGE                    COMMAND       CREATED         STATUS                   PORTS     NAMES
+28cdf5453e1e   centos:8                 "/bin/bash"   3 minutes ago   Created                            v801
+11280031f06e   python:3.6-slim-buster   "python3"     4 weeks ago     Exited (0) 4 weeks ago             t01
+8a49bb362e5d   python:3.6-slim-buster   "python3"     4 weeks ago     Exited (0) 4 weeks ago             peaceful_swartz
+容器状态:
+created	已创建
+restarting	重启中
+running	运行中
+removing	迁移中
+paused	暂停
+exited	停止
+dead	死亡
+6. 启动容器
+sudo docker start <容器ID 或者 容器名>
+此时容器状态为UP，Exited，Created
+[chenchen@grpc01 dc8]$ sudo docker start v801
+v801
+[chenchen@grpc01 dc8]$ sudo docker ps -a
+CONTAINER ID   IMAGE                    COMMAND       CREATED         STATUS                   PORTS     NAMES
+28cdf5453e1e   centos:8                 "/bin/bash"   6 minutes ago   Up 52 seconds                      v801
+11280031f06e   python:3.6-slim-buster   "python3"     4 weeks ago     Exited (0) 4 weeks ago             t01
+8a49bb362e5d   python:3.6-slim-buster   "python3"     4 weeks ago     Exited (0) 4 weeks ago             peaceful_swartz
+7. 停止容器
+sudo docker stop <容器ID 或者 容器名>
+[chenchen@grpc01 ~]$ sudo docker stop v801
+v801
+8. 进入容器
+$ docker exec -it 容器ID/容器NAME /bin/bash
+注：只有在容器启动的时候即UP状态才能进入容器终端
+[chenchen@grpc01 ~]$ sudo docker exec -it v801 /bin/bash
+9. 新建容器 -> 启动容器 -> 进入容器
+$ docker run -it centos:8 /bin/bash
+10. 指定端口号
+注：将宿主机的7001端口隐射给容器的8001端口，"-p"是小写，如果是"-P"Docker将会随机映射一个49000到49900的端口
+$ docker run -it -p 7001:8001 centos:8 /bin/bash
+11. 守护状态
+更多的时候，需要让 Docker 容器在后台以守护态（ Daemonized ）形式运行 此时，可以通过添加-d参数来实现
+$ docker run -it -d --name v801 centos:8
+12. 退出容器
+退出时如果想继续运行容器：按顺序按【ctrl+p】, 【ctrl+q】
+如果不想继续运行：按【ctrl+d】或输入exit
+13. 宿主机与容器之间复制文件
+$ docker cp 宿主机绝对路径  容器id:路径
+14. 删除容器
+$ docker rm 容器ID
+注：加"-f"参数便可删除已启动的容器
 
 ```
 

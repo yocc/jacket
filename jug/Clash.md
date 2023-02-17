@@ -20,8 +20,10 @@ https://github.com/Dreamacro/clash/releases/download/v1.11.8/clash-linux-amd64-v
 https://github.com/Dreamacro/clash/releases/download/v1.11.8/clash-linux-amd64-v3-v1.11.8.gz  此程序只能在支持 v3 微体系结构的 AMD64 处理器上运行
 
 2. 解压缩
+[tar -zxvf clash-linux-amd64-v1.13.0.gz -C ./][不是tar包, 不能这么用]
+gzip -d clash-linux-amd64-v1.13.0.gz, 解压后就一个文件 clash-linux-amd64-v1.13.0, 直接改为 clash
 2.1. 获得 clash 应用程序
-直接解压解包, 就一个文件, 直接修改 clash-linux-amd64-v1.11.8 名字位 clash, chmod 755
+直接解压解包, 就一个文件, 直接修改 clash-linux-amd64-v1.11.8 名字为 clash, chmod 755
 直接 ./clash -v, 看看是不是正常
 [chenchen@grpc01 clash]$ pwd
 /home/chenchen/tmp/clash
@@ -114,6 +116,62 @@ ping www.google.com
 
 
 ```
+
+### 调试配置踩坑2
+
+```shell
+1. 一开始就需要确定的位置:
+1.1 clash 服务(systemctl) 配置文件位置, 其中有 clash 服务本体位置和加载配置文件位置
+[chenchen@grpc01 clash]$ l /etc/systemd/system/clash.service
+1.2. clash 服务(systemctl)配置用的是哪个 clash 本体和 配置文件 config.yaml
+1.3. 开三个终端: 
+第一个终端: clash 命令行调试服务:
+[root@grpc01 clash]# /usr/local/bin/clash -t -d /etc/clash		# 先 -t 检查配置文件是否正确
+[root@grpc01 clash]# /usr/local/bin/clash -d /etc/clash				# 命令行前台运行服务在 debug 模式下
+
+第二个终端: 访问外站看是否返回正确, 如果不正确, 看 第一个终端 的 debug 调试信息
+curl www.google.com
+curl www.google.com -i			# 返回全部 header + body
+curl www.google.com -I			# 仅 header
+curl www.google.com -s
+curl www.google.com -I -s
+# 不能
+ping www.google.com
+# 待到调试没问题了, 再将 clash 服务用 systemd 管理起来, 自动运行什么
+
+第三个终端: vim config.yaml 
+allow-lan: true					# 改为 true, 原因没深究都让改
+mode: rule							# 三种选择, rule, global, direct
+log-level: debug				# info / warning / error / debug / silent, debug 要配合命令行运行服务在终端前台才能看到调试
+⚠️ 这里调整配置文件的代理网关的优先顺序, 是调整 根节点下的 proxy-groups 节点下的 proxies 顺序. 而不是 根节点下的 proxies, 这个没有用, 仅仅是特定网关的具体配置, 不负责加载顺序.
+proxy-groups:
+  -
+    name: 🔰国外流量
+    type: select
+    proxies:
+      - '[Lv3·1.0x] 日本001|混合负载|1000Mbps共享'
+      - '[Lv4·60.0x] 香港01|IPLC|广州|游戏|限速10Mbps'
+      - '[Lv4·60.0x] 香港02|IPLC|广州|游戏|限速10Mbps'
+1.4. 代理网关节点选择, 需要有耐心一个一个实验, 我觉得, '混合负载' 的都可以. 
+1.5. 以上步骤调试通了之后, 就要切换到正式 systemctl 服务上了
+[root@grpc01 clash]# systemctl start clash
+[root@grpc01 clash]# netstat -ntlp
+1.6. ~/.bashrc 增加代理配置
+# clash
+export https_proxy=http://127.0.0.1:7890
+export http_proxy=http://127.0.0.1:7890
+## export all_proxy=socks5://127.0.0.1:7891
+[root@grpc01 ~]$ . ~/.bashrc
+1.7. 如果要停止代理, 不是停服务, 而是将 env 环境变量中的 proxy 卸载 unset, 并重新 env | grep proxy 检查
+unset http_proxy
+unset https_proxy
+unset ftp_proxy
+unset no_proxy
+1.8. 即便调试和正式systemctl服务都没问题了, 在实际使用中依然会出现访问不能的情况, 此时别急, 遵循一条原则, 只要是使用了代理, 那就要多实验几次, 代理的可靠性并不高. 
+
+```
+
+
 
 ### 长时间不用, 重新配置使用
 
@@ -292,7 +350,7 @@ Sep 26 11:01:49 grpc01 clash[9467]: time="2022-09-26T11:01:49+08:00" level=info 
 [chenchen@grpc01 tmp]$ sudo systemctl enable firewalld
 ```
 
-
+![img](https://img2020.cnblogs.com/blog/1234034/202009/1234034-20200930083230253-965519395.jpg)
 
 ### 关闭 clash 服务后, 关闭本地代理配置
 
@@ -328,3 +386,5 @@ Unable to establish SSL connection.
 https://github.com/Dreamacro/clash
 
 https://github.com/Dreamacro/clash/wiki/Configuration#all-configuration-options
+
+https://hello.lxdhome.com/p/2396/

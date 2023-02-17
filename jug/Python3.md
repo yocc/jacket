@@ -351,6 +351,8 @@ $ python3 -m pip install --user 包名         # 只为当前用户安装
 $ python3 -m pip list                       # 列出所有已经安装过的包名
 $ python3 -m pip show 包名                   # 列出安装过的包名的详细信息
 $ python3 -m pip search 包名                 # 从远程PyPI里找包
+
+$ pip3 install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cpu
 ```
 
 ```shell

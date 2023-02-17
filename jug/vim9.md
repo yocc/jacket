@@ -757,6 +757,37 @@ nnoremap = normal no recursion map
 
 
 
+## Fold
+
+```shell
+展开:
+zo - 打开一个光标折叠
+zO - 递归打开所有光标这叠
+折叠:
+zc - 关闭一个光标折叠
+zC - 递归关闭所有光标这叠
+
+
+全局打开
+zr - 打开一层全局折叠: 在'foldlevel'中加1
+zR - 打开所有全局折叠: 'foldlevel' 设置为最高
+全局折叠
+zm - 关闭一层全局折叠: 在'foldlevel'中加1
+zM - 关闭所有全局折叠: 'foldlevel' 设置为0
+
+
+zx - 
+zX - 
+
+zn - 重置'foldenable', 全打开
+zN - 全关闭 'foldenable'
+
+za - 循环切换打开和关闭一个折叠
+zA - 循环切换递归打开和关闭一个折叠
+
+zv - 查看光标线; 打开足够的折叠, 使光标所在的线条不折叠. 仅从折叠线上看不折叠
+```
+
 
 
 ## See Also

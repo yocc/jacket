@@ -171,6 +171,7 @@ x86_64
      not match the domain name in the URL).
     If you'd like to turn off curl's verification of the certificate, use
      the -k (or --insecure) option.
+    ⚠️ -k 参数是 curl 关闭验证
     [chenchen@grpc01 ~]$ curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh -k | bash
       % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
                                      Dload  Upload   Total   Spent    Left  Speed
@@ -218,6 +219,44 @@ x86_64
     .
     .
     .
+    
+    # 20230214
+    [root@28cdf5453e1e tmp]# nvm ls
+                N/A
+    iojs -> N/A (default)
+    node -> stable (-> N/A) (default)
+    unstable -> N/A (default)
+    [root@28cdf5453e1e tmp]# nvm ls-remote			# 返回很多
+    
+    [root@28cdf5453e1e tmp]# nvm install node
+    Downloading and installing node v19.6.0...
+    Downloading https://nodejs.org/dist/v19.6.0/node-v19.6.0-linux-x64.tar.xz...
+    ########################################################################################################################################################################################################################### 100.0%
+    Computing checksum with sha256sum
+    Checksums matched!
+    Now using node v19.6.0 (npm v9.4.0)
+    Creating default alias: default -> node (-> v19.6.0 *)
+    [root@28cdf5453e1e tmp]# node -v
+    v19.6.0
+    [root@28cdf5453e1e tmp]# npm -v
+    9.4.0
+    [root@28cdf5453e1e tmp]# nvm ls
+    ->      v19.6.0 *
+    default -> node (-> v19.6.0 *)
+    iojs -> N/A (default)
+    node -> stable (-> v19.6.0 *) (default)
+    stable -> 19.6 (-> v19.6.0 *) (default)
+    unstable -> N/A (default)
+    lts/argon -> v4.9.1 (-> N/A)
+    lts/boron -> v6.17.1 (-> N/A)
+    lts/carbon -> v8.17.0 (-> N/A)
+    lts/dubnium -> v10.24.1 (-> N/A)
+    lts/erbium -> v12.22.12 (-> N/A)
+    lts/fermium -> v14.21.2 (-> N/A)
+    lts/gallium -> v16.19.0 (-> N/A)
+    lts/hydrogen -> v18.14.0 (-> N/A)
+    lts/* -> lts/hydrogen (-> N/A)
+    [root@28cdf5453e1e tmp]# 
     ```
 
     查看 nvm 远程 node 版本号 `$ nvm ls-remote`
@@ -235,7 +274,7 @@ x86_64
 
     nvm 安装后并不是二进制文件, 而是在 ~/.nvm 目录下的一个 shell 脚本的函数方法
 
-    nvm 是特指 Node 版本管理工具, 所以通过 nvm 命令可以指定使用 Node 的那个版本, 其中又分为 ==临时指定== 和 ==永久指定==
+    nvm 是特指 Node 版本的管理工具, 所以通过 nvm 命令可以指定使用 Node 的那个版本, 其中又分为 ==临时指定== 和 ==永久指定==
 
     临时切换 `nvm use <版本号>`
 
@@ -727,6 +766,342 @@ total 300K
 ### webpack
 
 另见: 
+
+
+
+### pnpm
+
+> Fast, disk space efficient package manager
+
+本质上他是一个包管理工具，和npm/yarn没有区别，主要优势在于
+
+- 包安装速度极快
+- 磁盘空间利用效率高
+
+使用方法:
+
+```undefined
+npm i pnpm -g
+```
+
+参见: 
+
+https://pnpm.io/
+
+https://pnpm.io/zh/motivation
+
+
+
+## FAQ
+
+### nvm 安装和升级
+
+```shell
+# Troubleshooting on Linux
+# 安装使用 nvm
+# See Also: https://github.com/nvm-sh/nvm
+We strongly recommend using a Node version manager like nvm to install Node.js and npm. 
+Node version manager === nvm
+https://docs.npmjs.com/downloading-and-installing-node-js-and-npm
+
+1. nvm 安装
+两种安装方式:
+1.1. 手动执行 'install script' (安装器) 一个 shell 脚本, https://github.com/nvm-sh/nvm/blob/v0.39.3/install.sh
+1.2. 执行 cURL or Wget 命令
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
+wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
+1.3. 以上两种方法都是克隆nvm仓库到 '~/.nvm' 目录, 并且向(~/.bash_profile, ~/.zshrc, ~/.profile, or ~/.bashrc)任意文件中添加片段
+export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
+1.4. 自定义安装
+可以自定义的变量如下, 四个:
+安装来源, install source, NVM_SOURCE, 可以通过 git , curl, wget 任何方式下载
+安装目录, directory, NVM_DIR, # 注意结尾一定不能有斜线
+系统环境配置文件, profile, PROFILE
+安装的版本, version, NODE_VERSION
+例如:
+curl ... | NVM_DIR="path/to/nvm"
+
+2. 验证安装
+command -v nvm
+command 命令: 调用指定的指令并执行, 命令执行时不查询 shell 函数. command 命令只能够执行 shell 内部的命令.
+-v 打印 COMMAND 命令的描述, 和 `type` 相似
+-V
+-p
+
+$ command echo "hello world"
+hello world
+$ command pwd
+/home/deng
+
+3. Git 安装
+3.1. 克隆仓库到 HOME 根
+cd ~/
+git clone https://github.com/nvm-sh/nvm.git .nvm
+3.2. 迁出
+cd ~/.nvm
+git checkout v0.39.3
+3.3. 启动 
+. ./nvm.sh
+3.4. 手动添加到 ~/.bashrc, ~/.profile, or ~/.zshrc, 以便登录shell时自动启动
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+
+
+
+4. 纯手动安装, 基本和 Git 安装类似
+4.1. 命令行批处理
+export NVM_DIR="$HOME/.nvm" && (
+  git clone https://github.com/nvm-sh/nvm.git "$NVM_DIR"		# 克隆
+  cd "$NVM_DIR"		# 进入 ~/.nvm 安装目录
+  git checkout `git describe --abbrev=0 --tags --match "v[0-9]*" $(git rev-list --tags --max-count=1)` # 迁出
+) && \. "$NVM_DIR/nvm.sh"	# 执行, && 前面的命令成功才执行后面的命令
+4.2. 手动添加到 ~/.bashrc, ~/.profile, or ~/.zshrc, 以便登录shell时自动启动
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+
+5. 手动升级
+5.1. 通过 Git 手动升级
+(
+  cd "$NVM_DIR"		# 1. 进入到 ~/.nvm 安装目录
+  git fetch --tags origin		# 查看远程最新版本列表
+  git checkout `git describe --abbrev=0 --tags --match "v[0-9]*" $(git rev-list --tags --max-count=1)`		# 迁出指定tag
+) && \. "$NVM_DIR/nvm.sh"		# 执行, && 前面的命令成功才执行后面的命令
+# 迁出指定 tag: git checkout , 这里虽然 有 0.9.0版本但实际是还是 0.39.3是 @latest
+# 手动修改 ./nvm.sh 文件为可执行, chmod 764, 664, 执行
+# 执行后, 需要再把 ~/.bashrc 重新加载一下. 否则 nvm --version 还是老的 ⚠️
+# 我找不到 nvm 安装到哪里了, 我感觉根据 ~/.bashrc 里的 nvm 配置, 感觉是 shell 一登录就自动加载到内存了, 并不是物理文件.
+
+```
+
+
+
+```shell
+# Troubleshooting on Linux
+# 通过 nvm 安装 Node.js 和 npm
+
+1. 安装最新版本
+nvm install node
+
+2. 安装特定版本
+nvm install 14.7.0
+
+3. 列出可用的远程版本
+nvm ls-remote
+
+4. 切换版本环境
+nvm use node		# 自动创建一个新shell环境下使用指定的版本, node 就是指本地最新的版本, 版本号就是本地特指
+nvm use 14
+nvm run node --version
+nvm exec 4.2 node --version
+
+5. 查看不同版本的 Node.js 安装在哪里
+nvm which 12.22
+
+更多参见: https://github.com/nvm-sh/nvm#manual-install
+
+例如:
+[chenchen@grpc01 vnjs]$ nvm install node
+Downloading and installing node v19.6.0...
+Downloading http://npm.taobao.org/mirrors/node/v19.6.0/node-v19.6.0-linux-x64.tar.xz...
+######################################################################## 100.0%
+Computing checksum with sha256sum
+Checksums matched!
+Now using node v19.6.0 (npm v)
+
+[chenchen@grpc01 node]$ pwd
+/home/chenchen/.nvm/versions/node				# 在 .nvm 安装目录下可以看到多出了v19.6.0
+[chenchen@grpc01 node]$ l
+total 0
+   595688 drwxrwxr-x. 6 chenchen chenchen 108 Aug  9  2021 v16.6.1
+  8460115 drwxrwxr-x. 3 chenchen chenchen  18 Aug  9  2021 ..
+419454858 drwxrwxr-x. 6 chenchen chenchen 108 Mar 17  2022 v17.7.2
+398514831 drwxrwxr-x. 6 chenchen chenchen 108 Feb  8 11:04 v19.6.0
+ 13612177 drwxrwxr-x. 5 chenchen chenchen  51 Feb  8 11:04 .
+[chenchen@grpc01 node]$ 	
+
+
+
+```
+
+
+
+```shell
+# Troubleshooting on Linux
+# npm 使用
+1. npm 使用前需要先安装 Node.js 和 npm
+We strongly recommend using a Node version manager like nvm to install Node.js and npm. 
+Node version manager === nvm
+https://docs.npmjs.com/downloading-and-installing-node-js-and-npm
+
+1.1 已有 npm, 为了版本最新, 自我升级
+npm install -g npm
+
+2. 查看 Node.js 和 npm 版本
+node -v
+npm -v
+
+3. npm 官方强力推荐用 nvm 来安装 Node.js 和 npm
+https://github.com/nvm-sh/nvm
+nvm 支持在同一环境上安装不同版本的 Node.js
+$ nvm use 16			# 使用 Node.js 16 版本, 前提是已经安装了 16 版本
+Now using node v16.9.1 (npm v7.21.1)
+$ node -v
+v16.9.1
+$ nvm use 14			# 使用 Node.js 14 版本, 前提是已经安装了 14 版本
+Now using node v14.18.0 (npm v6.14.15)
+$ node -v
+v14.18.0
+$ nvm install 12	# 安装 Node.js 12 版本, 之前没有安装过
+Now using node v12.22.6 (npm v6.14.5)
+$ node -v
+v12.22.6
+
+
+
+
+```
+
+### GLIBC `GLIBC_2.28' not found (required by node)
+
+```shell
+[chenchen@grpc01 node]$ nvm use 17
+Now using node v17.7.2 (npm v8.5.2)
+[chenchen@grpc01 node]$ npm -v
+8.5.2
+[chenchen@grpc01 node]$ nvm use 19
+Now using node v19.6.0 (npm v)
+[chenchen@grpc01 node]$ node -v
+node: /lib64/libm.so.6: version `GLIBC_2.27' not found (required by node)
+node: /lib64/libc.so.6: version `GLIBC_2.25' not found (required by node)
+node: /lib64/libc.so.6: version `GLIBC_2.28' not found (required by node)
+node: /lib64/libstdc++.so.6: version `CXXABI_1.3.9' not found (required by node)
+node: /lib64/libstdc++.so.6: version `GLIBCXX_3.4.20' not found (required by node)
+node: /lib64/libstdc++.so.6: version `GLIBCXX_3.4.21' not found (required by node)
+[chenchen@grpc01 node]$ 
+[chenchen@grpc01 node]$ nvm use 17
+Now using node v17.7.2 (npm v8.5.2)
+[chenchen@grpc01 node]$ node -v
+v17.7.2
+[chenchen@grpc01 node]$ npm -v
+8.5.2
+[chenchen@grpc01 node]$ nvm -v
+0.39.3
+```
+
+### npm install element-plus --save
+
+```shell
+[chenchen@grpc01 vnjs]$ npm install element-plus --save
+npm WARN deprecated sourcemap-codec@1.4.8: Please use @jridgewell/sourcemap-codec instead
+
+added 43 packages in 18s
+npm notice 
+npm notice New major version of npm available! 8.5.2 -> 9.4.2
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v9.4.2
+npm notice Run npm install -g npm@9.4.2 to update!
+npm notice 
+[chenchen@grpc01 vnjs]$ npm install npm
+npm WARN EBADENGINE Unsupported engine {
+npm WARN EBADENGINE   package: 'npm@9.4.2',
+npm WARN EBADENGINE   required: { node: '^14.17.0 || ^16.13.0 || >=18.0.0' },
+npm WARN EBADENGINE   current: { node: 'v17.7.2', npm: '8.5.2' }
+npm WARN EBADENGINE }
+
+added 1 package in 4s
+
+16 packages are looking for funding
+  run `npm fund` for details
+[chenchen@grpc01 vnjs]$ npm fund
+vnjs
+├─┬ https://github.com/chalk/chalk?sponsor=1
+│ │ └── chalk@4.1.2
+│ └── https://github.com/chalk/ansi-styles?sponsor=1
+│     └── ansi-styles@4.3.0
+├── https://github.com/sponsors/sibiraj-s
+│   └── ci-info@3.7.1
+├── https://github.com/sponsors/isaacs
+│   └── glob@7.2.3, minimatch@6.1.6, json-stringify-nice@1.1.4, promise-all-reject-late@1.0.1, promise-call-limit@1.0.1, rimraf@3.0.2
+├── https://github.com/sponsors/sindresorhus
+│   └── p-map@4.0.0, defaults@1.0.4
+├── https://github.com/sponsors/ljharb
+│   └── is-core-module@2.11.0
+└── https://github.com/sponsors/feross
+    └── buffer@6.0.3, base64-js@1.5.1, ieee754@1.2.1
+
+[chenchen@grpc01 vnjs]$ 
+```
+
+### npm install npm
+
+```shell
+问题:
+[chenchen@grpc01 v3ep]$ npm install npm
+npm WARN EBADENGINE Unsupported engine {
+npm WARN EBADENGINE   package: 'npm@9.4.2',
+npm WARN EBADENGINE   required: { node: '^14.17.0 || ^16.13.0 || >=18.0.0' },
+npm WARN EBADENGINE   current: { node: 'v17.7.2', npm: '8.5.2' }
+npm WARN EBADENGINE }
+
+[chenchen@grpc01 v3ep]$ node -v
+node: /lib64/libm.so.6: version `GLIBC_2.27' not found (required by node)
+node: /lib64/libc.so.6: version `GLIBC_2.25' not found (required by node)
+node: /lib64/libc.so.6: version `GLIBC_2.28' not found (required by node)
+node: /lib64/libstdc++.so.6: version `CXXABI_1.3.9' not found (required by node)
+node: /lib64/libstdc++.so.6: version `GLIBCXX_3.4.20' not found (required by node)
+node: /lib64/libstdc++.so.6: version `GLIBCXX_3.4.21' not found (required by node)
+
+原因:
+通过 npm 升级 npm 自身, 提示 WARN, 因为是 node 版本不够, 需要先升级 node 到 18 以上
+本质上是 CentOS7 yum 最高到 GLIBC2.17, 需要先升级 GLIBC到 2.28, CentOS8 yum 自带 GLIBC 2.28
+
+解决:
+# 下载并解压 glibc-2.28
+$ wget https://ftp.gnu.org/gnu/glibc/glibc-2.28.tar.gz
+$ tar -xzvf glibc-2.28.tar.gz
+$ cd glibc-2.28
+# 创建临时文件
+$ mkdir build && cd build
+$ ../configure --prefix=/usr --disable-profile --enable-add-ons --with-headers=/usr/include --with-binutils=/usr/bin
+$ ../configure (采用)
+
+# 这一步时, 发生了错误, 提示大致为
+These critical programs are missing or too old: make compiler
+参考: https://cloud.tencent.com/developer/article/2021784
+
+checking for python3... python3
+configure: error: 
+*** These critical programs are missing or too old: make compiler
+*** Check the INSTALL file for required versions.
+
+下一步升级 gcc 和 make
+升级gcc与make
+安装GLIBC所需的依赖 可以在 glibc 目录下的INSTALL中找到, 该版本需要 GCC 4.9 以上 及 make 4.0 以上
+
+
+
+```
+
+### npm安装时卡在sill idealTree buildDeps，npm安装速度慢，npm安装卡在一个地方不动
+
+```shell
+# 造成上述问题的原因是因为node的默认安装环境在国外，访问速度慢就会卡住。
+
+解决方法一：
+1、采用taobao的镜像地址，进入cmd之后输入：
+npm config set registry https://registry.npm.taobao.org 
+2、查看是否安装成功：
+npm config get registry 
+3、继续输入之前的npm install 命令进行安装。
+npm install
+
+解决方法二：
+输入命令：
+cnpm install
+
+```
 
 
 

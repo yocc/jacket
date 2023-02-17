@@ -352,6 +352,22 @@ ONBOOT=yes
 #DNS2=10.211.133.8
 ```
 
+##### Remote rejected opening a shell channel: Error: Not connected 
+
+```shell
+问题:
+SSH  Host key fingerprint:
+SSH   ecdsa-sha2-nistp256  EY9EVpKSkxNDkLIgUMdhZoR9g0v/RUZYJNhmy2IdbcU= 
+X  Timed out while waiting for handshake
+SSH   X  Remote rejected opening a shell channel: Error: Not connected
+
+原因:
+是 Tabby 的问题, ssh 可以连接, secureCRT也可以. 
+
+解决:
+重启 mac 系统
+```
+
 
 
 ## See Also

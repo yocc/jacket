@@ -61,6 +61,31 @@ export GOBIN=/home/chenchen/tmp/go1183/gobin
 export PATH=$PATH:/home/chenchen/tmp/go1183/upx396/upx-3.96-amd64_linux
 ```
 
+## Go 配置
+
+```shell
+另一个角度说明:
+
+一. 配置文件位置:
+		~/.bashrc
+
+二. 配置内容:
+1. go 本体的工具二进制文件路径 (必须)
+# export PATH=$PATH:/usr/local/go/bin											# 生产环境
+export PATH=$PATH:/home/chenchen/tmp/go1183/go/bin				# 开发环境, 多版本环境
+
+2. 不同版本的一些配置
+# go1183
+export GOPATH=/home/chenchen/tmp/go1183/gopath						# 工作目录, workspace, 必须, (包含, bin, src, pkg 目录)
+export GOROOT=/home/chenchen/tmp/go1183/go								# go 本体安装位置, go 本体的根目录, 可选, (与 PATH 相关)
+export GOBIN=/home/chenchen/tmp/go1183/gobin							# 源码编译后生成二进制文件的位置, 可选, (与 GOPATH/bin 相关)
+
+3. ~/.config/go/env, 运行时配置
+参见下文.
+
+⚠️ GOROOT/bin 和 GOBIN, 是两个不同含义, GOROOT/bin 本体二进制命令; GOBIN 是源码编译发布后的二进制命令; 二者含义不同, 但有可能指向同一个目录, 也就是将这些二进制文件放一起(并不推荐, 至少会重名)
+```
+
 
 
 ## UPX, 编译生成的文件 体积过大问题
@@ -187,7 +212,7 @@ total 616K
 
 ## 配置文件总结
 
-### ~/.config/go/env, 运行时
+### ~/.config/go/env, 运行时的配置
 
 ```shell
 # ~/.config/go/env, 此文件为 go 运行时才起效果的临时时配置文件, 按照最小原则, 应该优先使用在这个配置文件里配置, 当不能满足需要时, 才会用到 ~/.bashrc 文件.
@@ -196,6 +221,8 @@ total 616K
 GOPROXY=https://goproxy.cn,direct
 #GOROOT=/home/chenchen/tmp/go1172/go
 #GOBIN=/home/chenchen/tmp/go1172/gobin
+
+⚠️ 经过反复使用验证, 进需要 GOPROXY 一行配置, 其余都要放入 ~/.bashrc 中
 ```
 
 
@@ -297,7 +324,7 @@ export PATH="$(echo "$PATH" | /bin/awk 'BEGIN{RS=":";}{sub(sprintf("%c$",10),"")
 ### 环境变量说明
 
 ```shell
-GOROOT, 配置在 ~/.bashrc 中, 可选项; go 软件/工具本体安装的根目录位置, GOROOT/bin/, GOROOT/src/, GOROOT/pkg 等等
+GOROOT, 配置在 ~/.bashrc 中, 可选项; go 软件/工具本体安装的根目录位置.
 
 GOPATH, 配置在 ~/.bashrc 中, 必选项; 配置后必须检查 `$ go env GOPATH` 的返回将和系统环境变量一致了, 这点必须检查清楚;
 GOPATH, 可以设置多个, 其中, 第一个将会是默认的包目录, 使用 go get 下载的包都会在第一个 path 中的 src 目录下, 使用 go install 时, 在哪个 GOPATH 中找到了这个包, 就会在哪个 GOPATH 下的 bin 目录生成可执行文件.
@@ -331,7 +358,7 @@ PATH, 配置在 ~/.bashrc 中, 必选项; 用于简化便捷二进制工具命�
         $ go clean -i       // 删除上一步的安装
 ```
 
-
+## packages, module
 
 ## 依赖, 扩展包的安装
 
@@ -358,8 +385,13 @@ $GOROOT/pkg/$GOOS_$GOARCH/
 go本体\pkg\linux_amd64
 
 # build:
+usage: go build [-o output] [build flags] [packages]
 [chenchen@localhost e04_2]$ go build -o hh7 -ldflags="-s -w" hello_world.go 
 [chenchen@localhost e04_2]$ go build -o count_characters -ldflags "-s -w" count_characters.go
+
+# install
+usage: go install [build flags] [packages]
+[chenchen@grpc01 hello]$ go install -ldflags "-s -w" hello.go
 ```
 
 

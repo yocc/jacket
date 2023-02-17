@@ -381,7 +381,7 @@ rpmlib(PayloadIsXz) <= 5.2-1
 [chenchen@grpc01 tmp]$ sudo rpm -Uvh python3-3.6.8-18.el7.x86_64
 error: open of python3-3.6.8-18.el7.x86_64 failed: No such file or directory
 
-4. 第二步种的依赖失败, 逐一解决.
+4. 第二步中的依赖失败, 逐一解决.
 	 搜索找到, libc.so.6，该库对应的软件包名称为 glibc
 	 
 	 # 查找该软件包
@@ -728,6 +728,36 @@ missing     /usr/lib/python3.6/site-packages/pip-9.0.3.dist-info/INSTALLER
 .......
 .......
 
+```
+
+### Error: Failed to download metadata for repo 'appstream': Cannot prepare internal mirrorlist: No URLs in mirrorlist
+
+```shell
+问题:
+[root@28cdf5453e1e ~]# yum search vim  
+Failed to set locale, defaulting to C.UTF-8
+CentOS Linux 8 - AppStream                                                                                                                                                                         42  B/s |  38  B     00:00    
+Error: Failed to download metadata for repo 'appstream': Cannot prepare internal mirrorlist: No URLs in mirrorlist
+
+原因:
+便是 CentOS 已经停止维护的问题。2020 年 12 月 8 号，CentOS 官方宣布了停止维护 CentOS Linux 的计划，并推出了 CentOS Stream 项目，CentOS Linux 8 作为 RHEL 8 的复刻版本，生命周期缩短，于 2021 年 12 月 31 日停止更新并停止维护（EOL），更多的信息可以查看 CentOS 官方公告。如果需要更新 CentOS，需要将镜像从 mirror.centos.org 更改为 vault.centos.org
+
+
+解决:
+[root@28cdf5453e1e ~]# cd /etc/yum.repos.d/
+[root@28cdf5453e1e yum.repos.d]# sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-*
+[root@28cdf5453e1e yum.repos.d]# sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-*
+[root@28cdf5453e1e yum.repos.d]# yum makecache
+Failed to set locale, defaulting to C.UTF-8
+CentOS Linux 8 - AppStream                                                                                                                                                                         44 kB/s | 8.4 MB     03:17    
+CentOS Linux 8 - BaseOS                                                                                                                                                                            86 kB/s | 4.6 MB     00:54    
+CentOS Linux 8 - Extras                                                                                                                                                                           5.2 kB/s |  10 kB     00:02    
+Last metadata expiration check: 0:00:01 ago on Fri Feb 10 12:26:22 2023.
+Metadata cache created.
+[root@28cdf5453e1e yum.repos.d]# yum update -y				# 更新东西很多, 时间较长
+[root@28cdf5453e1e yum.repos.d]# yum -y install vim
+以上均能完美完成.
+参考: https://blog.csdn.net/weixin_43252521/article/details/124409151
 ```
 
 

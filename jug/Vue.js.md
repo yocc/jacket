@@ -40,7 +40,7 @@ See Also: https://cn.vuejs.org/guide/quick-start.html#creating-a-vue-application
 已安装 16.0 或更高版本的 Node.js
 
 2. $ npm init vue@latest
-这一指令将会安装并执行 create-vue, https://github.com/vuejs/create-vue, 它是 Vue 官方的项目脚手架工具.
+这一指令相当于将会安装并执行 create-vue, https://github.com/vuejs/create-vue, 它是 Vue 官方的项目脚手架工具.
 你将会看到一些诸如 TypeScript 和测试支持之类的可选功能提示：
 ✔ Project name: … <your-project-name>
 ✔ Add TypeScript? … No / Yes
@@ -58,7 +58,7 @@ Done.
 > cd <your-project-name>
 > npm install
 > npm run dev
-> npm run build
+> npm run build		// 在 ./dist 文件夹中为你的应用创建一个生产环境的构建版本
 
 全局构建版本,
 CDN, <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>

@@ -217,6 +217,12 @@ nil, uintptr, array, slice, map, channel, interface, func
 // 声明, 初始化
 var 数组名称 [大小] 类型
 var 数组名称 = [大小]类型{元素列表}
+
+// 第一种方法
+var arr [3]int = [3]int{1,2,3}
+// 第二种方法
+arr := [3]int{1,2,3}
+
 var balance [10] float32                            		// 声明, 定义了数组 balance 长度为 10 类型为 float32
 var balance = [5]float32{1000.0, 2.0, 3.4, 7.0, 50.0}   // 初始化, 
 balance := [5]float32{1000.0, 2.0, 3.4, 7.0, 50.0}      // 声明 + 初始化, 省了 var, 同变量
@@ -251,6 +257,16 @@ a[i][j]
 声明形参为数组, 以下两种方式来声明:
 . 形参设定数组大小, void myFunction(param [10]int) {}
 . 形参未设定数组大小, void myFunction(param []int) {}
+
+// ... 实际情况
+arr := [...]int{1,2,3}
+
+// type 关键字定义一个类型字面量
+type arr3 [3]int
+myarr := arr3{1,2,3}
+
+// 4表示数组有4个元素, 2 和 3 分别表示该数组索引为2(初始索引为0)的值为3, 而其他没有指定值的, 就是 int 类型的零值, 即0
+arr:=[4]int{2:3}
 ```
 
 
@@ -258,6 +274,10 @@ a[i][j]
 ## slice
 
 ```go
+// 切片是对数组的一个连续片段的引用, 所以切片是一个引用类型, 
+// 这个片段可以是整个数组, 也可以是由起始和终止索引标识的一些项的子集, 
+// 需要注意的是, 终止索引标识的项不包括在切片内(意思是这是个左闭右开的区间)
+
 // 切片(动态数组), 切片是对数组的抽象
 
 // 切片声明
@@ -283,6 +303,60 @@ numbers = append(numbers, 2,3,4)	// 向切片追加多个元素
 copy(numbers1,numbers)						// 复制切片
 
 []byte 表示"字节切片"
+```
+
+## array 和 slice
+
+```go
+1. array
+// 第一种方法
+// [3] 里的3 表示该数组的元素个数及容量
+var arr [3]int
+arr[0] = 1
+arr[1] = 2
+arr[2] = 3
+
+// 第二种方法
+var arr [3]int = [3]int{1,2,3}
+
+// 第三种方法
+// 定义一个数组
+arr := [3]int{1,2,3}
+myarr := [5]int{1,2,3,4,5}
+
+// 第四种方法
+arr := [...]int{1,2,3}
+
+// 第五种方法
+type arr3 [3]int
+myarr := arr3{1,2,3}
+
+// 第六种方法
+arr:=[4]int{2:3}
+结果: [0 0 3 0]
+
+
+2. slice, 4 种构造方式
+// 【第一种】
+// 1 表示从索引1开始，直到到索引为 2 (3-1)的元素
+mysli1 := myarr[1:3]
+
+// 【第二种】
+// 1 表示从索引1开始，直到到索引为 2 (3-1)的元素
+mysli2 := myarr[1:3:4]
+
+// 【第三种】
+// 声明字符串切片
+var strList []string
+// 声明整型切片
+var numList []int
+// 声明一个空切片
+var numListEmpty = []int{}
+
+// 【第四种】
+// make([]Type, size, cap)
+a := make([]int, 2)
+b := make([]int, 2, 10)
 ```
 
 
@@ -416,6 +490,9 @@ var struct_pointer *Books			// Books型指针变量
 
 // 结构体标签, Struct Tag
 结构体标签
+Tag 由反引号包含, 由一对或几对的键值对组成, 通过空格来分割键值. 格式如下:
+`key01:"value01" key02:"value02" key03:"value03"`
+
 结构体的字段除了名字和类型外, 还可以有一个可选的标签(tag): 它是一个附属于字段的字符串, 可以是文档或其他的重要标记.
 比如在我们解析json或生成json文件时, 常用到 encoding/json 包, 它提供一些默认标签, 
 例如: 
@@ -436,7 +513,7 @@ var struct_pointer *Books			// Books型指针变量
 
 
 
-## func 和 函数签名 和 方法
+## func, 函数签名, 方法, 函数类型
 
 ```go
 // 函数签名相同: 必须函数的函数名, 参数和返回值(类型, 个数, 顺序)都相同.
@@ -455,15 +532,92 @@ func swap(x, y string) (string, string) {
 . 方法, 带接收者的函数
 
 // 方法
-方法, 就是有接收者的函数, 而接收者就是方法所依附的类, 类就是结构体
+方法, 就是有(拥有者, 实现者)接收者(receiver)的函数, 而接收者就是方法所依附的类, 类就是结构体
 func (接收者变量名 接收者类型) 方法名(参数列表) (返回类型列表) {
 	函数体
 }
+1. 指针类型的接收者(拥有者, 实现者): 
+	 由一个结构体的指针组成. 由于指针的特性, 调用方法时修改接收者指针的任意成员变量, 在方法结束后, 修改都是有效的.
+2. 值类型的接收者: 
+	 当方法作用于值类型接收者时, Go语言会在代码运行时将接收者的值复制一份.
+	 在值类型接收者的方法中可以获取接收者的成员值, 但修改操作只是针对副本, 无法修改接收者变量本身 
+
+/*
+什么时候使用指针接受者 
+1. 需要修改接收者中的值
+2. 接收者是拷贝代价比较大的大对象
+3. 保证一致性，如果有某个方法使用了指针接收者，那么其他的方法也应该使用指针接收者
+*/
 
 按照 GO 语言的习惯一般不用 this/self, 而是使用接收者类型的第一个小写字母, 可以看标准库中的代码风格.
 func (p *Player) m_print_ptr() {			// p 为 *Player 接收者类型的第一个小写字母
   ...
 }
+
+
+/* func 的基本构成元素 */
+func (p myType) funcName (a, b int, c string) (r, s int) {
+    return
+}
+其中:
+ 关键字			---	func							// 这个是定义函数的关键字
+函数拥有者	   --- (p myType)					// 这个是此函数的拥有者, 下面解释（此项可省略）
+ 方法名			--- funcName 					// 这个是定义函数的名字
+ 入参				 --- a,b int,b string // 这个是定义函数的入参
+ 返回值			--- r,s int 					// 这个是定义函数的返回值，golang可以返回多个值
+ 函数体			--- {...}
+
+
+一个有问题的开启线程例子(注:func(){}()代表的是自执行函数), 其实就是传參执行
+str := "Xulinlin"
+func (name string) {
+  fmt.Println("Your name is", name)
+} (str)
+Your name is Xulinlin
+
+package main
+import (
+	"fmt"
+)
+func main() {
+	go func(){
+		fmt.Print("子线程正在执行")
+	}()
+}
+
+
+// 函数类型
+函数类型定义:
+用 type + 函数类型名 (输入类型) (输出类型), 代表一类的函数
+也就是, type 新类型名字 (参数类型) 返回类型
+也就是, type 新类型名字 函数签名
+
+// 定义函数类型, 通过 type 给函数类型起名
+// FuncType 它是一个函数类型
+type FuncType func(int32, int32) int32				// 这种函数类型它代表两个输入 int32, 和一个输出 int32 的类型
+
+// 声明一个函数类型
+var aFunType FuncType
+// 给函数类型赋值
+aFunType = Add
+aFunType(10, 5)
+// 重新给函数类型赋值
+aFunType = Minus
+aFunType(10, 5)
+// 函数类型的作用是实现函数的多态
+num := Calc(1, 2, Add)
+fmt.Println("%d", num)
+
+// 回调函数, 函数有一个参数是函数类型, 这个函数就是回调函数
+// 多态, 多种形态, 调用统一接口, 不同的表现
+// Calc 函数实现了很多与函数类型相似的输入和输出的函数
+// 实现函数的多重功能
+func Calc(a, b int32, fTest FuncType) (result int32) {
+    fmt.Println("Calc")
+    result = fTest(a, b)
+    return
+}
+
 ```
 
 
@@ -639,6 +793,8 @@ make() 只能为 slice, map, channel 分配内存
 
 ![new和make在内存中的差异](https://img-blog.csdnimg.cn/img_convert/c22ba572b16b84427ef1e915efd9bb92.png#pic_center)
 
+![img](https://img-blog.csdnimg.cn/img_convert/c22ba572b16b84427ef1e915efd9bb92.png#pic_center)
+
 ```go
 var ptr *int									// ptr 此时并不指向任何内存地址
 ptr = new(int)								// new() 返回指针(本质), 表象是一串地址
@@ -780,6 +936,38 @@ int
 [chenchen@grpc01 rou]$
 ```
 
+## 单引号、双引号、反引号
+
+```shell
+1. 单引号
+单引号里面是单个字符, 对应的值为改字符的ASCII值.
+表示 golang 中的 rune(int32) 类型
+例如:
+fmt.Println('1')
+打印:
+50
+
+2. 双引号
+常规双引号, 可以转义
+例如:
+fmt.Println("hello golang\nI am random_z.")
+打印:
+hello golang
+I am random_z.
+
+3. 反引号
+同常规单引号, 不转义
+例如:
+a := `hello golang\n:
+I am random_z.
+Good.`
+fmt.Println(a)
+打印:
+hello golang\n:
+I am random_z.
+Good.
+```
+
 
 
 ## goroutine
@@ -809,6 +997,16 @@ int
 . 协程保留了上次调用时的状态, 每次过程重入时, 就相当于进入上一次调用的状态
 . 强调非阻塞异步并发的一般都是使用协程
 
+
+什么是进程:
+定义: 进程是一个具有一定独立功能的程序在一个数据集合上依次动态执行的过程. 进程是一个正在执行的程序的实例, 包括程序计数器、寄存器和程序变量的当前值.
+定义: 线程被设计成进程的一个执行路径, 同一个进程中的线程共享进程的资源
+
+进程与线程的区别总结:
+本质区别: 进程是操作系统资源分配的基本单位，而线程是处理器任务调度和执行的基本单位。
+包含关系: 一个进程至少有一个线程，线程是进程的一部分，所以线程也被称为轻权进程或者轻量级进程。
+资源开销: 每个进程都有独立的地址空间，进程之间的切换会有较大的开销；线程可以看做轻量级的进程，同一个进程内的线程共享进程的地址空间，每个线程都有自己独立的运行栈和程序计数器，线程之间切换的开销小。
+影响关系: 一个进程崩溃后，在保护模式下其他进程不会被影响，但是一个线程崩溃可能导致整个进程被操作系统杀掉，所以多进程要比多线程健壮.
 
 ```
 
@@ -880,6 +1078,82 @@ go vet工具检查所有流程控制路径上使用 CancelFuncs.
 ```go
 ```
 
+## select, switch
+
+```go
+1. switch
+switch 表达式 {
+    case 表达式1:
+        代码块
+    case 表达式2:
+        代码块
+    case 表达式3:
+        代码块
+    case 表达式4:
+        代码块
+    case 表达式5:
+        代码块
+    default:
+        代码块
+}
+拿 switch 后的表达式分别和 case 后的表达式进行对比，只要有一个 case 满足条件，就会执行对应的代码块，然后直接退出 switch - case ，如果 一个都没有满足，才会执行 default 的代码块。
+
+那就是当 case 使用关键字 fallthrough 开启穿透能力的时候。
+s := "hello"
+switch {
+case s == "hello":
+    fmt.Println("hello")
+    fallthrough
+case s != "world":
+    fmt.Println("world")
+}
+
+switch 后可以不接任何变量、表达式、函数。当不接任何东西时，switch - case 就相当于 if - elseif - else
+当 case 后接的是常量时，该常量只能出现一次。
+case 后可以接多个条件，多个条件之间是 或 的关系，用逗号相隔。
+
+2. select
+select {
+    case 表达式1:
+        <code>
+    case 表达式2:
+        <code>
+  default:
+    <code>
+}
+
+在运行 select 时，会遍历所有（如果有机会的话）的 case 表达式，只要有一个信道有接收到数据，那么 select 就结束
+当 case 里的信道始终没有接收到数据时，而且也没有 default 语句时，select 整体就会阻塞，但是有时我们并不希望 select 一直阻塞下去，这时候就可以手动设置一个超时时间。
+    select {
+    case msg1 := <-c1:
+        fmt.Println("c1 received: ", msg1)
+    case msg2 := <-c2:
+        fmt.Println("c2 received: ", msg2)
+    case <-timeout:
+        fmt.Println("Timeout, exit.")
+    }
+
+select 与 switch 原理很相似，但它的使用场景更特殊，学习了本篇文章，你需要知道如下几点区别：
+select 只能用于 channel 的操作(写入/读出/关闭)，而 switch 则更通用一些；
+select 的 case 是随机的，而 switch 里的 case 是顺序执行；
+select 要注意避免出现死锁，同时也可以自行实现超时机制；
+select 里没有类似 switch 里的 fallthrough 的用法；
+select 不能像 switch 一样接函数或其他表达式。
+```
+
+## 词法作用域
+
+```go
+首先先来解释一下'作用域'就是作用的范围，比如定义一个普通函数，该函数就会有自己的作用域，并且在函数里面定义的变量，函数外面是使用不了函数里面定义的变量的，作用域决定了代码区块中的变量和其他资源的可见性。
+
+而作用域也分为'静态作用域'和'动态作用域'，'词法作用域'就是'静态作用域'，'静态作用域'在函数定义的时候就决定了，而'动态作用域'在函数调用时才决定。'静态作用域'在编译时期（词法解析阶段）就确定好了，所以也叫'词法作用域'。
+
+- 对于编译型语言, 编译步骤: 词法分析->语法分析->语义检查->代码优化->字节码生成
+- 对于解释型语言, 编译步骤: 语法检查->预编译期（预处理、预解析、预编译，预声明变量，在预定义函数）,然后就可以执行。
+
+https://blog.csdn.net/qq_42820612/article/details/120238932
+```
+
 
 
 ## 堆heap 和 栈stack
@@ -898,6 +1172,57 @@ go vet工具检查所有流程控制路径上使用 CancelFuncs.
 ```go
 多个包组成一个模块
 模块是相关的Go包的集合. 模块是源代码交换和版本控制的单元. 
+
+n个文件 == 包, n个包 == 模块
+
+文件, 
+目录(包)
+大目录(模块)
+
+```
+
+## panic, recover
+
+```go
+1. panic()
+手动触发宕机, 使用内置函数 panic(). 
+⚠️ 不同于编译时报错, panic() 是编译正确, 但运行时二进制程序宕机.
+
+2. recover()
+发生了异常，有时候就得捕获，这就不得不引出另外一个内建函数 – recover，它可以让程序在发生宕机后起生回生。
+但是 recover 的使用，有一个条件，就是它必须在 defer 函数中才能生效，其他作用域下，它是不工作的。
+import "fmt"
+
+func set_data(x int) {
+    defer func() {
+        // recover() 可以将捕获到的panic信息打印
+        if err := recover(); err != nil {
+            fmt.Println(err)
+        }
+    }()
+
+    // 故意制造数组越界，触发 panic
+    var arr [10]int
+    arr[x] = 88
+}
+
+func main() {
+    set_data(20)
+
+    // 如果能执行到这句，说明panic被捕获了
+    // 后续的程序能继续运行
+    fmt.Println("everything is ok")
+}
+
+3. 无法跨协程
+即使 panic 会导致整个程序退出，但在退出前，若有 defer 延迟函数，还是得执行完 defer .
+但是这个 defer 在多个协程之间是没有效果，在子协程里触发 panic，只能触发自己协程内的 defer，而不能调用 main 协程里的 defer 函数的。
+
+4. 总结
+Golang 异常的抛出与捕获, 依赖两个内置函数:
+panic: 抛出异常, 使程序崩溃
+recover: 捕获异常, 恢复程序或做收尾工作
+revocer 调用后, 抛出的 panic 将会在此处终结, 不会再外抛, 但是 recover, 并不能任意使用, 它有强制要求, 必须得在 defer 下才能发挥用途.
 ```
 
 

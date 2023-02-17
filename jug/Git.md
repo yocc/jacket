@@ -836,6 +836,15 @@ Fast-forward
 
 ## FAQ
 
+### config
+
+```shell
+# 查看当前项目的 git 配置
+vim ~/.gitconfig
+```
+
+
+
 ### log
 
 ```shell
