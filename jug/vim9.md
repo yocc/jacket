@@ -380,6 +380,22 @@ $ vim -u NONE -c "helptags ~/.vim/pack/vendor/start/nerdtree/doc" -c q			# 设�
 
 3. 终端软件设置字体
 
+##### vim-vue
+
+1. 
+
+2. installation
+
+   ```sh
+   * Vim 8 packages
+   # clone
+   $ git clone https://github.com/posva/vim-vue.git ~/.vim/pack/plugins/start/vim-vue
+   # install
+   
+   ```
+   
+   
+
 
 
 ### Vim 使用
@@ -807,7 +823,7 @@ https://vimawesome.com/plugin/nerdtree-red
 `:help recursive_mapping`
 `:help :map-modes`
 
-
+https://www.mianshigee.com/project/vim-vue
 
 
 

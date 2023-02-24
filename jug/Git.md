@@ -6,6 +6,15 @@
 
 
 
+## install
+
+```sh
+# yum -y install git
+git --version
+```
+
+
+
 ## checkout, merge, branch
 
 ```shell
@@ -1130,6 +1139,25 @@ $ git remote rename <远程仓库旧名字><远程仓库新名字>
 ![2E69B0B5-EE02-4793-88C1-7211E70F3102](/var/folders/g1/6bv__wz96ps83psq19r2fy_w0000gn/T/com.yinxiang.Mac/WebKitDnD.MptN3E/2E69B0B5-EE02-4793-88C1-7211E70F3102.png)
 
 
+
+## Toubleshooting
+
+```sh
+ 报错:
+ ! [rejected]        master     -> chenchen  (non-fast-forward)
+ 
+ 场景:
+ 在 chenchen 分支上, 由于没有先 git pull origin master:chenchen, 而是先 git add ., git commit
+  -m''; 这是 chenchen 分支上的代码已经提交到 stage 区, 现在再去 git pull origin master:chenchen 时, 报错这个错误.
+ 
+ 原因:
+ 从操作的过程就可以看出：git pull origin master，相当于git fetch + git merge。即从远程库中获取最新版本并merge到本地。
+ 
+ 解决:
+ 
+ 
+ 
+```
 
 
 
