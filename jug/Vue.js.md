@@ -633,6 +633,16 @@ import 导入其他模块成员
 		 
 ```
 
+### location.host, location.hostname
+
+```js
+区别：
+
+location.host 包含端口(端口是80的话，就不显示)
+
+location.hostname 不包含端口
+```
+
 
 
 ## See Also

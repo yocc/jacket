@@ -190,12 +190,114 @@ doc/**/*.pdf
 
 
 
+## ~/.ssh/known_hosts
+
+```sh
+位置: ~/.ssh/known_hosts
+什么是ssh known_hosts文件?
+A通过ssh首次连接到B，B会将公钥1（host key）传递给A，A将公钥1存入known_hosts文件中，以后A再连接B时，B依然会传递给A一个公钥2，OpenSSH会核对公钥，通过对比公钥1与公钥2 是否相同来进行简单的验证，如果公钥不同，OpenSSH会发出警告， 避免你受到DNS Hijack之类的攻ji
+
+打开known_hosts文件
+vi ~/.ssh/known_hosts 或 vi /root/.ssh/known_hosts
+host文件内容格式：ip 公钥
+
+ 了解更多ssh known_host, https://www.howtouselinux.com/post/ssh-known_hosts-file
+
+Host key verification failed
+三、A通过ssh登陆B时提示 Host key verification failed
+ 了解更多how to fix Host key verification failed, https://www.howtouselinux.com/post/fix-host-key-verification-failed
+
+原因：A的known_hosts文件中记录的B的公钥1 与 连接时B传过来的公钥2不匹配
+
+解决方法：
+
+方法一：删除A的known_hosts文件中记录的B的公钥（手动进行，不适用于自动化部署情形）
+有两只方法删除
+
+通过vi 找到这个对应的ip或者host的host key 然后删除
+通过ssh-keygen -r hostname 删除
+方法二：修改配置文件，在ssh登陆时不通过known_hosts文件进行验证（安全性有所降低），
+也是有两种方法：
+
+编辑对应host的ssh配置文件
+vi ~/.ssh/config //编辑配置文件
+添加以下两行代码：
+StrictHostKeyChecking no
+在ssh登录时利用 -i StrictHostKeyChecking=no 这样就不会检查host key。
+ 如何解决fix too many authentication failures, https://www.howtouselinux.com/post/2-ways-to-fix-ssh-too-many-authentication-failures
+ 如何处理remote host identification has changed, https://www.howtouselinux.com/post/fix-remote-host-identification-has-changed
+```
+
+## ~/.ssh/config
+
+```sh
+#
+# Main gitlab server
+#
+
+Host git.staff.sina.com.cn
+# 是否启用RSA认证授权
+RSAAuthentication yes
+# 私钥的路径和文件名
+IdentityFile ~/.ssh/gitlab_rsa
+# gitlab 上的帐号
+User chenchen@staff.sina.com.cn
+
+###
+##
+# https://git.intra.weibo.com/
+# Host 服务器别名, 只要是合法的变量名称且不重复即可, 可任意指定, ssh命令通过该名称来连接到指定服务器, 比如上面的 ssh hostA / ssh hostB
+Host git.intra.weibo.com 
+# Hostname 服务器地址, 可以是域名, 也可以是ip地址
+Hostname git.intra.weibo.com
+# Port 端口号, 默认为22, 只有修改了ssh连接的默认端口才需要配置此参数
+Port 2222
+# PreferredAuthentications 首选身份验证
+PreferredAuthentications publickey
+# 是否启用RSA认证授权
+RSAAuthentication yes
+# IdentityFile ssh 私钥的路径和文件名(不带.pub后缀的文件)
+IdentityFile ~/.ssh/gitlabintraweibo_rsa
+# User ssh 的登陆用户名, gitlab 上的帐号
+User chenchen@staff.sina.com
+```
+
+
+
+## ssh-keygen
+
+```sh
+位置: ~/.ssh/
+ssh-keygen -t rsa -C "这里换上你的邮箱"
+ssh-keygen -t rsa -C "chenchen@staff.sina.com"
+```
+
+## /etc/resolv.conf
+
+```sh
+配置本地 DNS 服务器, 位置: /etc/resolv.conf
+
+nameserver 10.210.12.10
+search localdomain
+```
+
+
+
 ## git config
 
 ```shell
 [chenchen@dev3_10.211.21.18 ~]$ git config --list
+[chenchen@dev3_10.211.21.18 ~]$ git config -l
+[chenchen@dev3_10.211.21.18 ~]$ git config --global -l
+[chenchen@dev3_10.211.21.18 ~]$ git config --local -l
 user.email=chenchen@staff.sina.com.cn
 user.name=chenchen
+
+
+$ git config --system --list    # 查看系统配置
+$ git config --global --list    # 查看当前用户配置
+$ git config --local --list     # 查看当前仓库配置
+$ git config --list             # 查看全部配置
 ```
 
 
@@ -1109,7 +1211,7 @@ checkout 是从本地仓库向工作区迁出一个名为‘本地新分支’�
 
 
 $ git remote -v
-查看远程仓库, 为关联为空
+查看远程仓库, 未关联为空
 
 $ git remote add <自定义仓库名><仓库地址>
 
@@ -1140,7 +1242,7 @@ $ git remote rename <远程仓库旧名字><远程仓库新名字>
 
 
 
-## Toubleshooting
+## Troubleshooting
 
 ```sh
  报错:
@@ -1157,6 +1259,220 @@ $ git remote rename <远程仓库旧名字><远程仓库新名字>
  
  
  
+```
+
+```sh
+报错: fatal: refusing to merge unrelated histories 
+[root@9fdcb516b951 fr]# git merge 
+fatal: refusing to merge unrelated histories
+[root@9fdcb516b951 fr]# git pull origin master --allow-unrelated-histories
+From ssh://git.intra.weibo.com:2222/weibo_sports/front-cassi.sports.weibo.cn
+ * branch            master     -> FETCH_HEAD
+CONFLICT (add/add): Merge conflict in README.md
+Auto-merging README.md
+Automatic merge failed; fix conflicts and then commit the result.
+
+原因:
+首次创建远程仓库后本地仓库和远程仓库没有关联. 
+
+解决:
+通过 --allow-unrelated-histories 参数强制关联, 然后解决冲突, 然后重新提交
+```
+
+
+
+```sh
+[chenchen@dev3_10.211.21.18 cassi.sports.weibo.cn]$ git co 0ef91149028bc23168dc application/modules/Game/controllers/Start.php
+[chenchen@dev3_10.211.21.18 cassi.sports.weibo.cn]$ git co 0ef91149028bc23168dc application/models/ActorStartGame.php
+
+将某个log的文件迁出覆盖本地分支文件
+```
+
+
+
+```sh
+提交代码三连：
+
+git add file
+git commit -m '修改原因'
+git push
+1
+2
+3
+执行完了commit后，还没有执行push，想要撤销这次的commit
+
+解决方案（使用命令）：
+
+git reset --soft HEAD^
+1
+这样就成功撤销了commit，如果想要连着add也撤销的话，–soft改为–hard（删除工作空间的改动代码）
+
+git reset --hard HEAD^
+1
+命令详解：
+HEAD^ 表示上一个版本，即上一次的commit，也可以写成HEAD~1
+如果进行两次的commit，想要都撤回，可以使用HEAD~2
+
+-soft
+不删除工作空间的改动代码 ，撤销commit，不撤销git add file
+
+-hard
+删除工作空间的改动代码，撤销commit且撤销add
+
+另外一点，commit注释写错了，想要改一下注释，当然也是可以的（详情请看这篇文章）：
+
+git commit --amend
+1
+
+```
+
+```sh
+一、理解 git fetch, git pull 
+
+要讲清楚git fetch、git pull,必须要附加讲清楚git remote，git merge 、远程repo， branch 、 commit-id 以及 FETCH_HEAD。
+
+1. git remote
+
+ git是一个分布式的结构，这意味着本地和远程是一个相对的名称。
+本地仓库（repository）要与远程仓库（repository）配合完成，版本对应必须要有 git remote子命令，通过git remote add来添加当前本地仓库的远程仓库， 有了这个动作本地仓库（repository）就知道了当遇到git push 的时候应该往哪里提交代码
+（git push 后不加参数的时候，默认就是git push origin 当前的分支名，比如对本地的master分支执行git push，其实就是git push origin master，当然，如果远程仓库没有master这个分支的话，肯定会报错）。
+
+2. git branch
+
+git天生就是为了多版本分支管理而创造的，因此分支一说，不得不提， 分支就相当于是为了单独记录软件的某一个发布版本而存在的，既然git是分布式的，便有了本地分支和远程分支一说，git branch 可以查看本地分支， git branch -r  可以用来查看远程分支。 本地分支和远程分支在git push 的时候可以随意指定，交错对应，只要不出现版本冲突即可。
+
+3. git merge
+
+git的分布式结构也非常适合多人合作开发不同的功能模块，此时如果每个人都在其各自的分支上开发一个相对独立的模块的话，在每次release制作时都需先将各成员的模块做一个合并操作，用于合并各成员的工作成果，完成集成。 此时需要的就是git merge.
+
+4.git push 和 commit-id
+
+在每次本地工作完成后，都会做一个git commit 操作来保存当前工作到本地仓库(repository)， 此时会产生一个commit-id，这是一个能唯一标识一个版本的序列号。 在使用git push后，这个序列号还会同步到远程仓库(repository)。
+在理解了以上git要素之后，分析git fetch 和 git pull 就不再困难了。 
+
+二、git fetch 四种基本用法
+
+1. git fetch 
+
+ 这将更新git remote 中所有的远程仓库(repository) 所包含分支的最新commit-id, 将其记录到.git/FETCH_HEAD文件中
+
+2. git fetch remote_repository
+
+ 这将更新名称为remote_repository 的远程repository上的所有branch的最新commit-id，将其记录。 
+
+3. git fetch remote_repository remote_branch_name
+
+ 这将更新名称为remote_repository 的远程repository上的分支： remote_branch_name
+
+4. git fetch remote_repository remote_branch_name:local_branch_name 
+
+这将更新名称为remote_repository 的远程repository上的分支： remote_branch_name ，并在本地创建local_branch_name 本地分支保存远端分支的所有数据。
+
+FETCH_HEAD： 是一个版本链接，记录在本地的一个文件中，指向目前已经从远程仓库取下来的分支的末端版本。
+
+三、git pull 的运行过程
+
+1. git pull 
+
+首先，基于本地的FETCH_HEAD记录，比对本地的FETCH_HEAD记录与远程仓库的版本号，然后git fetch 获得当前指向的远程分支的后续版本的数据，然后再利用git merge将其与本地的当前分支合并。
+
+git pull 后不加参数的时候，跟git push 一样，默认就是git pull origin 当前分支名，当然远程仓库没有跟本地当前分支名一样的分支的话，肯定会报错。
+本地master分支执行git pull的时候，其实就是git pull origin master。
+
+2. 拆解git pull 操作
+git pull操作其实是git fetch 与 git merge 两个命令的集合。
+git pull  等效于先执行 git fetch origin 当前分支名, 再执行 git merge FETCH_HEAD.
+
+通过上述分析，可以知道，如果要合并代码就并不一定要用git merge命令了，也可以用git pull命名，比如要把远程origin仓库的xx分支合并到本地的yy分支，可以有如下两种做法。
+第一种，传统标准的做法：
+git fetch origin 目标分支名  // fetch到远程仓库目标分支的最新commit记录到  ./git/FETCH_HEAD文件中
+git checkout 要被合并的分支名  // 切换到要合并的分支
+git merge FETCH_HEAD  // 将目标分支最新的commit记录合并到当前分支
+
+举例说明：将远程origin仓库的xx分支合并到本地的yy分支。
+git fetch origin xx
+git checkout yy
+git merge FETCH_HEAD
+完成。
+
+第二种，直接使用pull命令，将远程仓库的目标分支合并到本地的分支：
+git pull <remote_repository_name> <branch_name> 
+
+举例说明：将远程origin仓库的xx分支合并到本地的yy分支
+
+git checkout yy
+
+git pull origin xx
+完成。
+
+其实还有一种思路，在前面第一种，第二种方式的基础上，可以这样来思考。
+
+是否可以先本地checkout远程目标分支，或者本地已经有了，先pull更新下来，然后将本地的两个分支进行merge不也可以吗？
+
+答案是肯定的。
+
+举个例子：
+
+将远程origin仓库的xx分支合并到本地的yy分支。
+
+git checkout xx
+
+git pull   // 如果本地没有xx分支的，这一步都可以不执行。
+
+git checkout yy   // 切换到yy分支
+
+git merge xx  //  将xx分支合并到yy分支  这一步可以加上 --no-ff 参数，即 git merge --no-ff
+
+原文地址：git fetch 、git pull、git merge 的理解_Json159的博客-CSDN博客
+
+详解git pull和git fetch的区别：_马恩光的博客-CSDN博客_gitpull和gitfetch
+
+
+```
+
+```sh
+git remote show origin
+git  log -5 --stat
+```
+
+
+
+### git pull origin chenchen:chenchen
+
+```sh
+[chenchen@dev3_10.211.21.18 szbr.sports.weibo.cn]$ git lg -20
+* 2f7155d - (69 seconds ago) 060101 — chenchen (HEAD, chenchen)
+* 7cdaf2f - (24 hours ago) 053107 — chenchen (origin/chenchen)
+* 9f65ff5 - (25 hours ago) 053106 — chenchen
+* 3205272 - (25 hours ago) 053105 — chenchen
+* 6ab8eb1 - (26 hours ago) 053102 — chenchen
+
+[chenchen@dev3_10.211.21.18 szbr.sports.weibo.cn]$ git pull
+From ssh://git.intra.weibo.com:2222/weibo_sports/szbr.sports.weibo.cn
+   7cdaf2f..2f7155d  chenchen   -> origin/chenchen
+There is no tracking information for the current branch.
+Please specify which branch you want to merge with.
+See git-pull(1) for details
+
+    git pull <remote> <branch>
+
+If you wish to set tracking information for this branch you can do so with:
+
+    git branch --set-upstream-to=origin/<branch> chenchen
+
+[chenchen@dev3_10.211.21.18 szbr.sports.weibo.cn]$ git branch --set-upstream-to=origin/chenchen chenchen
+Branch chenchen set up to track remote branch chenchen from origin.
+
+[chenchen@dev3_10.211.21.18 szbr.sports.weibo.cn]$ git lg -20
+* 2f7155d - (80 seconds ago) 060101 — chenchen (HEAD, origin/chenchen, chenchen)
+* 7cdaf2f - (24 hours ago) 053107 — chenchen
+* 9f65ff5 - (25 hours ago) 053106 — chenchen
+* 3205272 - (25 hours ago) 053105 — chenchen
+
+[chenchen@dev3_10.211.21.18 szbr.sports.weibo.cn]$ git pull
+From ssh://git.intra.weibo.com:2222/weibo_sports/szbr.sports.weibo.cn
+   2f7155d..e0ee63c  chenchen   -> origin/chenchen
+Already up-to-date.
 ```
 
 

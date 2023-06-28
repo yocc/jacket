@@ -12,7 +12,7 @@
 
 Register, 注册服务器, 用于管理 image 仓库. 
 
-Repository, image 仓库, 用于存储具体的 docker image, 起到的是仓库存储作用. Docker 存储库是一个具有相同名称(repository)的不同 image 的集合, 这些 image 具有不同的标记(tag), 通俗的理解就是 docker repository一般存放的是一类镜像, 这一类镜像只不过是 tag 版本不同. 在一个 repository 中一个镜像(image)的 tag 就是一个 alphanumeric 标识.
+Repository, image 仓库, 用于存储具体的 docker image, 起到的是仓库存储作用. Docker 存储库是一个具有相同名称(repository)的不同 image 的集合, 这些 image 具有不同的标记(tag), 通俗的理解就是 docker repository 一般存放的是一类镜像, 这一类镜像只不过是 tag 版本不同. 在一个 repository 中一个镜像(image)的 tag 就是一个 alphanumeric 标识.
 
 > 实际上注册服务器是管理仓库的具体服务器, 每个服务器上可以有多个仓库, 而每个仓库下面有多个 image. 
 >
@@ -273,7 +273,7 @@ Dockerfile 是个纯文本文件, 从 From 指令开始按顺序执行指令, �
 
 
 
-#### ARG, 构建时变量, 在构建时使用
+#### ARG, 构建时变量, 在构建时使用(我理解: docker 软件本身构建 image 时使用的脚本程序)
 
 ```dockerfile
 里:
@@ -318,9 +318,9 @@ VOLUME ["/var/lib/mysql"]
 
 RUN, 有两种形式, 1)是shell形式, 2)是数组形式(双引号). 运行在当前 image 上面的一个新层里(RUN 会增加一个新层).  CMD, 有三种形式, 1)数组形式(双引号), 2)数组形式*ENTRYPOINT*的默认参数, 3)shell命令行形式. 整个 Dockerfile 中只有一个 CMD 有效, 多个 CMD 中, 只有最后一个 CMD 生效.
 
-LABEL, 将原数据加入到 image. 一个 image 可以有多个 LABEL. 多个 LABEL 可以连写. 对个多个 FROM 中的 LABEL 都会又最后的 image 继承下来, 并且出现重名 LABEL 的话, 最后以最后的为准覆盖之前的.
+LABEL, 将原数据加入到 image, 用于运行的 image 中. 一个 image 可以有多个 LABEL. 多个 LABEL 可以连写. 对个多个 FROM 中的 LABEL 都会又最后的 image 继承下来, 并且出现重名 LABEL 的话, 最后以最后的为准覆盖之前的.
 
-ENV, 设置环境变量. 也会继承. 如果环境变量不是为了用于最终 image 中, 而是仅在构建期间, 这时用 RUN 或者 ARG, 而不是 ENV.
+ENV, 设置环境变量, 用于运行的 image 中. 也会继承. 如果环境变量不是为了用于最终 image 中, 而是仅在构建期间, 这时用 RUN 或者 ARG, 而不是 ENV.
 
 
 
@@ -406,7 +406,7 @@ Usage:  docker images [OPTIONS] [REPOSITORY[:TAG]]
 列出 images
 
 -a， --all, 显示所有图像（默认隐藏中间图像） 
---degests, 显示摘要 
+--digests, 显示摘要 
 -f, --filter filter, 根据提供的条件过滤输出 
 --format string, 使用 Go 模板漂亮打印图像 
 --no-trunc, 不截断输出 
@@ -1327,7 +1327,7 @@ error pulling image configuration: Get "https://production.cloudflare.docker.com
 
 原因:
 事实与真相: 
-Docker这个程序只是一个控制台程序，用于attach，真正操作docker的是运行在后台的docker daemon，也就是我们需要通过systemctl start docker来启动docker daemon。所以说即使我们设置了环境变量http_proxy，那么也只是针对前台docker console使用，而真正访问pull镜像的确是后台的daemon，因此，需要设置daemon访问proxy。
+Docker 这个程序只是一个控制台程序, 用于 attach, 真正操作 docker 的是运行在后台的 docker daemon, 也就是我们需要通过 systemctl start docker 来启动 docker daemon. 所以说即使我们设置了环境变量 http_proxy, 那么也只是针对前台 docker console 使用, 而真正访问 pull 镜像的确是后台的 daemon, 因此, 需要设置 daemon 访问 proxy. 
 
 解决: 
 1. 给 systemctl 服务做配置, 让所有 daemon 服务进程走代理
@@ -1530,6 +1530,11 @@ ebc5ce0efc81   registry.nevis.sina.com.cn/tiyu/env.sports.weibo.com   "/etc/dApp
 [chenchen@dev3_10.211.21.18 _docker-env]$ sudo docker stop ebc5ce0efc81
 
 
+
+sudo docker run -itd -p 5173:5173 --name vue3 chenchen:centos8
+
+sudo docker run -itd -p 5173:5173 -v /usr/home/chenchen/htdocs:/root/htdocs --name volume3 chenchen:vue3
+sudo docker exec -it volume3 /bin/bash
 
 
 

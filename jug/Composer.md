@@ -112,7 +112,7 @@ Generating autoload files
 ## Download Composer
 
 ```shell
-# 1. 在线下载安装, 需要事先安装了 PHP, 因为 Composer 安装器本身就是一个 PHP 脚本
+# 1. 在线下载安装器, 需要事先安装了 PHP, 因为 Composer 安装器本身就是一个 PHP 脚本
 https://getcomposer.org/download/
 php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
 php -r "if (hash_file('sha384', 'composer-setup.php') === '906a84df04cea2aa72f40b5f787e49f22d4c2f19492ac310e8cba5b96ac8b64115ac402c8cd292b8a03482574915d1a8') { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;"
@@ -250,6 +250,41 @@ Available commands:
 3) 使用 composer update 更新依赖与 composer.lock 文件
 4) 升级 = 文档研读 + 代码修改 + 全面测试(非常重要)
 ```
+
+## install, update, require
+
+```sh
+composer install - 如有 composer.lock 文件，直接安装，否则从 composer.json 安装最新扩展包和依赖；
+
+composer update - 从 composer.json 安装最新扩展包和依赖；
+composer update vendor/package - 从 composer.json 或者对应包的配置，并更新到最新；
+$ composer update sina_sports/phplib -vv
+
+composer require new/package - 添加安装 new/package, 可以指定版本，如： composer require new/package ~2.5.
+```
+
+## 翻墙
+
+```sh
+如果提示:
+# Loading composer repositories with package information
+这主要是因为“中国长城”的作用
+
+解决:
+composer config -g repo.packagist composer https://packagist.phpcomposer.com   原始配置(被墙)
+改为中国镜像站
+composer config -g repo.packagist composer https://mirrors.aliyun.com/composer/
+-- or -- 
+composer config -g repo.packagist composer https://mirrors.cloud.tencent.com/composer/
+这两行任选其一, 会直接修改 ~/.config/composer/config.json 文件
+
+恢复:
+解除镜像并恢复到 packagist 官方源:
+composer config -g --unset repos.packagist
+
+```
+
+
 
 
 

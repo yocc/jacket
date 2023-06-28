@@ -345,6 +345,12 @@ x86_64
     [chenchen@grpc01 ~]$ whereis npm
     npm: /home/chenchen/.nvm/versions/node/v17.7.2/bin/npm
     [chenchen@grpc01 ~]$ 
+    
+    # 通过 nvm 卸载 node
+    [chenchen@dev3_10.211.21.18 .nvm]$ nvm -h					(先看帮助)
+    [chenchen@dev3_10.211.21.18 .nvm]$ nvm current			(确定当前 node 版本)
+    [chenchen@dev3_10.211.21.18 .nvm]$ nvm deactivate			(退出激活状态, 激活状态时不能卸载)
+    [chenchen@dev3_10.211.21.18 .nvm]$ nvm uninstall v12.0.0			(卸载)
     ```
 
     

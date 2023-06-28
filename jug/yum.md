@@ -760,6 +760,50 @@ Metadata cache created.
 参考: https://blog.csdn.net/weixin_43252521/article/details/124409151
 ```
 
+### 常用方法
+
+```sh
+参考: https://www.cyberciti.biz/faq/centos-8-dig-command-not-found-how-to-install-dig-on-centos-8/
+1. 需要通过 yum 安装 dig
+
+2. 搜索 dig CentOS 8 的 yum 软件包
+[root@9fdcb516b951 .ssh]# yum whatprovides dig
+Last metadata expiration check: 9 days, 17:07:13 ago on Mon 06 Mar 2023 10:45:46 AM UTC.
+bind-utils-32:9.11.26-6.el8.x86_64 : Utilities for querying DNS name servers
+Repo        : appstream
+Matched from:
+Filename    : /usr/bin/dig
+
+3. 通过上一步返回的结果, 进一步获取 bind-utils 软件包的详细信息
+[root@9fdcb516b951 ~]# yum info bind-utils
+CentOS Linux 8 - AppStream						2.4 kB/s | 4.3 kB     00:01    
+CentOS Linux 8 - BaseOS								2.8 kB/s | 3.9 kB     00:01    
+CentOS Linux 8 - Extras								1.0 kB/s | 1.5 kB     00:01    
+Available Packages
+Name         : bind-utils
+Epoch        : 32
+Version      : 9.11.26
+Release      : 6.el8
+Architecture : x86_64
+Size         : 451 k
+Source       : bind-9.11.26-6.el8.src.rpm
+Repository   : appstream
+Summary      : Utilities for querying DNS name servers
+URL          : https://www.isc.org/downloads/bind/
+License      : MPLv2.0
+Description  : Bind-utils contains a collection of utilities for querying DNS (Domain
+             : Name System) name servers to find out information about Internet
+             : hosts. These tools will provide you with the IP addresses for given
+             : host names, as well as other information about registered domains and
+             : network addresses.
+             : 
+             : You should install bind-utils if you need to get information from DNS name
+             : servers.
+
+4. 安装 bind-utils 软件包
+sudo yum install bind-utils
+```
+
 
 
 ### See Also

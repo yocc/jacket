@@ -55,22 +55,22 @@ Python-3.10.2/Mac/README.rst
 ``` shell
 $ sudo yum -y install gcc make automake autoconf libtool
 $ sudo yum -y install openssl openssl-devel
-$ sudo yum -y install libffi libffi-devel
+$ sudo yum -y install libffi libffi-devel			(_ctypes)
 
-$ sudo yum -y install bzip2 bzip2-devel
-$ sudo yum -y install readline readline-devel
-$ sudo yum -y install tcl tcl-devel
-$ sudo yum -y install tk tk-devel
-$ sudo yum -y install tkinter
-$ sudo yum -y install python3-tkinter
+$ sudo yum -y install bzip2 bzip2-devel			(_bz2)
+$ sudo yum -y install readline readline-devel			(readline)
+$ sudo yum -y install tcl tcl-devel			(_tkinter)
+$ sudo yum -y install tk tk-devel			(_tkinter)
+$ sudo yum -y install tkinter			(_tkinter)
+$ sudo yum -y install python3-tkinter			(_tkinter)
 $ sudo yum -y install libX11 libX11-devel
-$ sudo yum -y install sqlite sqlite-devel
-$ sudo yum -y install xz lzma xz-devel
-$ sudo yum -y install uuid uuid-devel
+$ sudo yum -y install sqlite sqlite-devel			(_sqlite3)
+$ sudo yum -y install xz lzma xz-devel			(_lzma)
+$ sudo yum -y install uuid uuid-devel			(_uuid)
 #$ sudo yum -y install libuuid libuuid-devel  (libxxx 命名的一般是 Ubantu系统)
-$ sudo yum -y install zlib zlib-devel
-$ sudo yum -y install ncurses ncurses-devel
-$ sudo yum -y install gdbm gdbm-devel
+$ sudo yum -y install zlib zlib-devel			(zlib)
+$ sudo yum -y install ncurses ncurses-devel			(_curses, _curses_panel)
+$ sudo yum -y install gdbm gdbm-devel			(_dbm, _gdbm)
 
 # 别用, 安装了好几十个
 # $ sudo yum -y install yum-utils
@@ -345,15 +345,134 @@ python3本体安装目录/lib/python版本/site-packages/包名
 
 $ python3 -m pip --version									# 查看 pip 是否已经安装, 安装了返回版本
 $ python3 -m pip install --upgrade pip      # 升级自身
+$ python3 -m pip install --upgrade pip==20.0.2
 $ python3 -m pip install -U pip						  # pip 自身更新
 $ python3 -m pip install 包名                # 安装
 $ python3 -m pip install --user 包名         # 只为当前用户安装
 $ python3 -m pip list                       # 列出所有已经安装过的包名
+$ python3 -m pip list -o										# 在安装的库中, 看哪些需要版本升级
 $ python3 -m pip show 包名                   # 列出安装过的包名的详细信息
+$ python3 -m pip show -f 包名                # 列出安装过的包名的详细信息和文件位置
 $ python3 -m pip search 包名                 # 从远程PyPI里找包
+$ pip uninstall 包名 												 # 卸载包名
+$ pip install --upgrade keras==2.1.0 				# 升级到指定版本
+$ pip install -U keras==2.1.0 							# 升级到指定版本
+$ pip install keras==2.1.0 									# 安装指定版本
+# $ python -m pip install 等于 $ pip install, 即 $ python -m pip 等于 $ pip
+$ pip install "package>=0.2,<0.3"						# 版本至少为0.2且小于0.3 (必须双引号)
+$ pip install -U "gast<=0.4.0,>=0.2.1"
+$ pip check 																# 检查所有安装包之间的兼容性
+$ pip check 包名 		 												 # 检查指定包与其他包之间的兼容性
 
+# 
+$ pip list --outdate		# 列出可升级的包
+$ pip list --outdated --format=freeze | grep -v '^\-e' | cut -d = -f 1  | xargs -n1 pip install -U    # 升级所有可升级的包
+$ pip freeze --local | grep -v '^-e' | cut -d = -f 1  | xargs -n1 pip install -U    # 升级所有可升级的包
+
+# 安装 pytorch, https://pytorch.org/get-started/locally/
 $ pip3 install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cpu
+或者
+(grpc02) [chenchen@grpc01 bin]$ python -m pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu
+
+# pip 回退版本实例
+$ pip install -U "gast<=0.4.0,>=0.2.1"
+$ pip show gast
+$ pip list -o		# 检查回退
+
+(grpc02) [chenchen@grpc01 bin]$ pip install -U "gast<=0.4.0,>=0.2.1"
+Requirement already satisfied: gast<=0.4.0,>=0.2.1 in /home/chenchen/tmp/venv/python39/grpc02/lib/python3.9/site-packages (0.4.0)
+(grpc02) [chenchen@grpc01 bin]$ pip show gast
+Name: gast
+Version: 0.4.0
+Summary: Python AST that abstracts the underlying Python version
+Home-page: https://github.com/serge-sans-paille/gast/
+Author: serge-sans-paille
+Author-email: serge.guelton@telecom-bretagne.eu
+License: BSD 3-Clause
+Location: /home/chenchen/tmp/venv/python39/grpc02/lib/python3.9/site-packages
+Requires: 
+Required-by: tensorflow
+(grpc02) [chenchen@grpc01 bin]$ pip install -U "numpy<1.24,>=1.22"
+Requirement already satisfied: numpy<1.24,>=1.22 in /home/chenchen/tmp/venv/python39/grpc02/lib/python3.9/site-packages (1.23.5)
+(grpc02) [chenchen@grpc01 bin]$ pip show numpy
+Name: numpy
+Version: 1.23.5
+Summary: NumPy is the fundamental package for array computing with Python.
+Home-page: https://www.numpy.org
+Author: Travis E. Oliphant et al.
+Author-email: 
+License: BSD
+Location: /home/chenchen/tmp/venv/python39/grpc02/lib/python3.9/site-packages
+Requires: 
+Required-by: h5py, jax, ml-dtypes, opt-einsum, scipy, tensorboard, tensorflow, torchvision
+(grpc02) [chenchen@grpc01 bin]$ 
+(grpc02) [chenchen@grpc01 bin]$ pip list -o
+Package     Version Latest Type
+----------- ------- ------ -----
+gast        0.4.0   0.5.4  wheel
+numpy       1.23.5  1.24.3 wheel
+setuptools  58.1.0  67.8.0 wheel
+tensorboard 2.12.3  2.13.0 wheel
+urllib3     1.26.15 2.0.2  wheel
+wheel       0.38.4  0.40.0 wheel
+wrapt       1.14.1  1.15.0 wheel
 ```
+
+```shell
+# pip 包兼容性处理办法
+$ pip check 				# 检查所有安装包之间的兼容性
+$ pip check 包名 		 # 检查指定包与其他包之间的兼容性
+
+(grpc02) [chenchen@grpc01 bin]$ pip check
+tensorflow 2.12.0 has requirement gast<=0.4.0,>=0.2.1, but you have gast 0.5.4.
+(grpc02) [chenchen@grpc01 bin]$ pip check gast
+tensorflow 2.12.0 has requirement gast<=0.4.0,>=0.2.1, but you have gast 0.5.4.
+
+
+# 出现兼容性后, 根据提示降级(也就是升级到低版本)
+$ pip check
+$ pip show gast
+$ pip install -U "gast<=0.4.0,>=0.2.1"
+$ pip show gast
+$ pip check
+
+(grpc02) [chenchen@grpc01 bin]$ pip show gast
+Name: gast
+Version: 0.5.4
+Summary: Python AST that abstracts the underlying Python version
+Home-page: https://github.com/serge-sans-paille/gast/
+Author: serge-sans-paille
+Author-email: serge.guelton@telecom-bretagne.eu
+License: BSD 3-Clause
+Location: /home/chenchen/tmp/venv/python39/grpc02/lib/python3.9/site-packages
+Requires: 
+Required-by: tensorflow
+(grpc02) [chenchen@grpc01 bin]$ pip install -U "gast<=0.4.0,>=0.2.1"
+Collecting gast<=0.4.0,>=0.2.1
+  Using cached gast-0.4.0-py3-none-any.whl (9.8 kB)
+Installing collected packages: gast
+  Attempting uninstall: gast
+    Found existing installation: gast 0.5.4
+    Uninstalling gast-0.5.4:
+      Successfully uninstalled gast-0.5.4
+Successfully installed gast-0.4.0
+(grpc02) [chenchen@grpc01 bin]$ pip show gast
+Name: gast
+Version: 0.4.0
+Summary: Python AST that abstracts the underlying Python version
+Home-page: https://github.com/serge-sans-paille/gast/
+Author: serge-sans-paille
+Author-email: serge.guelton@telecom-bretagne.eu
+License: BSD 3-Clause
+Location: /home/chenchen/tmp/venv/python39/grpc02/lib/python3.9/site-packages
+Requires: 
+Required-by: tensorflow
+(grpc02) [chenchen@grpc01 bin]$ pip check
+No broken requirements found.
+
+```
+
+
 
 ```shell
 [chenchen@localhost python3]$ ./bin/python3 -m pip list
@@ -673,14 +792,16 @@ make install
 
 ```shell
 问题:
+detect_modules() 在 setup.py 中找到的以下模块是由 Makefile 构建的, 由安装程序文件配置：
 The following modules found by detect_modules() in setup.py, have been
 built by the Makefile instead, as configured by the Setup files:
 _abc                  pwd                   time 
 
 原因:
+我理解不是错误, 是提示说明. 
 
 解决:
-
+不用管
 ```
 
 ```shell
@@ -964,7 +1085,7 @@ dict_keys(['sys', 'builtins', '_frozen_importlib', '_imp', '_thread', '_warnings
 # 激活, 本质是执行 activate 脚本, 启动了一个 shell 环境. 一旦激活进入虚拟环境, 那么连 python 解释器也应该用虚拟环境下的 ./bin/python3.9
 [chenchen@grpc01 grpc02]$ . ./bin/activate
 # 撤销, 是新 shell 环境下的方法, 退出这个新 shell 环境
-[chenchen@grpc01 grpc02]$ . ./bin/deactivate
+[chenchen@grpc01 grpc02]$ deactivate
 # pip, 查看 pip 是否已经安装, 有没有 pip
 (grpc02) [chenchen@grpc01 grpc02]$ ./bin/python3.9 -m pip -V
 pip 22.3.1 from /home/chenchen/tmp/venv/python39/grpc02/lib/python3.9/site-packages/pip (python 3.9)
@@ -1060,7 +1181,843 @@ https://developer.aliyun.com/article/796828
 https://zhuanlan.zhihu.com/p/92847111
 ```
 
+### 选项
 
+```sh
+
+./configure --prefix=$HOME/tmp/python311 --enable-shared --enable-big-digits  --with-system-ffi --with-openssl=/usr/local/openssl111m (成功, --with-openssl=OpenSSL本体根目录, 执行大约1分钟)
+
+--enable-shared --enable-big-digits  --with-system-ffi --with-openssl=/usr/local/openssl111m
+
+# --enable-shared
+即是说，在大多数 Unix 系统上（除了 Mac OS X 之外），共享库的路径不是绝对路径。因此，如果我们在非标准位置安装 Python，为了不和相同版本的系统 Python 产生干扰，我们需要配置非标准位置安装的 Python 共享库的路径，或者通过设置运行时的环境变量，如 LD_LIBRARY_PATH。 为了避免这个问题，我们最好避免使用 `--enable-shared`。
+From Python Issue27685, Issue 27685: altinstall with --enable-shared showing incorrect behaviour, https://link.zhihu.com/?target=https%3A//bugs.python.org/issue27685
+
+如果你要编译一个库的源代码，可以把它编译链接成静态库，也可以把它编译链接成动态库。
+如果你想编译链接成动态库，就用 --enable-shared 参数；如果你想编译链接成静态库，就用 --enable-static 参数。
+
+--enable-shared disable/enable building shared python library
+关闭/开启 将要构建 共享 python 库
+
+# --with-system-ffi
+--with-system-ffi build _ctypes module using an installed ffi library
+构建 _ctypes 模块时使用的一个已经安装过的 ffi 库
+
+# --with-openssl=/usr/local/openssl111m
+--with-openssl=DIR root of the OpenSSL directory
+OpenSSL的根目录
+
+# ./configure
+[chenchen@dev3_10.211.21.18 Python-3.9.16]$ pwd
+/usr/home/chenchen/htdocs/python3916/Python-3.9.16
+[chenchen@dev3_10.211.21.18 Python-3.9.16]$ ./configure --prefix=$HOME/htdocs/python3916 --enable-shared --enable-big-digits  --with-system-ffi --with-openssl=/etc/pki/tls
+```
+
+### OpenSSL
+
+```sh
+https://pkgs.org/download/openssl
+openssl-1.0.2k-24.el7_9.x86_64	(openssl 软件本身)
+openssl-libs-1.0.2k-24.el7_9.x86_64	(依赖包)
+openssl-devel-1.0.2k-24.el7_9.x86_64	(依赖包)
+因为 openssl 依赖 openssl-devel 和 openssl-libs 两个包, 所以也要下载相应的包。
+
+# 验证
+[chenchen@dev3_10.211.21.18 Python-3.9.16]$ openssl version
+OpenSSL 1.0.2k-fips  26 Jan 2017
+
+# 查看当前 openssl 位置
+[chenchen@dev3_10.211.21.18 Python-3.9.16]$ which openssl
+/bin/openssl
+[chenchen@dev3_10.211.21.18 Python-3.9.16]$ whereis openssl
+openssl: /usr/bin/openssl /usr/lib64/openssl /usr/include/openssl /usr/share/man/man1/openssl.1ssl.gz
+
+[chenchen@dev3_10.211.21.18 Python-3.9.16]$ l /bin/openssl
+137750 -rwxr-xr-x 1 root root 543K Jan 18  2022 /bin/openssl
+[chenchen@dev3_10.211.21.18 Python-3.9.16]$ l /usr/bin/openssl
+137750 -rwxr-xr-x 1 root root 543K Jan 18  2022 /usr/bin/openssl
+[chenchen@dev3_10.211.21.18 Python-3.9.16]$ l /usr/lib64/openssl
+total 76K
+662286 drwxr-xr-x.  3 root root 4.0K Jan 18  2022 .
+662287 drwxr-xr-x.  2 root root 4.0K Jun 15  2022 engines
+656641 dr-xr-xr-x. 90 root root  64K Jul 28  2022 ..
+[chenchen@dev3_10.211.21.18 Python-3.9.16]$ l /usr/include/openssl
+total 1.9M
+184770 -rw-r--r--   1 root root 144K Jan 18  2022 ssl.h
+...
+
+[chenchen@dev3_10.211.21.18 Python-3.9.16]$ rpm -qa | grep openssl
+openssl-libs-1.0.2k-24.el7_9.x86_64
+openssl098e-0.9.8e-29.el7.centos.3.x86_64
+openssl-1.0.2k-24.el7_9.x86_64
+openssl-devel-1.0.2k-24.el7_9.x86_64
+[chenchen@dev3_10.211.21.18 Python-3.9.16]$ rpm -ql openssl-1.0.2k-24.el7_9.x86_64
+/etc/pki/CA
+/usr/bin/openssl
+...
+
+# 涉及的目录
+openssl:
+/etc/pik/
+/usr/bin/openssl
+/usr/share/
+
+openssl-libs:
+/etc/pki/
+/usr/lib64/
+/usr/share/
+
+openssl-devel:
+/usr/include/openssl/ 头文件
+/usr/lib64/ 库
+/usr/share/ 共享文档
+
+/bin - Binaries (二进制文件) 的缩写, 这个目录存放着最经常使用的命令, 普通用户可以使用的命令的存放目录
+/usr - unix shared resources(共享资源)的缩写, 用户的很多应用程序和文件都放在这个目录下, 类似于 windows 下的 program files 目录
+/usr/bin - 系统用户使用的应用程序
+/usr/share - 存放共享文件的目录, 在此目录下不同的子目录中保存了同一个操作系统在不同构架下工作时特定应用程序的共享数据(例如程序文档信息)
+/usr/include - C程序语言编译使用的头文件. linux下开发和编译应用程序所需要的头文件一般都存放在这里，通过头文件来使用某些库函数. 默认来说这个路径被添加到了环境变量中, 这样编译开发程序的时候编译器会自动搜索这个路径, 从中找到你的程序中可能包含的头文件.
+/usr/local - 安装本地程序的一般默认路径. 当我们下载一个程序源代码, 编译并且安装的时候, 如果不特别指定安装的程序路径, 那么默认会将程序相关的文件安装到这个目录的对应目录下. 例如, 安装的程序可执行文件被安装(安装实质就是复制到了/usr/local/bin下面, 此程序(可执行文件所需要依赖的库文件被安装到了 /usr/local/lib 目录下, 被安装的软件如果是某个开发库(例如Qt, Gtk等那么相应的头文件可能就被安装到了 /usr/local/include 中等等. 也就是说, 这个目录存放的内容, 一般都是我们后来自己安装的软件的默认路径, 如果择了这个默认路径作为软件的安装路径, 被安装的软件的所文件都限制在这个目录中, 其中的子目录就相应于根目录的子目录.
+/etc - Etcetera(等等)的缩写, 这个目录用来存放所有的系统管理所需要的配置文件和子目录
+/lib - 存放基本代码库(比如c++库), 其作用类似于 Windows 里的DLL文件. 几乎所有的应用程序都需要用到这些共享库.
+
+# /bin,/sbin与/usr/bin,/usr/sbin:
+/bin - 一般存放对于用户和系统来说“必须”的程序（二进制文件）。
+/sbin - 一般存放用于系统管理的“必需”的程序（二进制文件），一般普通用户不会使用，根用户使用。
+/usr/bin - 一般存放的只是对用户和系统来说“不是必需的”程序（二进制文件）。
+/usr/sbin - 一般存放用于系统管理的系统管理的不是必需的程序（二进制文件）。
+
+# /lib与/usr/lib:
+/lib 和 /usr/lib 的区别类似 /bin, /sbin 与 /usr/bin, /usr/sbin
+/lib - 一般存放对于用户和系统来说“必须”的库（二进制文件）
+/usr/lib - 一般存放的只是对用户和系统来说“不是必需的”库（二进制文件）
+
+
+# 对比
+[chenchen@dev3_10.211.21.18 openssl]$ ldd /usr/bin/openssl
+[chenchen@dev3_10.211.21.18 openssl]$ ldd /bin/openssl
+对比返回的结果, 结果是只有.so的地址不同, 其他均相同
+```
+
+###  通过 openssl 命令本身获取信息
+
+```sh
+openssl 命令 选项
+[chenchen@dev3_10.211.21.18 openssl]$ openssl version
+OpenSSL 1.0.2k-fips  26 Jan 2017
+[chenchen@dev3_10.211.21.18 openssl]$ openssl version -
+usage:version -[avbofpd]
+[chenchen@dev3_10.211.21.18 openssl]$ openssl version -a
+OpenSSL 1.0.2k-fips  26 Jan 2017
+built on: reproducible build, date unspecified
+platform: linux-x86_64
+options:  bn(64,64) md2(int) rc4(16x,int) des(idx,cisc,16,int) idea(int) blowfish(idx) 
+compiler: gcc -I. -I.. -I../include  -fPIC -DOPENSSL_PIC -DZLIB -DOPENSSL_THREADS -D_REENTRANT -DDSO_DLFCN -DHAVE_DLFCN_H -DKRB5_MIT -m64 -DL_ENDIAN -Wall -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fexceptions -fstack-protector-strong --param=ssp-buffer-size=4 -grecord-gcc-switches   -m64 -mtune=generic -Wa,--noexecstack -DPURIFY -DOPENSSL_IA32_SSE2 -DOPENSSL_BN_ASM_MONT -DOPENSSL_BN_ASM_MONT5 -DOPENSSL_BN_ASM_GF2m -DRC4_ASM -DSHA1_ASM -DSHA256_ASM -DSHA512_ASM -DMD5_ASM -DAES_ASM -DVPAES_ASM -DBSAES_ASM -DWHIRLPOOL_ASM -DGHASH_ASM -DECP_NISTZ256_ASM
+OPENSSLDIR: "/etc/pki/tls"
+engines:  dynamic 
+
+OPENSSLDIR - openssl 的安装目录
+通过 openssl version -a 返回的 OPENSSLDIR 获取 openssl 安装目录
+```
+
+
+
+### Python-3.9.16 源码安装过程
+
+```sh
+[chenchen@dev3_10.211.21.18 python3916]$ curl www.google.com -I
+HTTP/1.1 200 OK
+Transfer-Encoding: chunked
+...
+# https://www.python.org/downloads/release/python-3916/ 下载页面
+[chenchen@dev3_10.211.21.18 python3916]$ wget https://www.python.org/ftp/python/3.9.16/Python-3.9.16.tgz
+--2023-06-21 12:20:36--  https://www.python.org/ftp/python/3.9.16/Python-3.9.16.tgz
+Connecting to 127.0.0.1:7890... connected.
+Proxy request sent, awaiting response... 200 OK
+Length: 26333525 (25M) [application/octet-stream]
+Saving to: ‘Python-3.9.16.tgz’
+
+100%[==================================================================================================================================================================================>] 26,333,525  5.86MB/s   in 4.8s   
+
+2023-06-21 12:20:43 (5.22 MB/s) - ‘Python-3.9.16.tgz’ saved [26333525/26333525]
+
+# 解压缩
+[chenchen@dev3_10.211.21.18 python3916]$ l
+total 26M
+23377848 -rw-rw-r--  1 chenchen chenchen  26M Dec  7  2022 Python-3.9.16.tgz
+23330989 drwxr-xr-x 81 chenchen www       12K Jun 21 11:31 ..
+23396831 drwxrwxr-x  2 chenchen chenchen 4.0K Jun 21 12:20 .
+[chenchen@dev3_10.211.21.18 python3916]$ md5sum Python-3.9.16.tgz
+38c99c7313f416dcf3238f5cf444c6c2  Python-3.9.16.tgz
+[chenchen@dev3_10.211.21.18 python3916]$ tar zxvf Python-3.9.16.tgz -C ./
+
+# ./configure
+使用 --with-openssl=/usr/ 之后 openssl 成功, 这里描述了解决和找寻的过程: 
+./configure --prefix=/usr/home/chenchen/htdocs/python3916 --enable-shared --enable-big-digits --with-system-ffi --with-openssl=/usr/
+参考, https://stackoverflow.com/questions/17915098/openssl-ssl-h-no-such-file-or-directory-during-installation-of-git
+
+checking for openssl/ssl.h in /usr/... yes
+checking whether compiling and linking against OpenSSL works... yes
+checking for X509_VERIFY_PARAM_set1_host in libssl... yes
+checking for --with-ssl-default-suites... python
+
+# 编译
+make -j4
+
+Python build finished successfully!
+The necessary bits to build these optional modules were not found:
+_bz2                  _dbm                  _gdbm              
+_lzma                 _sqlite3              _tkinter           
+_uuid                 readline                                 
+To find the necessary bits, look in setup.py in detect_modules() for the module's name.
+
+
+The following modules found by detect_modules() in setup.py, have been
+built by the Makefile instead, as configured by the Setup files:
+_abc                  atexit                pwd                
+time                                                           
+
+
+Failed to build these modules:
+_ctypes    
+
+
+running build_scripts
+creating build/scripts-3.9
+copying and adjusting /data1/www/htdocs/chenchen/python3916/Python-3.9.16/Tools/scripts/pydoc3 -> build/scripts-3.9
+copying and adjusting /data1/www/htdocs/chenchen/python3916/Python-3.9.16/Tools/scripts/idle3 -> build/scripts-3.9
+copying and adjusting /data1/www/htdocs/chenchen/python3916/Python-3.9.16/Tools/scripts/2to3 -> build/scripts-3.9
+changing mode of build/scripts-3.9/pydoc3 from 664 to 775
+changing mode of build/scripts-3.9/idle3 from 664 to 775
+changing mode of build/scripts-3.9/2to3 from 664 to 775
+renaming build/scripts-3.9/pydoc3 to build/scripts-3.9/pydoc3.9
+renaming build/scripts-3.9/idle3 to build/scripts-3.9/idle3.9
+renaming build/scripts-3.9/2to3 to build/scripts-3.9/2to3-3.9
+
+# 逐一消除编译后的模块不支持的情况
+_dbm 和 _gdbm 这两个是由一个软件包完成的
+# 先查一下本地是否安装过 gdbm, 一查果然安装过了, 既然安装过了为什么不行呢? 仔细一看是仅安装了 gdbm, 但没有安装 gdbm-devel, 于是开始安装 gdbm-devel. 安装时 yum 提示 critical, 估计是没有代理, 开代理后安装成功.
+[chenchen@dev3_10.211.21.18 Python-3.9.16]$ rpm -qa | grep gdbm
+gdbm-1.10-8.el7.x86_64
+[chenchen@dev3_10.211.21.18 Python-3.9.16]$ rpm -ql gdbm-1.10-8.el7.x86_64
+/usr/bin/testgdbm
+/usr/lib64/libgdbm.so.4
+...
+$ sudo yum -y install gdbm gdbm-devel
+[chenchen@dev3_10.211.21.18 Python-3.9.16]$ sudo yum -y install gdbm-devel
+CRITICAL:yum.cli:Config error: Error accessing file for config http://repos.sina.cn/conf/yumconf.php
+[chenchen@dev3_10.211.21.18 clash]$ pwd
+/usr/home/chenchen/htdocs/clash
+[chenchen@dev3_10.211.21.18 clash]$ sudo ./clash2 -d ./
+[chenchen@dev3_10.211.21.18 Python-3.9.16]$ sudo yum -y install gdbm-devel
+Loaded plugins: fastestmirror, langpacks
+...
+Installed:
+  gdbm-devel.x86_64 0:1.10-8.el7                                                               
+Complete!
+
+_bz2
+$ sudo yum -y install bzip2 bzip2-devel
+# 只安装了 bzip2, 没有安装 bzip2-devel
+[chenchen@dev3_10.211.21.18 Python-3.9.16]$ rpm -qa | grep bzip2
+bzip2-libs-1.0.6-13.el7.x86_64
+bzip2-1.0.6-13.el7.x86_64
+[chenchen@dev3_10.211.21.18 Python-3.9.16]$ sudo yum -y install bzip2-devel
+
+_tkinter 和 python3-tkinter 与 (tk, tcl) 有关, 也要装 tk, tcl
+$ sudo yum -y install tkinter
+# 完全没有安装 tkinter
+[chenchen@dev3_10.211.21.18 Python-3.9.16]$ rpm -qa | grep tkinter
+[chenchen@dev3_10.211.21.18 Python-3.9.16]$ sudo yum -y install tkinter
+[chenchen@dev3_10.211.21.18 Python-3.9.16]$ make -j4    # 还有报错, _thinter, 应该安装 python3-tkinter
+# 安装 python3-tkinter
+[chenchen@dev3_10.211.21.18 Python-3.9.16]$ rpm -qa | grep python3-tkinter
+[chenchen@dev3_10.211.21.18 Python-3.9.16]$ sudo yum -y install python3-tkinter
+[chenchen@dev3_10.211.21.18 Python-3.9.16]$ make -j4    # 还有报错, _thinter 和 _uuid
+# 安装 tcl-devel 和 tk-devel
+[chenchen@dev3_10.211.21.18 Python-3.9.16]$ rpm -qa | grep tcl
+targetcli-2.1.fb41-3.el7.noarch
+tcl-8.5.13-8.el7.x86_64
+[chenchen@dev3_10.211.21.18 Python-3.9.16]$ rpm -qa | grep tk
+tkinter-2.7.5-90.el7.x86_64
+at-spi2-atk-2.14.1-1.el7.x86_64
+gtk2-2.24.28-8.el7.x86_64
+python3-tkinter-3.6.8-18.el7.x86_64
+gtk3-3.14.13-20.el7.x86_64
+tk-8.5.13-6.el7.x86_64
+atk-2.14.0-1.el7.x86_64
+[chenchen@dev3_10.211.21.18 Python-3.9.16]$ sudo yum -y install tcl-devel tk-devel
+[chenchen@dev3_10.211.21.18 Python-3.9.16]$ make -j4    # _thinter 报错没有了, 仅剩 _uuid
+
+_sqlite3
+$ sudo yum -y install sqlite sqlite-devel
+# 只安装了 sqlite, 没有安装 sqlite-devel
+[chenchen@dev3_10.211.21.18 Python-3.9.16]$ rpm -qa | grep sqlite
+sqlite-3.7.17-8.el7.x86_64
+[chenchen@dev3_10.211.21.18 Python-3.9.16]$ rpm -qa | grep sqlite-devel
+[chenchen@dev3_10.211.21.18 Python-3.9.16]$ sudo yum -y install sqlite-devel
+
+readline
+$ sudo yum -y install readline readline-devel
+# 只安装了 readline, 没有安装 readline-devel
+[chenchen@dev3_10.211.21.18 Python-3.9.16]$ rpm -qa | grep readline
+readline-6.2-9.el7.x86_64
+[chenchen@dev3_10.211.21.18 Python-3.9.16]$ rpm -qa | grep readline-devel
+[chenchen@dev3_10.211.21.18 Python-3.9.16]$ sudo yum -y install readline-devel
+
+_lzma
+$ sudo yum -y install xz lzma xz-devel
+# 只安装了 xz 和 lzma, 没有安装 xz-devel
+[chenchen@dev3_10.211.21.18 Python-3.9.16]$ rpm -qa | grep lzma
+pyliblzma-0.5.3-11.el7.x86_64
+[chenchen@dev3_10.211.21.18 Python-3.9.16]$ rpm -qa | grep xz
+xz-5.2.2-1.el7.x86_64
+xz-libs-5.2.2-1.el7.x86_64
+[chenchen@dev3_10.211.21.18 Python-3.9.16]$ rpm -qa | grep xz-devel
+[chenchen@dev3_10.211.21.18 Python-3.9.16]$ sudo yum -y install xz-devel
+
+_uuid
+$ sudo yum -y install uuid uuid-devel
+# 只安装了 libuuid(和uuid无关), 没有安装 uuid 和 uuid-devel
+[chenchen@dev3_10.211.21.18 Python-3.9.16]$ rpm -qa | grep uuid
+libuuid-2.23.2-33.el7.x86_64 ()
+[chenchen@dev3_10.211.21.18 Python-3.9.16]$ rpm -qa | grep uuid-devel
+[chenchen@dev3_10.211.21.18 Python-3.9.16]$ sudo yum -y install uuid-devel
+[chenchen@dev3_10.211.21.18 Python-3.9.16]$ rpm -qa | grep uuid # 检查一下再 
+uuid-1.6.2-26.el7.x86_64
+libuuid-2.23.2-33.el7.x86_64
+uuid-devel-1.6.2-26.el7.x86_64
+# 试着安装了 libffi-devel, 但问题没有解决, 还有错误, 当时解决了 _ctypes 问题!
+[chenchen@dev3_10.211.21.18 Python-3.9.16]$ rpm -qa | grep libffi
+libffi-3.0.13-18.el7.x86_64
+[chenchen@dev3_10.211.21.18 Python-3.9.16]$ sudo yum -y install libffi-devel
+[chenchen@dev3_10.211.21.18 Python-3.9.16]$ make -j4  # 问题依旧, 但解决了 _ctypes
+# 尝试安装 lzma
+[chenchen@dev3_10.211.21.18 Python-3.9.16]$ sudo yum -y install lzma
+[chenchen@dev3_10.211.21.18 Python-3.9.16]$ rpm -qa | grep lzma
+xz-lzma-compat-5.2.2-1.el7.x86_64
+pyliblzma-0.5.3-11.el7.x86_64
+[chenchen@dev3_10.211.21.18 Python-3.9.16]$ make -j4  # 问题依旧
+# 尝试 make clean 后重新 ./config, 和 make -j4 之后问题解决.
+# 也就是当遇到安装了包和make之后问题没有解决时, 需要重新 make clean, ./config, make -j4
+
+# 经过以上的处理, 目前仅剩一下问题
+# 这个问题我理解不需要处理, 仅仅是个说明
+The following modules found by detect_modules() in setup.py, have been
+built by the Makefile instead, as configured by the Setup files:
+_abc                  atexit                pwd                
+time    
+
+_ctypes (与 libffi libffi-devel 有依赖关系)
+# 通过 libffi-devel 安装, 解决了
+$ sudo yum -y install libffi libffi-devel
+
+# 测试
+# 测试有错误, 还没有找到原因
+make test
+[chenchen@dev3_10.211.21.18 Python-3.9.16]$ make test
+== Tests result: FAILURE ==
+
+409 tests OK.
+
+3 tests failed:
+    test_urllib test_urllib2 test_urllib2net
+
+13 tests skipped:
+    test_devpoll test_ioctl test_kqueue test_msilib test_ossaudiodev
+    test_startfile test_tix test_tk test_ttk_guionly test_winconsoleio
+    test_winreg test_winsound test_zipfile64
+0:06:13 load avg: 4.61
+0:06:13 load avg: 4.61 Re-running failed tests in verbose mode
+0:06:13 load avg: 4.61 Re-running test_urllib in verbose mode (matching: test_url_host_with_control_char_rejected, test_url_host_with_newline_header_injection_rejected)
+test_url_host_with_control_char_rejected (test.test_urllib.urlopen_HttpTests) ... FAIL
+test_url_host_with_newline_header_injection_rejected (test.test_urllib.urlopen_HttpTests) ... FAIL
+
+======================================================================
+FAIL: test_url_host_with_control_char_rejected (test.test_urllib.urlopen_HttpTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data1/www/htdocs/chenchen/python3916/Python-3.9.16/Lib/test/test_urllib.py", line 437, in test_url_host_with_control_char_rejected
+    urlopen(f"http:{schemeless_url}")
+AssertionError: InvalidURL not raised
+
+======================================================================
+FAIL: test_url_host_with_newline_header_injection_rejected (test.test_urllib.urlopen_HttpTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data1/www/htdocs/chenchen/python3916/Python-3.9.16/Lib/test/test_urllib.py", line 452, in test_url_host_with_newline_header_injection_rejected
+    urlopen(f"http:{schemeless_url}")
+AssertionError: InvalidURL not raised
+
+----------------------------------------------------------------------
+Ran 2 tests in 0.005s
+
+FAILED (failures=2)
+test test_urllib failed
+0:06:13 load avg: 4.61 Re-running test_urllib2net in verbose mode (matching: test_redirect_url_withfrag, test_urlwithfrag)
+test_redirect_url_withfrag (test.test_urllib2net.OtherNetworkTests) ... ERROR
+test_urlwithfrag (test.test_urllib2net.OtherNetworkTests) ... ERROR
+
+======================================================================
+ERROR: test_redirect_url_withfrag (test.test_urllib2net.OtherNetworkTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data1/www/htdocs/chenchen/python3916/Python-3.9.16/Lib/test/test_urllib2net.py", line 173, in test_redirect_url_withfrag
+    res = urllib.request.urlopen(req)
+  File "/data1/www/htdocs/chenchen/python3916/Python-3.9.16/Lib/urllib/request.py", line 214, in urlopen
+    return opener.open(url, data, timeout)
+  File "/data1/www/htdocs/chenchen/python3916/Python-3.9.16/Lib/urllib/request.py", line 523, in open
+    response = meth(req, response)
+  File "/data1/www/htdocs/chenchen/python3916/Python-3.9.16/Lib/urllib/request.py", line 632, in http_response
+    response = self.parent.error(
+  File "/data1/www/htdocs/chenchen/python3916/Python-3.9.16/Lib/urllib/request.py", line 555, in error
+    result = self._call_chain(*args)
+  File "/data1/www/htdocs/chenchen/python3916/Python-3.9.16/Lib/urllib/request.py", line 494, in _call_chain
+    result = func(*args)
+  File "/data1/www/htdocs/chenchen/python3916/Python-3.9.16/Lib/urllib/request.py", line 747, in http_error_302
+    return self.parent.open(new, timeout=req.timeout)
+  File "/data1/www/htdocs/chenchen/python3916/Python-3.9.16/Lib/urllib/request.py", line 523, in open
+    response = meth(req, response)
+  File "/data1/www/htdocs/chenchen/python3916/Python-3.9.16/Lib/urllib/request.py", line 632, in http_response
+    response = self.parent.error(
+  File "/data1/www/htdocs/chenchen/python3916/Python-3.9.16/Lib/urllib/request.py", line 561, in error
+    return self._call_chain(*args)
+  File "/data1/www/htdocs/chenchen/python3916/Python-3.9.16/Lib/urllib/request.py", line 494, in _call_chain
+    result = func(*args)
+  File "/data1/www/htdocs/chenchen/python3916/Python-3.9.16/Lib/urllib/request.py", line 641, in http_error_default
+    raise HTTPError(req.full_url, code, msg, hdrs, fp)
+urllib.error.HTTPError: HTTP Error 404: Not Found
+
+======================================================================
+ERROR: test_urlwithfrag (test.test_urllib2net.OtherNetworkTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data1/www/htdocs/chenchen/python3916/Python-3.9.16/Lib/test/test_urllib2net.py", line 165, in test_urlwithfrag
+    res = urllib.request.urlopen(req)
+  File "/data1/www/htdocs/chenchen/python3916/Python-3.9.16/Lib/urllib/request.py", line 214, in urlopen
+    return opener.open(url, data, timeout)
+  File "/data1/www/htdocs/chenchen/python3916/Python-3.9.16/Lib/urllib/request.py", line 523, in open
+    response = meth(req, response)
+  File "/data1/www/htdocs/chenchen/python3916/Python-3.9.16/Lib/urllib/request.py", line 632, in http_response
+    response = self.parent.error(
+  File "/data1/www/htdocs/chenchen/python3916/Python-3.9.16/Lib/urllib/request.py", line 561, in error
+    return self._call_chain(*args)
+  File "/data1/www/htdocs/chenchen/python3916/Python-3.9.16/Lib/urllib/request.py", line 494, in _call_chain
+    result = func(*args)
+  File "/data1/www/htdocs/chenchen/python3916/Python-3.9.16/Lib/urllib/request.py", line 641, in http_error_default
+    raise HTTPError(req.full_url, code, msg, hdrs, fp)
+urllib.error.HTTPError: HTTP Error 404: Not Found
+
+----------------------------------------------------------------------
+Ran 2 tests in 2.843s
+
+FAILED (errors=2)
+Warning -- urllib.requests._opener was modified by test_urllib2net
+  Before: None
+  After:  <urllib.request.OpenerDirector object at 0x7f914ae87ac0> 
+test test_urllib2net failed
+0:06:16 load avg: 4.24 Re-running test_urllib2 in verbose mode (matching: test_redirect_encoding, test_redirect_encoding, test_redirect_encoding, test_redirect_encoding, test_redirect_no_path)
+test_redirect_encoding (test.test_urllib2.HandlerTests) ... test_redirect_no_path (test.test_urllib2.HandlerTests) ... FAIL
+
+======================================================================
+FAIL: test_redirect_encoding (test.test_urllib2.HandlerTests) [b'/p\xc3\xa5-dansk/']
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data1/www/htdocs/chenchen/python3916/Python-3.9.16/Lib/test/test_urllib2.py", line 1359, in test_redirect_encoding
+    self.assertTrue(request.startswith(expected), repr(request))
+AssertionError: False is not true : b'GET http://example.com/p%C3%A5-dansk/ HTTP/1.1\r\nAccept-Encoding: identity\r\nHost: example.com\r\nUser-Agent: Python-urllib/3.9\r\nConnection: close\r\n\r\n'
+
+======================================================================
+FAIL: test_redirect_encoding (test.test_urllib2.HandlerTests) [b'/spaced%20path/']
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data1/www/htdocs/chenchen/python3916/Python-3.9.16/Lib/test/test_urllib2.py", line 1359, in test_redirect_encoding
+    self.assertTrue(request.startswith(expected), repr(request))
+AssertionError: False is not true : b'GET http://example.com/spaced%20path/ HTTP/1.1\r\nAccept-Encoding: identity\r\nHost: example.com\r\nUser-Agent: Python-urllib/3.9\r\nConnection: close\r\n\r\n'
+
+======================================================================
+FAIL: test_redirect_encoding (test.test_urllib2.HandlerTests) [b'/spaced path/']
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data1/www/htdocs/chenchen/python3916/Python-3.9.16/Lib/test/test_urllib2.py", line 1359, in test_redirect_encoding
+    self.assertTrue(request.startswith(expected), repr(request))
+AssertionError: False is not true : b'GET http://example.com/spaced%20path/ HTTP/1.1\r\nAccept-Encoding: identity\r\nHost: example.com\r\nUser-Agent: Python-urllib/3.9\r\nConnection: close\r\n\r\n'
+
+======================================================================
+FAIL: test_redirect_encoding (test.test_urllib2.HandlerTests) [b'/?p\xc3\xa5-dansk']
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data1/www/htdocs/chenchen/python3916/Python-3.9.16/Lib/test/test_urllib2.py", line 1359, in test_redirect_encoding
+    self.assertTrue(request.startswith(expected), repr(request))
+AssertionError: False is not true : b'GET http://example.com/?p%C3%A5-dansk HTTP/1.1\r\nAccept-Encoding: identity\r\nHost: example.com\r\nUser-Agent: Python-urllib/3.9\r\nConnection: close\r\n\r\n'
+
+======================================================================
+FAIL: test_redirect_no_path (test.test_urllib2.HandlerTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data1/www/htdocs/chenchen/python3916/Python-3.9.16/Lib/test/test_urllib2.py", line 1323, in test_redirect_no_path
+    fp = urllib.request.urlopen("http://python.org/path")
+  File "/data1/www/htdocs/chenchen/python3916/Python-3.9.16/Lib/urllib/request.py", line 214, in urlopen
+    return opener.open(url, data, timeout)
+  File "/data1/www/htdocs/chenchen/python3916/Python-3.9.16/Lib/urllib/request.py", line 517, in open
+    response = self._open(req, data)
+  File "/data1/www/htdocs/chenchen/python3916/Python-3.9.16/Lib/urllib/request.py", line 534, in _open
+    result = self._call_chain(self.handle_open, protocol, protocol +
+  File "/data1/www/htdocs/chenchen/python3916/Python-3.9.16/Lib/urllib/request.py", line 494, in _call_chain
+    result = func(*args)
+  File "/data1/www/htdocs/chenchen/python3916/Python-3.9.16/Lib/urllib/request.py", line 1375, in http_open
+    return self.do_open(http.client.HTTPConnection, req)
+  File "/data1/www/htdocs/chenchen/python3916/Python-3.9.16/Lib/urllib/request.py", line 1346, in do_open
+    h.request(req.get_method(), req.selector, req.data, headers,
+  File "/data1/www/htdocs/chenchen/python3916/Python-3.9.16/Lib/test/test_urllib2.py", line 1318, in request
+    self.assertEqual(url, next(urls))
+AssertionError: 'http://python.org/path' != '/path'
+- http://python.org/path
++ /path
+
+
+----------------------------------------------------------------------
+Ran 2 tests in 0.014s
+
+FAILED (failures=5)
+test test_urllib2 failed
+3 tests failed again:
+    test_urllib test_urllib2 test_urllib2net
+
+== Tests result: FAILURE then FAILURE ==
+
+409 tests OK.
+
+3 tests failed:
+    test_urllib test_urllib2 test_urllib2net
+
+13 tests skipped:
+    test_devpoll test_ioctl test_kqueue test_msilib test_ossaudiodev
+    test_startfile test_tix test_tk test_ttk_guionly test_winconsoleio
+    test_winreg test_winsound test_zipfile64
+
+3 re-run tests:
+    test_urllib test_urllib2 test_urllib2net
+
+Total duration: 6 min 16 sec
+Tests result: FAILURE then FAILURE
+make: *** [test] Error 2
+[chenchen@dev3_10.211.21.18 Python-3.9.16]$ 
+
+# 安装
+make install
+[chenchen@dev3_10.211.21.18 Python-3.9.16]$ make install
+Installing collected packages: setuptools, pip
+  WARNING: The scripts pip3 and pip3.9 are installed in '/usr/home/chenchen/htdocs/python3916/bin' which is not on PATH.
+  Consider adding this directory to PATH or, if you prefer to suppress this warning, use --no-warn-script-location.
+Successfully installed pip-22.0.4 setuptools-58.1.0
+
+# 修改 ~/.bashrc, PATH
+# python python3916
+export PATH=/data1/www/htdocs/chenchen/python3916/bin:$PATH
+
+# 测试
+[chenchen@dev3_10.211.21.18 bin]$ ./python3 -v
+./python3: error while loading shared libraries: libpython3.9.so.1.0: cannot open shared object file: No such file or directory
+
+# 虚拟环境
+[chenchen@dev3_10.211.21.18 python3916]$ python3 -m venv /data1/www/htdocs/chenchen/python3916/venv/ai			(创建虚拟环境)
+[chenchen@dev3_10.211.21.18 python3916]$ . /data1/www/htdocs/chenchen/python3916/venv/ai/bin/activate			(激活虚拟环境)
+(venv) [chenchen@dev3_10.211.21.18 python3916]$ deactivate			(退出当前虚拟环境)
+
+(venv) [chenchen@dev3_10.211.21.18 python3916]$ python3 -V
+Python 3.9.16
+(venv) [chenchen@dev3_10.211.21.18 python3916]$ python3 -m pip list			(列出所有pip包)
+Package    Version
+---------- -------
+pip        22.0.4
+setuptools 58.1.0
+WARNING: You are using pip version 22.0.4; however, version 23.1.2 is available.
+You should consider upgrading via the '/data1/www/htdocs/chenchen/python3916/venv/bin/python3 -m pip install --upgrade pip' command.
+
+
+[chenchen@dev3_10.211.21.18 venv]$ python3 -m venv --help			(列出虚拟模块帮助)
+[chenchen@dev3_10.211.21.18 python3916]$ python3 -m venv --clear /data1/www/htdocs/chenchen/python3916/venv			(删除指定的虚拟环境目录)
+
+[chenchen@dev3_10.211.21.18 python3916]$ python3 -m venv /data1/www/htdocs/chenchen/python3916/venv/ai			(创建虚拟环境, 并指定目录)
+[chenchen@dev3_10.211.21.18 python3916]$ . /data1/www/htdocs/chenchen/python3916/venv/ai/bin/activate			(激活指定的虚拟环境)
+(ai) [chenchen@dev3_10.211.21.18 ai]$ python3 -m pip list			(列出所有pip包)
+Package    Version
+---------- -------
+pip        22.0.4
+setuptools 58.1.0
+WARNING: You are using pip version 22.0.4; however, version 23.1.2 is available.
+You should consider upgrading via the '/data1/www/htdocs/chenchen/python3916/venv/ai/bin/python3 -m pip install --upgrade pip' command.
+(ai) [chenchen@dev3_10.211.21.18 ai]$ python3 -m pip install --upgrade pip			(升级pip自身)
+Requirement already satisfied: pip in ./lib/python3.9/site-packages (22.0.4)
+Collecting pip
+  Downloading pip-23.1.2-py3-none-any.whl (2.1 MB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 2.1/2.1 MB 3.6 MB/s eta 0:00:00
+Installing collected packages: pip
+  Attempting uninstall: pip
+    Found existing installation: pip 22.0.4
+    Uninstalling pip-22.0.4:
+      Successfully uninstalled pip-22.0.4
+Successfully installed pip-23.1.2
+(ai) [chenchen@dev3_10.211.21.18 ai]$ python3 -m pip list			(列出所有pip包)
+Package    Version
+---------- -------
+pip        23.1.2
+setuptools 58.1.0
+(ai) [chenchen@dev3_10.211.21.18 ai]$ python3 -m pip --version			(列出pip包版本)
+pip 23.1.2 from /data1/www/htdocs/chenchen/python3916/venv/ai/lib/python3.9/site-packages/pip (python 3.9)
+(ai) [chenchen@dev3_10.211.21.18 ai]$ pip3 --version			(列出pip包版本)
+pip 23.1.2 from /data1/www/htdocs/chenchen/python3916/venv/ai/lib/python3.9/site-packages/pip (python 3.9)
+(ai) [chenchen@dev3_10.211.21.18 ai]$ pip3 -h			(列出pip包帮助)
+(ai) [chenchen@dev3_10.211.21.18 ai]$ pip3 -V			(列出pip包版本)
+pip 23.1.2 from /data1/www/htdocs/chenchen/python3916/venv/ai/lib/python3.9/site-packages/pip (python 3.9)
+(ai) [chenchen@dev3_10.211.21.18 ai]$ 
+(ai) [chenchen@dev3_10.211.21.18 ai]$ pip3 install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cpu			(安装pytorch)
+Looking in indexes: https://pypi.org/simple, https://download.pytorch.org/whl/cpu
+Collecting torch
+...
+Installing collected packages: mpmath, urllib3, typing-extensions, sympy, pillow, numpy, networkx, MarkupSafe, idna, filelock, charset-normalizer, certifi, requests, jinja2, torch, torchvision, torchaudio
+Successfully installed MarkupSafe-2.1.3 certifi-2023.5.7 charset-normalizer-3.1.0 filelock-3.12.2 idna-3.4 jinja2-3.1.2 mpmath-1.3.0 networkx-3.1 numpy-1.25.0 pillow-9.5.0 requests-2.31.0 sympy-1.12 torch-2.0.1+cpu torchaudio-2.0.2+cpu torchvision-0.15.2+cpu typing-extensions-4.6.3 urllib3-2.0.3
+(ai) [chenchen@dev3_10.211.21.18 ai]$ 
+(ai) [chenchen@dev3_10.211.21.18 ai]$ pip3 list -h			(pip list 帮助)
+(ai) [chenchen@dev3_10.211.21.18 ai]$ pip3 list --help
+(ai) [chenchen@dev3_10.211.21.18 ai]$ pip3 list         (列出已安装的软件包, 包括可编辑的软件包)
+Package            Version
+------------------ ----------
+certifi            2023.5.7
+charset-normalizer 3.1.0
+filelock           3.12.2
+idna               3.4
+Jinja2             3.1.2
+MarkupSafe         2.1.3
+mpmath             1.3.0
+networkx           3.1
+numpy              1.25.0
+Pillow             9.5.0
+pip                23.1.2
+requests           2.31.0
+setuptools         58.1.0
+sympy              1.12
+torch              2.0.1+cpu
+torchaudio         2.0.2+cpu
+torchvision        0.15.2+cpu
+typing_extensions  4.6.3
+urllib3            2.0.3
+(ai) [chenchen@dev3_10.211.21.18 ai]$ pip3 list -o      (列出过时的软件包)
+Package    Version Latest Type
+---------- ------- ------ -----
+setuptools 58.1.0  68.0.0 wheel
+(ai) [chenchen@dev3_10.211.21.18 ai]$ 
+(ai) [chenchen@dev3_10.211.21.18 ai]$ pip3 install -U setuptools			(升级 setuptools)
+...
+Successfully installed setuptools-68.0.0
+(ai) [chenchen@dev3_10.211.21.18 ai]$ pip3 list -o			(列出过时的软件包)
+
+# 问题:
+还是 OpenSSL 的问题, 按以下方式编译的 python3 并不支持 urllib3 v2.0, 使用 urllib3 需要 OpenSSL 1.1.1+ 具体解决参看本页 FAQ
+./configure --prefix=/data1/www/htdocs/chenchen/python3916 --enable-shared --enable-big-digits --with-system-ffi --with-openssl=/usr/
+
+重新配合和编译, --with-openssl=安装目录树, 参看 OpenSSL.md 文档
+./configure --prefix=/data1/www/htdocs/chenchen/python3916 --enable-shared --enable-big-digits --with-system-ffi --with-openssl=/data1/www/htdocs/chenchen/openssl111u
+
+./configure --prefix=/data1/www/htdocs/chenchen/python3916 --enable-shared --enable-big-digits --with-system-ffi --with-openssl=/data1/www/htdocs/chenchen/openssl311				(采用)
+
+./configure --prefix=/data1/www/htdocs/chenchen/python3916 --enable-shared --enable-big-digits --with-system-ffi --with-openssl=/data1/www/htdocs/chenchen/openssl311 --with-openssl-rpath=auto				(实验, 无效果)
+
+[chenchen@dev3_10.211.21.18 Python-3.9.16]$ make -j4
+[chenchen@dev3_10.211.21.18 Python-3.9.16]$ make test
+[chenchen@dev3_10.211.21.18 Python-3.9.16]$ sudo make install
+[chenchen@dev3_10.211.21.18 Python-3.9.16]$ python3 -V
+[chenchen@dev3_10.211.21.18 Python-3.9.16]$ . ~/.bashrc
+
+```
+
+### Python3.10.11 源码安装过程
+
+```sh
+[chenchen@dev3_10.211.21.18 python31011]$ wget https://www.python.org/ftp/python/3.10.11/Python-3.10.11.tgz
+[chenchen@dev3_10.211.21.18 python31011]$ md5sum Python-3.10.11.tgz
+7e25e2f158b1259e271a45a249cb24bb  Python-3.10.11.tgz
+[chenchen@dev3_10.211.21.18 python31011]$ tar zxvf Python-3.10.11.tgz -C ./
+
+./configure --prefix=/data1/www/htdocs/chenchen/python31011 --enable-shared --enable-big-digits --with-system-ffi --with-openssl=/data1/www/htdocs/chenchen/openssl311
+
+[chenchen@dev3_10.211.21.18 Python-3.10.11]$ make -j4
+[chenchen@dev3_10.211.21.18 Python-3.10.11]$ make test
+[chenchen@dev3_10.211.21.18 Python-3.10.11]$ vim ~/.bashrc
+# python python31011
+export PATH=/data1/www/htdocs/chenchen/python31011/bin:$PATH
+
+[chenchen@dev3_10.211.21.18 Python-3.10.11]$ python3 -V
+python3: error while loading shared libraries: libpython3.10.so.1.0: cannot open shared object file: No such file or directory
+[chenchen@dev3_10.211.21.18 Python-3.10.11]$ cd /etc/ld.so.conf.d/
+[chenchen@dev3_10.211.21.18 ld.so.conf.d]$ sudo cp python3916-htdocs-chenchen.conf python31011-htdocs-chenchen.conf
+[chenchen@dev3_10.211.21.18 ld.so.conf.d]$ sudo vim python31011-htdocs-chenchen.conf
+/data1/www/htdocs/chenchen/python31011/lib
+[chenchen@dev3_10.211.21.18 bin]$ sudo ldconfig
+[chenchen@dev3_10.211.21.18 bin]$ ldconfig -p
+[chenchen@dev3_10.211.21.18 bin]$ ldd python3
+        linux-vdso.so.1 =>  (0x00007ffc8a1b6000)
+        libpython3.10.so.1.0 => /data1/www/htdocs/chenchen/python31011/lib/libpython3.10.so.1.0 (0x00007fed98e6c000)
+[chenchen@dev3_10.211.21.18 python31011]$ python3 -V
+Python 3.10.11
+[chenchen@dev3_10.211.21.18 python31011]$ python3 -m venv /data1/www/htdocs/chenchen/python31011/venv/ai
+[chenchen@dev3_10.211.21.18 python31011]$ . /data1/www/htdocs/chenchen/python31011/venv/ai/bin/activate
+(ai) [chenchen@dev3_10.211.21.18 python31011]$ pip list -o
+(ai) [chenchen@dev3_10.211.21.18 python31011]$ pip install -U pip
+(ai) [chenchen@dev3_10.211.21.18 python31011]$ pip install -U setuptools
+(ai) [chenchen@dev3_10.211.21.18 python31011]$ pip list -o
+
+```
+
+### urllib, urllib2, urllib3
+
+```sh
+# 1. urllib, urllib2
+在 Python2 中主要为 urllib 和 urllib2, 在 Python3 中整合成了 urllib, 为官方内置模块, 不用安装, 可以直接使用, 和一般的导包不同, 必须按照指定方法导包.
+
+urllib 是一个收集了多个(4个)用到 URL 的模块包:
+urllib.request - 打开和读取 URL
+urllib.error - 包含 urllib.request 抛出的异常
+urllib.parse - 用于解析 URL
+urllib.robotparser - 用于解析 robots.txt 文件
+参考: https://zhuanlan.zhihu.com/p/543133759
+
+https 用到证书使用 Python3 内置 ssl 模块, 和 urllib 一样不需要安装, 仅需要 import 导入, 并且增加一行设置证书: 
+ssl._create_default_https_context = ssl._create_unverified_context			# https 证书相关
+
+# 2. urllib3
+urllib3 是独立的第三方包, 需要 pip install urllib3 来特别安装.
+https 用到证书也需要安装 certifi 模块, pip install certifi
+```
+
+### urllib, ssl
+
+```python
+#! /usr/bin/env python
+# -*- coding:UTF-8 -*-
+
+import urllib.request
+import ssl		# https 证书相关
+
+ssl._create_default_https_context = ssl._create_unverified_context			# https 证书相关
+response = urllib.request.urlopen('https://www.google.com')
+# response = urllib.request.urlopen('https://saga.sports.sina.com.cn/api/data/player_litse?player=6841&dpc=1')
+print(response.status)
+print(response.getheaders())
+
+返回:
+(ai) [chenchen@dev3_10.211.21.18 aiworkspacepython31011]$ ./uull.py 
+200
+[('Date', 'Wed, 28 Jun 2023 04:53:35 GMT'), ('Expires', '-1'), ('Cache-Control', 'private, max-age=0'), ('Content-Type', 'text/html; charset=Big5'), ('Content-Security-Policy-Report-Only', "object-src 'none';base-uri 'self';script-src 'nonce-2bSUqXrt9s4NmVsGW8z9CQ' 'strict-dynamic' 'report-sample' 'unsafe-eval' 'unsafe-inline' https: http:;report-uri https://csp.withgoogle.com/csp/gws/other-hp"), ('P3P', 'CP="This is not a P3P policy! See g.co/p3phelp for more info."'), ('Server', 'gws'), ('X-XSS-Protection', '0'), ('X-Frame-Options', 'SAMEORIGIN'), ('Set-Cookie', '1P_JAR=2023-06-28-04; expires=Fri, 28-Jul-2023 04:53:35 GMT; path=/; domain=.google.com.hk; Secure'), ('Set-Cookie', 'AEC=AUEFqZfawef03ihejR2o0vy6lI89Q9ggKEYg-o5yRrzXqDAWH7HuT-X1HQ; expires=Mon, 25-Dec-2023 04:53:35 GMT; path=/; domain=.google.com.hk; Secure; HttpOnly; SameSite=lax'), ('Set-Cookie', 'NID=511=eloluMnzGDg65zmKh488BMGX2C0Fs2z41IF5C43wQLSEGfZE-BRfIjKvnAiV3Qj25Ld8mYBceeQNOjWACe3qKsiW1uzgqddotjbxDoghzhctHsxWWeCIeAtqQ40FCzOV8hXec6BhOPyqaQI3R-6A1WN4u1jL_ZJtWt5qBN2w50U; expires=Thu, 28-Dec-2023 04:53:35 GMT; path=/; domain=.google.com.hk; HttpOnly'), ('Alt-Svc', 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000'), ('Accept-Ranges', 'none'), ('Vary', 'Accept-Encoding'), ('Connection', 'close'), ('Transfer-Encoding', 'chunked')]
+
+```
+
+### urllib3, ssl
+
+```python
+#! /usr/bin/env python
+# -*- coding:UTF-8 -*-
+
+# https://urllib3.readthedocs.io/en/latest/user-guide.html
+
+import ssl
+import certifi
+import urllib3
+import json
+import time
+import random
+
+
+def main():
+    print(certifi.where())
+    cdt()
+
+def req():
+    url = 'https://saga.sports.sina.com.cn/api/data/player_litse?player=6841&dpc=1'
+    resp = urllib3.request("GET", "https://saga.sports.sina.com.cn/api/data/player_litse?player=6841&dpc=1")
+    resp.status
+    200
+    resp.data
+    b"User-agent: *\nDisallow: /deny\n"
+
+def cdt():
+    # Creating a PoolManager instance for sending requests.
+    # 两种解决证书方式, 1. CERT_NONE; 2. CERT_REQUIRED; 方式2更好(采用), 方式1是忽略证书
+    # http = urllib3.PoolManager(cert_reqs = "CERT_NONE")               # 方式1, 会报 warnings
+   
+    http = urllib3.PoolManager(                                                                 # 方式2
+        cert_reqs="CERT_REQUIRED",
+        ca_certs=certifi.where()
+    )
+
+    # Sending a GET request and getting back response as HTTPResponse object.
+    url = 'https://saga.sports.sina.com.cn/api/data/player_litse?player=6841&dpc=1'
+    resp = http.request('GET', url, timeout=urllib3.Timeout(connect = 1.0, read = 2.0))
+    # resp = http.request('GET', url, context=ssl.create_default_context(cafile=certifi.where()))
+    # resp = http.request('GET', url, verify=False)
+    # resp = http.request('GET', url, verify='/home/chenchen/tmp/venv/python39/grpc02/lib/python3.9/site-packages/certifi/cacert.pem')
+
+    # Print the returned data.
+    print(resp.data)
+    # b"User-agent: *\nDisallow: /deny\n"
+
+if __name__ == '__main__':
+    main()
+```
+
+### pkg-config, LD_LIBRARY_PATH
+
+```sh
+pkg-config 是一个 Linux 下的命令, 用于获得某一个库/模块的所有编译相关的信息, 使用这个工具, 我们可以很方便地编译一个项目.
+
+参考: https://www.cnblogs.com/yxyx213/articles/2451073.html
+
+编译和连接
+        一般来说，如果库的头文件不在 /usr/include 目录中，那么在编译的时候需要用 -I 参数指定其路径。由于同一个库在不同系统上可能位于不同的目录下，用户安装库的时候也可以将库安装在不同的目录下，所以即使使用同一个库，由于库的路径的 不同，造成了用 -I 参数指定的头文件的路径也可能不同，其结果就是造成了编译命令界面的不统一。如果使用 -L 参数，也会造成连接界面的不统一。编译和连接界面不统一会为库的使用带来麻烦。
+       为了解决编译和连接界面不统一的问题，人们找到了一些解决办法。其基本思想就是：事先把库的位置信息等保存起来，需要的时候再通过特定的工具将其中有用的 信息提取出来供编译和连接使用。这样，就可以做到编译和连接界面的一致性。其中，目前最为常用的库信息提取工具就是下面介绍的 pkg-config。
+pkg-config 是通过库提供的一个 .pc 文件获得库的各种必要信息的，包括版本信息、编译和连接需要的参数等。这些信息可以通过 pkg-config 提供的参数单独提取出来直接供编译器和连接器使用.
+
+运行时
+        库文件在连接（静态库和共享库）和运行（仅限于使用共享库的程序）时被使用，其搜索路径是在系统中进行设置的。一般 Linux 系统把 /lib 和 /usr/lib 两个目录作为默认的库搜索路径，所以使用这两个目录中的库时不需要进行设置搜索路径即可直接使用。对于处于默认库搜索路径之外的库，需要将库的位置添加到 库的搜索路径之中。设置库文件的搜索路径有下列两种方式，可任选其一使用：
+
+在环境变量 LD_LIBRARY_PATH 中指明库的搜索路径。在 /etc/ld.so.conf 文件中添加库的搜索路径。         将自己可能存放库文件的路径都加入到/etc/ld.so.conf中是明智的选择 ^_^
+```
+
+
+
+### FAQ
+
+```sh
+问题:
+(ai) [chenchen@dev3_10.211.21.18 ai]$ ./test.py 
+Traceback (most recent call last):
+  File "/data1/www/htdocs/chenchen/python3916/workspace/ai/./test.py", line 8, in <module>
+    import urllib3
+  File "/data1/www/htdocs/chenchen/python3916/venv/ai/lib/python3.9/site-packages/urllib3/__init__.py", line 41, in <module>
+    raise ImportError(
+ImportError: urllib3 v2.0 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'OpenSSL 1.0.2k-fips  26 Jan 2017'. See: https://github.com/urllib3/urllib3/issues/2168
+
+make test 时错误:
+0:00:24 load avg: 4.02 [ 72/425/1] test_urllib2net failed (2 errors)
+test test_urllib2net failed -- multiple errors occurred; run in verbose mode for details
+
+0:01:04 load avg: 4.34 [161/425/2] test_urllib failed (2 failures)
+test test_urllib failed -- multiple errors occurred; run in verbose mode for details
+
+0:04:48 load avg: 7.99 [372/425/3] test_urllib2 failed (5 failures) -- running: test_concurrent_futures (40.1 sec), test_subprocess (31.0 sec)
+test test_urllib2 failed -- multiple errors occurred; run in verbose mode for details
+
+
+原因:
+10.211.21.18 系统上 OpenSSL 版本是 1.0.2k-fips, 太低, urllib3 v2.0 需要 OpenSSL 1.1.1+ 以上
+
+解决:
+在 /data1/www/htdocs/chenchen/ 目录下安装独立高版本 OpenSSL, 并且要保证和系统 OpenSSL 不冲突, 不影响现有系统环境.
+
+
+
+```
 
 
 
@@ -1075,3 +2032,7 @@ https://devguide.python.org/setup/#linux
 https://vault.centos.org/7.7.1908/os/x86_64/Packages/
 
 https://www.tensorflow.org/install
+
+https://blog.csdn.net/sweetfather/article/details/79625482
+
+https://zhuanlan.zhihu.com/p/578577985

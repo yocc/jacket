@@ -6,6 +6,10 @@
 
 ## Overviews
 
+```sh
+$ npm install axios
+```
+
 
 
 

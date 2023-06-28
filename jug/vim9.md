@@ -170,7 +170,7 @@ vim 插件 (plugins) 安装之前要先安装插件管理器 (package managers),
 
    ```shell
    * Vim 8 packages
-       * git clone https://github.com/fatih/vim-go.git ~/.vim/pack/plugins/start/vim-go
+       $ git clone https://github.com/fatih/vim-go.git ~/.vim/pack/plugins/start/vim-go
    ```
 
    > ⚠️

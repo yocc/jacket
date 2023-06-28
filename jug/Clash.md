@@ -10,6 +10,19 @@
 
 在 CentOS7 上安装 Clash, 并通过命令行使用.
 
+> yocc@yoccdeMacBook-Pro Downloads % rsync -avzP clash-linux-amd64-v1.16.0.gz 10.211.21.18::chenchen/ --port=8873
+
+```sh
+[MAC]
+yocc@yoccdeMacBook-Pro Downloads % rsync -avzP clash-linux-amd64-v1.16.0.gz 10.211.21.18::chenchen/ --port=8873
+
+[10.211.21.18]
+[chenchen@dev3_10.211.21.18 clash]$ cp /data1/rsync/chenchen/clash-linux-amd64-v1.16.0.gz ./
+
+```
+
+
+
 ### Clash 安装
 
 ```shell
@@ -22,6 +35,8 @@ https://github.com/Dreamacro/clash/releases/download/v1.11.8/clash-linux-amd64-v
 2. 解压缩
 [tar -zxvf clash-linux-amd64-v1.13.0.gz -C ./][不是tar包, 不能这么用]
 gzip -d clash-linux-amd64-v1.13.0.gz, 解压后就一个文件 clash-linux-amd64-v1.13.0, 直接改为 clash
+gzip -dc clash-linux-amd64-v1.13.0.gz > gzip -d clash-linux-amd64-v1.13.0, 保留原文件
+
 2.1. 获得 clash 应用程序
 直接解压解包, 就一个文件, 直接修改 clash-linux-amd64-v1.11.8 名字为 clash, chmod 755
 直接 ./clash -v, 看看是不是正常

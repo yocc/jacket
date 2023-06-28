@@ -406,7 +406,7 @@ field_names = tuple(field_names)
 
 ```
 
-
+> rsync -avzP clash-linux-amd64-v1.13.0.gz 10.211.21.18::chenchen/ --port=8873
 
 ## See Also
 

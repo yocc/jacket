@@ -75,7 +75,17 @@ Every Unix system has its own set of default locations for shared libraries, suc
 OpenSSL 1.1.1m  14 Dec 2021
 ```
 
+```sh
 
+[chenchen@dev3_10.211.21.18 ld.so.conf.d]$ openssl version -a
+OpenSSL 1.0.2k-fips  26 Jan 2017
+built on: reproducible build, date unspecified
+platform: linux-x86_64
+options:  bn(64,64) md2(int) rc4(16x,int) des(idx,cisc,16,int) idea(int) blowfish(idx) 
+compiler: gcc -I. -I.. -I../include  -fPIC -DOPENSSL_PIC -DZLIB -DOPENSSL_THREADS -D_REENTRANT -DDSO_DLFCN -DHAVE_DLFCN_H -DKRB5_MIT -m64 -DL_ENDIAN -Wall -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fexceptions -fstack-protector-strong --param=ssp-buffer-size=4 -grecord-gcc-switches   -m64 -mtune=generic -Wa,--noexecstack -DPURIFY -DOPENSSL_IA32_SSE2 -DOPENSSL_BN_ASM_MONT -DOPENSSL_BN_ASM_MONT5 -DOPENSSL_BN_ASM_GF2m -DRC4_ASM -DSHA1_ASM -DSHA256_ASM -DSHA512_ASM -DMD5_ASM -DAES_ASM -DVPAES_ASM -DBSAES_ASM -DWHIRLPOOL_ASM -DGHASH_ASM -DECP_NISTZ256_ASM
+OPENSSLDIR: "/etc/pki/tls"
+engines:  dynamic 
+```
 
 ## 本体目录说明
 
@@ -153,6 +163,170 @@ $ make -j8
 $ make altinstall
 
 4. 注意 OpenSSL 的修补程序版本具有向后兼容的 ABI. 你不需要重新编译 Python 来更新 OpenSSL. 将自定义 OpenSSL 安装替换为较新版本就足够了.
+```
+
+## openss-l.1.1.1u
+
+```sh
+[chenchen@dev3_10.211.21.18 openssl111u]$ pwd
+/usr/home/chenchen/htdocs/openssl111u
+[chenchen@dev3_10.211.21.18 clash]$ sudo ./clash -d ./
+[chenchen@dev3_10.211.21.18 openssl111u]$ wget https://github.com/openssl/openssl/releases/download/OpenSSL_1_1_1u/openssl-1.1.1u.tar.gz
+[chenchen@dev3_10.211.21.18 openssl111u]$ tar zxvf openssl-1.1.1u.tar.gz -C ./
+
+# 自定义安装规划
+# 同一系统并且同一环境下, 安装多个 OpenSSL, 个版本的共享库会冲突, 避免冲突需要 no-shared 参数.
+$ ./config no-shared --prefix=/usr/home/chenchen/htdocs/openssl111u --openssldir=/usr/home/chenchen/htdocs/openssl111u/ssl --libdir=/usr/home/chenchen/htdocs/openssl111u/lib
+
+--prefix=DIR      安装目录树(installation directory tree)的顶部. 默认值为: /usr/local
+                  (/data1/www/htdocs/chenchen/openssl111u)
+--openssldir=DIR  OpenSSL 配置文件的目录, 以及默认证书和密钥存储. 默认值为: /usr/local/ssl
+                  (/data1/www/htdocs/chenchen/openssl111u/ssl)                  
+--libdir=DIR      安装目录树(installation directory tree)的顶部下的目录名称(请参阅 --prefix 选项), 其中将安装库. 默认情况下, 这是 "lib".
+                  (/data1/www/htdocs/chenchen/openssl111u/lib)
+
+installation directory tree/      => --prefix=DIR       => --prefix=/data1/www/htdocs/chenchen/openssl111u          => 顶部安装目录
+
+installation directory tree/ssl   => --openssldir=DIR   => --openssldir=/data1/www/htdocs/chenchen/openssl111u/ssl  => 配置文件, 证书, 密钥, *权限
+
+installation directory tree/lib   => --libdir=DIR       => --libdir=/data1/www/htdocs/chenchen/openssl111u/lib      => 库
+
+
+# Unix 安装后目录结果说明:
+bin/            包含 openssl 二进制文件和其他一些实用程序脚本. (由 --prefix=DIR 控制)
+include/openssl 包含想要构建自己的使用 libcrypto 或 libssl 的程序所需的头文件. (--prefix=DIR)
+
+lib             包含 OpenSSL 库文件 (--libdir=DIR)
+lib/engines     包含 OpenSSL 动态可加载引擎 (--libdir=DIR)
+
+ssl/            OpenSSL 配置文件的目录, 以及默认证书和密钥存储. (--openssldir=DIR )
+
+share/man/man1 包含 OpenSSL 命令行手册页 (--prefix=DIR)
+share/man/man3 包含 OpenSSL 库调用手册页 (--prefix=DIR)
+share/man/man5 包含 OpenSSL 配置格式手册页 (--prefix=DIR)
+share/man/man7 包含 OpenSSL 其他杂项手册页 (--prefix=DIR)
+
+share/doc/openssl/html/man1 (--prefix=DIR)
+share/doc/openssl/html/man3 (--prefix=DIR)
+share/doc/openssl/html/man5 (--prefix=DIR)
+share/doc/openssl/html/man7 包含手册页的 HTML 格式副本  (--prefix=DIR)
+
+查看 make 的结果
+$ ./configdata.pm --help
+
+[chenchen@dev3_10.211.21.18 openssl-1.1.1u]$ pwd
+/usr/home/chenchen/htdocs/openssl111u/openssl-1.1.1u
+[chenchen@dev3_10.211.21.18 openssl-1.1.1u]$ ./config no-shared --prefix=/usr/home/chenchen/htdocs/openssl111u --openssldir=/usr/home/chenchen/htdocs/openssl111u/ssl --libdir=/usr/home/chenchen/htdocs/openssl111u/lib
+Operating system: x86_64-whatever-linux2
+Configuring OpenSSL version 1.1.1u (0x1010115fL) for linux-x86_64
+Using os-specific seed configuration
+Creating configdata.pm
+Creating Makefile
+
+**********************************************************************
+***                                                                ***
+***   OpenSSL has been successfully configured                     ***
+***                                                                ***
+***   If you encounter a problem while building, please open an    ***
+***   issue on GitHub <https://github.com/openssl/openssl/issues>  ***
+***   and include the output from the following command:           ***
+***                                                                ***
+***       perl configdata.pm --dump                                ***
+***                                                                ***
+***   (If you are new to OpenSSL, you might want to consult the    ***
+***   'Troubleshooting' section in the INSTALL file first)         ***
+***                                                                ***
+**********************************************************************
+[chenchen@dev3_10.211.21.18 openssl-1.1.1u]$ 
+
+[chenchen@dev3_10.211.21.18 openssl-1.1.1u]$ make
+[chenchen@dev3_10.211.21.18 openssl-1.1.1u]$ make test
+make depend && make _tests
+...
+[chenchen@dev3_10.211.21.18 openssl-1.1.1u]$ make install
+
+# Note
+1. no-shared 问题:
+默认是 shared, 支持共享库. 共享库由于是共享的, 所以在同一个系统并且同一环境下, 只能共享一个库. 此时如果有不同的程序需要使用不同版本的 OpenSSL 时, 就会出问题. 
+具体表现是, bin/openssl version -a, 会返回与 bin/openssl 本身不同的 OPENSSLDIR 和 ENGINESDIR 等.
+解决办法:
+采用非共享库安装各自的 OpenSSL. 安装后通过 bin/openssl version -a 检查, 应该返回各自的独立的内容. 而不是返回 OPENSSLDIR 相同的内容.
+
+2. --prefix=DIR, --openssldir=DIR, --libdir=DIR 问题:
+看本块前面部分, 有详细说明, 结论是: 这三个参数确实有效果, 如有问题一定是自己的问题.
+
+3. perl-Test-Simple 问题:
+在 make test 时返回 Dubious, test returned 2 (wstat 512, 0x200) No subtests run 大量错误, 并且测试失败. 这是因为测试使用的是 perl 脚本, 需要对应的 perl 模块支持. 缺少模块. 直接 yum 安装.
+sudo yum -y install perl-Test-Simple
+满足 make test, 需要安装以下模块.
+yum install -y gcc pam-devel zlib-devel perl expat-devel perl-Time-HiRes perl-Test-Harness perl-Test-Simple
+主要是 perl 相关的几个: 
+expat-devel
+perl
+perl-Time-HiRes
+perl-Test-Harness
+perl-Test-Simple
+查看:
+rpm -qa | grep perl
+rpm -ql perlxxx
+
+4. LD_LIBRARY_PATH 问题:
+# 当修改完 ~/.bashrc 环境变量后, ./openssl version -a, 返回的是正常预期的 openssldir 和 libdir了
+vim ~/.bashrc
+#export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/openssl111m/lib  #.so file path
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/home/chenchen/htdocs/openssl111u/lib  #.so file path
+以上方法仅是在环境变量层面控制共享库位置, 并且还没有用系统 /etc/ld.so.conf 控制, 但这种方法仅能在同一个环境下控制一个 OpenSSL, 如果多个版本就不行了.
+那么问题来了, 如何在一个环境下共存多个 OpenSSL. (只能采用非共享库方式安装了)
+当环境变量有多个设置时, 优先前面的. 也就是说, 一个环境变量仅对应一个lib指定(优先遇到的, 起效openssl111u, 而不是 openssl111m). 
+LD_LIBRARY_PATH=:/usr/home/chenchen/htdocs/openssl111u/lib:/usr/local/openssl111m/lib
+```
+
+## openssl-3.1.1
+
+```sh
+[chenchen@dev3_10.211.21.18 openssl-3.1.1]$ pwd
+/usr/home/chenchen/htdocs/openssl311/openssl-3.1.1
+[chenchen@dev3_10.211.21.18 openssl-3.1.1]$ wget https://github.com/openssl/openssl/releases/download/openssl-3.1.1/openssl-3.1.1.tar.gz
+[chenchen@dev3_10.211.21.18 openssl-3.1.1]$ tar zxvf openssl-3.1.1.tar.gz -C ./
+
+./Configure no-shared --prefix=/usr/home/chenchen/htdocs/openssl311 --openssldir=/usr/home/chenchen/htdocs/openssl311/ssl --libdir=/usr/home/chenchen/htdocs/openssl311/lib				(采用)
+
+# 问题出现:
+[chenchen@dev3_10.211.21.18 openssl-3.1.1]$ ./Configure no-shared --prefix=/usr/home/chenchen/htdocs/openssl311 --openssldir=/usr/home/chenchen/htdocs/openssl311/ssl --libdir=/usr/home/chenchen/htdocs/openssl311/lib
+Can't locate IPC/Cmd.pm in @INC (@INC contains: /data1/www/htdocs/chenchen/openssl311/openssl-3.1.1/util/perl /usr/local/lib64/perl5 /usr/local/share/perl5 /usr/lib64/perl5/vendor_perl /usr/share/perl5/vendor_perl /usr/lib64/perl5 /usr/share/perl5 . /data1/www/htdocs/chenchen/openssl311/openssl-3.1.1/external/perl/Text-Template-1.56/lib) at /data1/www/htdocs/chenchen/openssl311/openssl-3.1.1/util/perl/OpenSSL/config.pm line 19.
+BEGIN failed--compilation aborted at /data1/www/htdocs/chenchen/openssl311/openssl-3.1.1/util/perl/OpenSSL/config.pm line 19.
+Compilation failed in require at ./Configure line 23.
+BEGIN failed--compilation aborted at ./Configure line 23.
+[chenchen@dev3_10.211.21.18 openssl-3.1.1]$ sudo yum -y install perl-IPC-Cmd		(解决)
+
+[chenchen@dev3_10.211.21.18 openssl-3.1.1]$ ./Configure no-shared --prefix=/usr/home/chenchen/htdocs/openssl311 --openssldir=/usr/home/chenchen/htdocs/openssl311/ssl --libdir=/usr/home/chenchen/htdocs/openssl311/lib
+Configuring OpenSSL version 3.1.1 for target linux-x86_64
+Using os-specific seed configuration
+Created configdata.pm
+Running configdata.pm
+Created Makefile.in
+Created Makefile
+Created include/openssl/configuration.h
+
+**********************************************************************
+***                                                                ***
+***   OpenSSL has been successfully configured                     ***
+***                                                                ***
+***   If you encounter a problem while building, please open an    ***
+***   issue on GitHub <https://github.com/openssl/openssl/issues>  ***
+***   and include the output from the following command:           ***
+***                                                                ***
+***       perl configdata.pm --dump                                ***
+***                                                                ***
+***   (If you are new to OpenSSL, you might want to consult the    ***
+***   'Troubleshooting' section in the INSTALL.md file first)      ***
+***                                                                ***
+**********************************************************************
+[chenchen@dev3_10.211.21.18 openssl-3.1.1]$ 
+
+[chenchen@dev3_10.211.21.18 openssl-3.1.1]$ make -j4
+[chenchen@dev3_10.211.21.18 openssl-3.1.1]$ make test
+[chenchen@dev3_10.211.21.18 openssl-3.1.1]$ make install
 ```
 
 
@@ -404,7 +578,7 @@ Created include/openssl/configuration.h
 **********************************************************************
 [chenchen@grpc01 openssl-3.0.4]$ make
 [chenchen@grpc01 openssl-3.0.4]$ make test
-[chenchen@grpc01 openssl-3.0.4]$ sudo make install
+[chenchen@grpc01 openssl-3.0.4]$ sudo make install			(sudo)
 [chenchen@grpc01 openssl-3.0.4]$ make clean
 
 
@@ -414,6 +588,46 @@ Created include/openssl/configuration.h
 ```
 
 
+
+```sh
+网文: https://www.jianshu.com/p/092c060510e4?utm_campaign=maleskine&utm_content=note&utm_medium=seo_notes&utm_source=recommendation
+
+升级openssl版本
+1 简介
+根据安全扫描结果，由于自带的opensl的版本存在漏洞，所以需要升级openssl版本。但是由于机器数量过多。并且有些机器可以连接外网，有些机器是存内网的状态，所以提供一些两种方法进行升级。
+
+系统版本：centos7.2
+
+2 方法一（rpm包安装）
+1、去网站下载rpm的安装包。网站地址如下 https://pkgs.org/download/openssl
+2、按照你的系统版本选择要下载的rpm包
+OpenSSL 1.0.2k-16.el7.x86_64.rpm
+3、下载相应的依赖包
+因为openssl依赖openssl-devel和openssl-libs两个包，所以也要下载相应的包。
+4、上传到服务器上，并且安装(root权限)
+# rpm -ivh openssl-libs-1.0.2k-16.el7.x86_64.rpm --force --nodeps
+# rpm -ivh openssl-devel-1.0.2k-16.el7.x86_64.rpm --force --nodeps
+# rpm -ivh openssl-1.0.2k-16.el7.x86_64.rpm --force --nodeps
+命令解释:
+--nodeps就是安装时不检查依赖关系，比如你这个rpm需要A，但是你没装A，这样你的包就装不上，用了--nodeps你就能装上了。
+--force就是强制安装，比如你装过这个rpm的版本1，如果你想装这个rpm的版本2，就需要用--force强制安装
+4、验证
+# openssl version
+OpenSSL 1.0.2k-fips 26 Jan 2017
+
+3 方法二（yum update）
+此方法方便简单，但是无法升级到指定的版本。
+1、查看openssl版本
+# openssl version
+OpenSSL 1.0.1e-fips 11 Feb 2013
+2、把包信息下载到本地电脑缓存
+# yum makecache
+3、升级openssl
+# yum update openssl
+4、验证升级结果
+# openssl version
+OpenSSL 1.0.2k-fips 26 Jan 2017
+```
 
 
 

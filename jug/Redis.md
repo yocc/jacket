@@ -1949,6 +1949,10 @@ rdb-save-incremental-fsync yes
 
 
 
+## 事物
+
+https://blog.csdn.net/wohu1104/article/details/122115542
+
 
 
 

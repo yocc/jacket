@@ -24,7 +24,7 @@
 	>
 	> ​		 安装的目标目录结构是 /usr/local/go/bin, 而不是 /usr/local/go/go/bin
 	
-2. 将 /usr/local/go/bin 添加到 PATH 环境变量中.
+2. 将 /usr/local/go/bin 添加到 PATH 环境变量中. (go本体)
     您可以通过将以下行添加到您的 $HOME/.bashrc 或 /etc/bashrc  (用于系统范围的安装) 来做到这一点:
 
   ```shell
