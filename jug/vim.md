@@ -150,6 +150,56 @@ Golang 需要 vim 8+, 但 CentOS 7 的 yum 是 vim 7+, 需要更高版本
       # 在 vim 运行中, :scriptnames 查看插件和插件加载顺序
       
       ```
+      
+      3. 安装 python-mode, vim 插件
+      
+      ```sh
+      # vim 插件安装本质上是拷贝代码到 ~/.vim/ 目录下. 这个本质和目录规范遵循 vim‘s package 管理协议
+      # python-mode, https://github.com/python-mode/python-mode
+      cd ~/.vim/pack/python-mode/start
+      git clone --recurse-submodules https://github.com/python-mode/python-mode.git
+      cd python-mode
+      
+      # 配置本插件的帮助文件, :helptags (都是插件的 doc 目录)
+      :helptags ~/.vim/pack/python-mode/start/python-mode/doc
+      然后
+      :help pymode	# 有响应
+      ```
+      
+      3. python3 支持
+      
+      ```sh
+      # vim 8.2 (version 8.2.3582) 源码位置, /usr/home/chenchen/htdocs/tmp/vim
+      # vim 8.2 安装目标目录, /data1/www/htdocs/chenchen/vim8
+      # 由 --prefix=/data1/www/htdocs/chenchen/vim8 指定
+      
+      [chenchen@localhost ~]$ cd vim
+      [chenchen@localhost vim]$ make distclean			# 清除 configure
+      [chenchen@localhost vim]$ ./configure --help
+      
+      [chenchen@localhost vim]$ ./configure --prefix=/data1/www/htdocs/chenchen/vim8 --with-features=huge --enable-python3interp=yes --with-python3-command=/data1/www/htdocs/chenchen/python31011/bin/python3 --with-python3-config-dir=/usr/home/chenchen/htdocs/python31011/Python-3.10.11
+      [chenchen@localhost vim]$ make
+      [chenchen@localhost vim]$ sudo make install
+      
+      $ make distclean, 类似 make clean, 但同时也将 configure 生成的文件全部删除掉, 包括 Makefile.
+      $ make clean, 清除上次的 make 命令所产生的 object 文件(后缀为 ".o" 的文件)及可执行文件.
+      
+      ‼️ --with-python3-config-dir=/usr/home/chenchen/htdocs/python31011/Python-3.10.11, 这里的配置目录是源码安装时的python源码解压缩包里的 python-config 文件所在目录(不包含 python-config 文件本身), 因为在 vim ./configure 时提示, 找的是 --with-python3-config-dir=/usr/home/chenchen/htdocs/python31011/Python-3.10.11/里面的 Makefile 文件, 即 /usr/home/chenchen/htdocs/python31011/Python-3.10.11/Makefile, ♥️幸好当初安装 python 时留着源码没删. 要不就找不到 Makefile 文件了.
+      另外还有如下一些配置选项, 相对简单, 
+      --with-features=huge, 感觉可有可无, 因为 ./configure --help 里默认是 huge;
+      --enable-python3interp=yes, 必须要有, 开启 python3 的 interpreter, 默认是 no, 所以要显式开启.
+      --with-python3-command=/data1/www/htdocs/chenchen/python31011/bin/python3, 我理解应该要有, 显式指明 python3 命令本体的位置.
+      
+      # 检查是否 python-mode 安装成功
+      打开 .py 文件, 风格变了, 同时 :help pymode 也有响应.
+      ```
+      
+      ```sh
+      PymodeLint					# 标出错误
+      :PymodeLintAuto			# 自动修复
+      ```
+      
+      
 
 
 
@@ -405,10 +455,23 @@ $ vim -u NONE -c "helptags ~/.vim/pack/vendor/start/nerdtree/doc" -c q			# 设�
 
 3. 终端软件设置字体
 
+### indentLine
+
+```sh
+# https://github.com/Yggdroot/indentLine
+$ git clone https://github.com/Yggdroot/indentLine.git ~/.vim/pack/vendor/start/indentLine
+:helptags ~/.vim/pack/vendor/start/indentLine/doc
+
+# ~/.vimrc 配置内容
+" vim-indentline
+let g:indentLine_color_term = 239 	"对齐线颜色
+```
+
 ### Vim 使用
 
 - `tmux`
 - `:terminal`, `:term`
+- `:!python3 %`
 - buffer, window, tab, `:help window`
   - A buffer is the in-memory text of a file. 载入到内存的文件内容
   - A window is a viewport on a buffer. 显示 buffer 内容, 和布局

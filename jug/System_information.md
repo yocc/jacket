@@ -30,6 +30,7 @@ CentOS Linux release 7.3.1611 (Core)
 ```
 
 ```shell
+# 打印当前系统相关信息(内核版本号、硬件架构、主机名称和操作系统类型等)
 [chenchen@dev3_10.211.21.18 ~]$ uname -a
 Linux dev5 3.10.0-514.el7.x86_64 #1 SMP Tue Nov 22 16:42:41 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
 [chenchen@localhost ~]$ uname -r		// 查看内核版本
@@ -49,6 +50,7 @@ GNU/Linux     操作系统
 ```
 
 ```shell
+# 查看当前系统的发行版信息
 [chenchen@localhost ~]$ lsb_release -a
 sudo: lsb_release: command not found
 [chenchen@localhost ~]$ sudo yum install -y redhat-lsb

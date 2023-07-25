@@ -48,6 +48,27 @@ a.txt
 a.txt exist
 ```
 
+crontab, 小于粒度1秒
+
+```sh
+# 格式:
+* * * * * sleep 5  && /解析器/php /data1/www/htdocs/脚本.php > /data1/www/applogs/日日志.log 2>&1
+
+## 女足世界杯, nami match 刷到 livcast match 直播大厅
+* * * * *             /usr/local/sinasrv5/bin/php /data1/www/htdocs/ore.sports.sina.com.cn/system/match/nmaz.livecast.update.php > /data1/www/applogs/ore.sports.sina.com.cn/nmaz.livecast.update.cron.log 2>&1
+* * * * * sleep 5  && /usr/local/sinasrv5/bin/php /data1/www/htdocs/ore.sports.sina.com.cn/system/match/nmaz.livecast.update.php > /data1/www/applogs/ore.sports.sina.com.cn/nmaz.livecast.update.cron.log 2>&1
+* * * * * sleep 10 && /usr/local/sinasrv5/bin/php /data1/www/htdocs/ore.sports.sina.com.cn/system/match/nmaz.livecast.update.php > /data1/www/applogs/ore.sports.sina.com.cn/nmaz.livecast.update.cron.log 2>&1
+* * * * * sleep 15 && /usr/local/sinasrv5/bin/php /data1/www/htdocs/ore.sports.sina.com.cn/system/match/nmaz.livecast.update.php > /data1/www/applogs/ore.sports.sina.com.cn/nmaz.livecast.update.cron.log 2>&1
+* * * * * sleep 20 && /usr/local/sinasrv5/bin/php /data1/www/htdocs/ore.sports.sina.com.cn/system/match/nmaz.livecast.update.php > /data1/www/applogs/ore.sports.sina.com.cn/nmaz.livecast.update.cron.log 2>&1
+* * * * * sleep 25 && /usr/local/sinasrv5/bin/php /data1/www/htdocs/ore.sports.sina.com.cn/system/match/nmaz.livecast.update.php > /data1/www/applogs/ore.sports.sina.com.cn/nmaz.livecast.update.cron.log 2>&1
+* * * * * sleep 30 && /usr/local/sinasrv5/bin/php /data1/www/htdocs/ore.sports.sina.com.cn/system/match/nmaz.livecast.update.php > /data1/www/applogs/ore.sports.sina.com.cn/nmaz.livecast.update.cron.log 2>&1
+* * * * * sleep 35 && /usr/local/sinasrv5/bin/php /data1/www/htdocs/ore.sports.sina.com.cn/system/match/nmaz.livecast.update.php > /data1/www/applogs/ore.sports.sina.com.cn/nmaz.livecast.update.cron.log 2>&1
+* * * * * sleep 40 && /usr/local/sinasrv5/bin/php /data1/www/htdocs/ore.sports.sina.com.cn/system/match/nmaz.livecast.update.php > /data1/www/applogs/ore.sports.sina.com.cn/nmaz.livecast.update.cron.log 2>&1
+* * * * * sleep 45 && /usr/local/sinasrv5/bin/php /data1/www/htdocs/ore.sports.sina.com.cn/system/match/nmaz.livecast.update.php > /data1/www/applogs/ore.sports.sina.com.cn/nmaz.livecast.update.cron.log 2>&1
+* * * * * sleep 50 && /usr/local/sinasrv5/bin/php /data1/www/htdocs/ore.sports.sina.com.cn/system/match/nmaz.livecast.update.php > /data1/www/applogs/ore.sports.sina.com.cn/nmaz.livecast.update.cron.log 2>&1
+* * * * * sleep 55 && /usr/local/sinasrv5/bin/php /data1/www/htdocs/ore.sports.sina.com.cn/system/match/nmaz.livecast.update.php > /data1/www/applogs/ore.sports.sina.com.cn/nmaz.livecast.update.cron.log 2>&1
+```
+
 
 
 

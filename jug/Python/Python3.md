@@ -538,7 +538,16 @@ setuptools 60.9.3
 [chenchen@grpc01 python37]$ 
 ```
 
+### pip 清理安装包后的缓存 ~/.cache/pip
 
+```python
+# 上述命令可以清空 pip 缓存, 包括 pip 下载的所有包, 解压后的内容以及源代码. 
+# 此外, pip 还会删除所有的安装历史和日志文件.
+
+(nano) [chenchen@dev3_10.211.21.18 ~]$ pip cache purge
+Files removed: 290
+(nano) [chenchen@dev3_10.211.21.18 ~]$ du -sh .[!.]* * | sort -hr
+```
 
 ### 安装 gRPC
 
@@ -1915,6 +1924,8 @@ print(response.getheaders())
 
 ### urllib3, ssl
 
+要记住的一件事是，urllib3的HTTPConnectionPool旨在成为特定主机的“连接池”，而不是有状态客户端。在这种情况下，将 cookie 的跟踪保持在实际池之外是有意义的。
+
 ```python
 #! /usr/bin/env python
 # -*- coding:UTF-8 -*-
@@ -1965,6 +1976,8 @@ def cdt():
 if __name__ == '__main__':
     main()
 ```
+
+有关链接池说明: https://stackabuse.com/guide-to-sending-http-requests-in-python-with-urllib3/
 
 ### pkg-config, LD_LIBRARY_PATH
 

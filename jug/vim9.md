@@ -44,6 +44,19 @@ $ make distclean, 类似 make clean, 但同时也将 configure 生成的文件�
 $ make clean, 清除上次的 make 命令所产生的 object 文件(后缀为 ".o" 的文件)及可执行文件.
 ```
 
+### +python3
+
+```sh
+# 细节参考, vim.md. (python3 的源码安装包不能删)
+[chenchen@localhost ~]$ cd vim
+[chenchen@localhost vim]$ make distclean			# 清除 configure
+[chenchen@localhost vim]$ ./configure --help
+
+[chenchen@localhost vim]$ ./configure --prefix=/data1/www/htdocs/chenchen/vim8 --with-features=huge --enable-python3interp=yes --with-python3-command=/data1/www/htdocs/chenchen/python31011/bin/python3 --with-python3-config-dir=/usr/home/chenchen/htdocs/python31011/Python-3.10.11
+[chenchen@localhost vim]$ make
+[chenchen@localhost vim]$ sudo make install
+```
+
 
 
 ## ~/.bashrc 和 ~/.bash_profile
@@ -258,6 +271,29 @@ $ vim -u NONE -c "helptags ~/.vim/pack/vendor/start/nerdtree/doc" -c q			# 设�
 :NERDTree			# 开启 NERDTree, Press ? for help
 :help NERDTree
 ```
+
+```sh
+" ~/.vimrc 配置文件, NERDTree 的配置
+
+" NERDTree
+" nmap '' :NERDTreeToggle<CR>         " NerdTree 将在没有文件的终端中启动 vim 时自动打开
+nnoremap <C-t> :NERDTreeToggle<CR>    " ctrl+t, 启闭
+nnoremap <C-f> :NERDTreeFocus<CR>     " 把侧边栏定位到当前的文件
+" nnoremap <C-n> :NERDTree<CR>          " 在当前文件上打开 文件管理
+" nnoremap <C-l> :call CocActionAsync('jumpDefinition')<CR>
+
+" let g:NERDTreeDirArrowExpandable="+"
+" let g:NERDTreeDirArrowCollapsible="~"
+let NERDTreeDirArrowExpandable="+"
+let NERDTreeDirArrowCollapsible="~"
+
+" NERDTree 键入 展开 侧边栏树形结构
+" NERDTreeToggle 触发打开和关闭
+" NERDTreeFind 把侧边栏定位到当前的文件
+
+```
+
+
 
 3. 常用命令
 
@@ -585,6 +621,7 @@ Unzip the archive into your ~/.vim directory. That should put NERD_tree.vim in ~
   ```
 
 - `tmux`
+- `:!python3 %`
 - `:terminal`, `:term`
 - buffer, window, tab, `:help window`
   - A buffer is the in-memory text of a file. 载入到内存的文件内容
@@ -626,9 +663,53 @@ h （隐藏的缓冲区）
 :bp -- buffer列表中前一个 buffer
 :b# -- 你之前所在的前一个 buffer
 
-
+# nmap, noremap, nnoremap, <leader>
 nmap <C-b>n  :bnext<CR>;
 nmap <C-b>p  :bprev<CR>;
+nnoremap <C-t> :NERDTreeToggle<CR>
+noremap <S-space> <C-b>
+noremap <leader>t :NERDTreeToggle<CR>
+
+map, 作用于 normal, visual 模式
+nmap, 仅在 normal 模式, 
+vmap, 仅在 visual 模式, 例如: vmap \ U, 按\切换就是U的意思, 就是切换大小写
+imap, 仅在 insert 模式, 例如: 
+
+例如: 
+:map td :tabnew .<cr>, 在其作用模式(普通、可视、操作符)下, 输入td等价于输入 :tabnew .回车
+
+递归
+nmap - dd
+nmap \ -
+以上是一组, 在 normal 模式下, 按-就是dd, 按\就是-, -又是dd, 可以自动找到最后
+
+非递归(norecursion)
+nnoremap, normal 模式
+vnoremap, visual 模式
+inoremap, insert 模式
+任何时候都建议用非递归映射
+nnoremap py :!python %
+
+<leader>
+键位一共就那么多, 总会不够用, 所以设置一个<leader>会是一个不错的选择.
+:let mapleader = ","		"我习惯用逗号作为leader
+然后就可以使用 :map <leader>- dd这样子设置映射了.
+这个映射的意思是, 先按下逗号, 再按下-, 会删除本行(dd).
+
+# let l:, g:, b:, ....
+See :help internal-variables
+内部变量
+It lists the following types:
+                (nothing) In a function: local to a function; otherwise: global 
+                如果不写, 在函数内就是局部, 否则就是全局
+buffer-variable    b:     Local to the current buffer.                          
+window-variable    w:     Local to the current window.                          
+tabpage-variable   t:     Local to the current tab page.                        
+global-variable    g:     Global.                                         # 函数外都是全局      
+local-variable     l:     Local to a function.                            # 函数内都是局部      
+script-variable    s:     Local to a :source'ed Vim script.                     
+function-argument  a:     Function argument (only inside a function).           
+vim-variable       v:     Global, predefined by Vim.                       # vim 保留预定义的全局
 
 
 跳跃指令 jumps

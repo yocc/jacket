@@ -143,7 +143,43 @@ ln -s 实际目录或者文件 符号
 [chenchen@dev3_10.211.21.18 clash]$ sudo ./clash -d ./
 ```
 
+### find
 
+```sh
+[chenchen@dev3_10.211.21.18 library]$ find ./ -type d -name .git
+./vendor/sinasports/security/.git
+./vendor/sinasports/phplib/.git
+[chenchen@dev3_10.211.21.18 library]$ rm ./vendor/sinasports/security/.git -rf
+[chenchen@dev3_10.211.21.18 library]$ rm ./vendor/sinasports/phplib/.git -rf
+[chenchen@dev3_10.211.21.18 library]$ find ./ -type d -name .git
+```
+
+### du
+
+```sh
+.[!.]* 是正则式, 意思是第一位是点, 第二位是除了点以外的字符, 第三位是任意字符或者不存在
+后面可以再加一个" *"来包括非隐藏文件
+后面还可以接 sort -h来对占用空间进行排序(sort 的 -k2 可以指明根据第二列来排序)
+下面这条命令就是显示所有隐藏文件和非隐藏文件的大小并根据占用空间排序的语句
+
+du -sh .[!.]* * | sort -hr
+```
+
+### df
+
+```sh
+df -lh
+```
+
+nohup
+
+```sh
+# nohup
+# 只输出错误信息到日志文件
+$ nohup ./program >/dev/null 2>log &
+# 什么信息也不要
+$ nohup ./program >/dev/null 2>&1 &
+```
 
 
 

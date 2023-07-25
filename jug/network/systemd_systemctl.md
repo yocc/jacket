@@ -970,3 +970,7 @@ $ journalctl -xe
 ## See Also
 
 https://blog.csdn.net/omaidb/article/details/120123405
+
+systemd.service — Service unit configuration
+
+https://www.freedesktop.org/software/systemd/man/systemd.service.html

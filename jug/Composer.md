@@ -263,6 +263,38 @@ $ composer update sina_sports/phplib -vv
 composer require new/package - 添加安装 new/package, 可以指定版本，如： composer require new/package ~2.5.
 ```
 
+## remove, require
+
+```sh
+[chenchen@dev3_10.211.21.18 library]$ composer remove sinasports/security	(删除指定的包名)
+[chenchen@dev3_10.211.21.18 library]$ composer require sinasports/security (安装包名, 并加入 composer.json 文件中)
+
+```
+
+## clearcache
+
+```sh
+# clear-cache 命令的作用：删除缓存目录下的文件（清空缓存)
+# $ composer clear-cache, 或者 $ composer clearcache, 缩写 $ composer cc, 均可
+# (nano) [chenchen@dev3_10.211.21.18 start]$ composer clear-cache --help
+
+(nano) [chenchen@dev3_10.211.21.18 .cache]$ composer cc
+Clearing cache (cache-vcs-dir): /usr/home/chenchen/.cache/composer/vcs
+Clearing cache (cache-repo-dir): /usr/home/chenchen/.cache/composer/repo
+Clearing cache (cache-files-dir): /usr/home/chenchen/.cache/composer/files
+Clearing cache (cache-dir): /usr/home/chenchen/.cache/composer
+All caches cleared.
+(nano) [chenchen@dev3_10.211.21.18 .cache]$ du -sh .[!.]* * | sort -hr
+du: cannot access ‘.[!.]*’: No such file or directory
+514M    go-build
+3.7M    pip
+8.0K    abrt
+4.0K    composer
+(nano) [chenchen@dev3_10.211.21.18 .cache]$ 
+```
+
+
+
 ## 翻墙
 
 ```sh

@@ -83,6 +83,20 @@ The determinant gives the factory by which areas change (details coming in chapt
 
 
 
+矩阵乘法，很重要的一点就是要注意矩阵的order，即A*B不一定等于B*A。
+
+另外，要做A*B运算时，要保证A的列要与B的行所属物理意义相同。比如上例中A的列分别是beef pie， chicken pie， vegetable pie，分别对应于B中的行beef，chicken，vegetable，这样两个矩阵相乘才有意义。这也是做矩阵乘法时为何要保证A的列数=B的行数的原因之一。
+
+
+
+基向量啊，basis vector
+
+列向量(column vector)按照矩阵乘法的定义，很容易看出就是basis vector
+
+确实column rank = row rank ,但这种行跟列数量不一样的，行或者列向量肯定有一个是线性相关(linear dependent)的，你row reduce一下就会出现一行0的
+
+
+
 ## FAQ
 
 
